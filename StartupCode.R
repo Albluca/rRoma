@@ -8,7 +8,10 @@ ExampleData <- matrix(as.character(abs(rnorm(10*100))), 10)
 
 # Constructing VDataTable
 
-VDataTable <- .jnew(class = "vdaoengine/data/VDataTable")
+Tabl <- .jnew(class = "vdaoengine/data/VDataTable")
+Tabl$colCount <- ncol(ExampleData)
+Tabl$fieldNames <- .jarray(paste("N", 1:ncol(ExampleData), sep = ''), "java/lang/String", dispatch = TRUE)
+
 
 VDataTable$stringTable <- .jarray(ExampleData, dispatch = TRUE)
 
