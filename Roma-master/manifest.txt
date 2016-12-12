@@ -1,2 +1,0 @@
-Main-Class: fr.curie.ROMA.ModuleActivityAnalysis 
-Class-Path: lib/VDAOEngine.jar
