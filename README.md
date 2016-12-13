@@ -79,11 +79,11 @@ Tables$module_scores.xls
 
     ##      [,1]       [,2]          [,3]        [,4]             
     ## [1,] "MODULE"   "L1"          "L1/L2"     "NUMBER_OF_GENES"
-    ## [2,] "Module 1" "0.038935035" "1.0936673" "93"             
-    ## [3,] "Module 2" "0.035686396" "1.0329556" "98"             
-    ## [4,] "Module 3" "0.038409717" "1.120583"  "94"             
-    ## [5,] "Module 4" "0.038515143" "1.0198312" "94"             
-    ## [6,] "Module 5" "0.03761544"  "1.0786164" "95"
+    ## [2,] "Module 1" "0.03751716"  "1.0511351" "94"             
+    ## [3,] "Module 2" "0.038088135" "0.9692078" "94"             
+    ## [4,] "Module 3" "0.036027104" "1.0404766" "95"             
+    ## [5,] "Module 4" "0.038958933" "1.0217744" "93"             
+    ## [6,] "Module 5" "0.03880043"  "1.0502253" "96"
 
 Note that `ModuleList` must possess exactly three fields: `Name`, which is the name of the module, `Desc`, which is a description string, and `Genes`, which is an array of genes. Gene weights can be specified as in GMT files by appending the value encloded in a square parenthesis to the gene name, e.g., "Gene\_1\[+5\]".
 
