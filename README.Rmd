@@ -1,0 +1,64 @@
+---
+title: "rROMA"
+author: "Luca Albergante (luca.albergante@gmail.com)"
+date: "`r Sys.Date()`"
+output:
+  md_document:
+    variant: markdown_github
+---
+
+The rROMA package is being developed to simplify the use of [ROMA](https://github.com/sysbio-curie/Roma) from R. It is currently under development.
+
+## Intalling rROMA
+
+The package is currently under development, non very well documented, and only available on GitHub. A functional Java Virtual machine for your system is necessary. Before installing the package, it is advisable to install rJava from sources by using
+
+```{r, eval=FALSE}
+install.packages(pkgs = "rJava", repos="http://rforge.net", type = 'source')
+```
+
+Compiling from source requires the appropriate development tools, e.g., C/C++ compiler. The installation of the package requires the devtools package, which is available from CRAN. The rpgraph package can be installed using
+
+```{r, eval=FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("Albluca/rROMA")
+```
+
+## Using rROMA
+
+rROMA exports the single function `rRoma` which provides a subset of the functionalites of ROMA. The function requires a matrix with gene expression data across multiple samples and a module list. In the folllwing example artificial gene expression matrix and module list will be created 
+
+```{r, eval=TRUE}
+library(rRoma)
+
+nGenes <- 300
+nSamples <- 100
+nModules <- 5
+GenesPerModule <- 100
+
+GeneNames <- paste("Gene_", 1:nGenes, sep='')
+SampleNames <- paste("Sample_", 1:nSamples, sep='')
+
+NumericalExpressionMatrix <- matrix(rlnorm(n = nGenes*nSamples), nrow = nGenes, nSamples)
+ExpressionMatrix <- cbind(GeneNames, NumericalExpressionMatrix)
+colnames(ExpressionMatrix) <- c("Gene", SampleNames)
+
+ModuleList <- list()
+
+for(i in 1:nModules){
+  ModuleList[[i]] <- list(Name=paste("Module", i), Desc="Descripion", Genes=sample(GeneNames, GenesPerModule))
+}
+
+
+Tables <- rRoma(ExpressionMatrix = ExpressionMatrix, ModuleList = ModuleList, fillMissingValues = 1, centerData = TRUE, doubleCenterData = FALSE,
+                  minimalNumberOfGenesInModule = 3, maximalNumberOfGenesInModule = 5000, numberOfPermutations = 50, typeOfModuleFile = 0)
+
+```
+
+
+
+
+
+
+
