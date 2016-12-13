@@ -71,7 +71,7 @@ Tables <- rRoma(ExpressionMatrix = ExpressionMatrix, ModuleList = ModuleList, fi
     ## [1] "Creating modile activity table"
     ## [1] "Cleaning up"
 
-After running the function, `Tables` will be a list containing the tables that the Java command wuold have produced, with the only exclusion of numerical ".dat" files, which are ignored. The names of the elements of the list indicates the name of the file produced by the Java executable. For example the module scures can be obtained by typing
+After running the function, `Tables` will be a list containing the tables that the Java command would have produced, with the only exception of tables encoded in both ".txt" and ".dat" files, in which case only ".txt" files are considered. The names of the elements of the list indicate the name of the file produced by the Java executable. For example, the module scores can be obtained by typing
 
 ``` r
 Tables$module_scores.xls
@@ -79,8 +79,12 @@ Tables$module_scores.xls
 
     ##      [,1]       [,2]          [,3]        [,4]             
     ## [1,] "MODULE"   "L1"          "L1/L2"     "NUMBER_OF_GENES"
-    ## [2,] "Module 1" "0.037623778" "1.0182447" "94"             
-    ## [3,] "Module 2" "0.034890465" "1.0404245" "95"             
-    ## [4,] "Module 3" "0.03583977"  "1.0488455" "95"             
-    ## [5,] "Module 4" "0.035935674" "1.0560927" "93"             
-    ## [6,] "Module 5" "0.034267865" "1.0302799" "97"
+    ## [2,] "Module 1" "0.038935035" "1.0936673" "93"             
+    ## [3,] "Module 2" "0.035686396" "1.0329556" "98"             
+    ## [4,] "Module 3" "0.038409717" "1.120583"  "94"             
+    ## [5,] "Module 4" "0.038515143" "1.0198312" "94"             
+    ## [6,] "Module 5" "0.03761544"  "1.0786164" "95"
+
+Note that `ModuleList` must possess exactly three fields: `Name`, which is the name of the module, `Desc`, which is a description string, and `Genes`, which is an array of genes. Gene weights can be specified as in GMT files by appending the value encloded in a square parenthesis to the gene name, e.g., "Gene\_1\[+5\]".
+
+`ExpressionMatrix` must be a numeric, with missing values encoded by `NA`. The first column must indicate the gene namas and the names of the columns must indicate the names of the samples (except for the first one, which marks the gene name column).
