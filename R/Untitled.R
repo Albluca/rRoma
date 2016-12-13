@@ -9,7 +9,7 @@ library(rRoma)
 
 library(readr)
 
-ExpressionMatrix <- read_delim("~/Google Drive/Datasets/Patel et al - Human primary glioblastoma/PATEL_uniquelog.zip", 
+ExpressionMatrix <- read_delim("~/Google Drive/Datasets/Patel et al - Human primary glioblastoma/PATEL_uniquelog.zip",
                                "\t", escape_double = FALSE, trim_ws = TRUE)
 
 ExpressionMatrix <- ExpressionMatrix[, -ncol(ExpressionMatrix)]
@@ -28,7 +28,7 @@ ModuleList <- list(list(Name="G1/S", Desc="G1/S",
                         Genes = intersect(GeneNames, union(rpgraph::StageAssociation_Whit$S3_U, rpgraph::StageAssociation_Whit$S4_U)))
 )
 
-SampleInfo <- read_delim("~/Google Drive/Datasets/Patel et al - Human primary glioblastoma/glioblastoma_samples.txt", 
+SampleInfo <- read_delim("~/Google Drive/Datasets/Patel et al - Human primary glioblastoma/glioblastoma_samples.txt",
                          "\t", escape_double = FALSE, trim_ws = TRUE)
 
 ToKeep <- SampleInfo$SAMPLE[SampleInfo$TYPE == "Single cell mRNA-seq"]
