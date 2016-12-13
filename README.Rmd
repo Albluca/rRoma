@@ -27,6 +27,12 @@ install_github("Albluca/rROMA")
 
 ## Using rROMA
 
+ROMA can be a bit memory hungry, so it si advisable to increse the amout of memory available to the JVM using the `"-Xmx` options to at least 2 Gb. This can be done with the following command. 
+
+```{r, eval=TRUE}
+options(java.parameters = "-Xmx2g")
+```
+
 rROMA exports the single function `rRoma` which provides a subset of the functionalites of ROMA. The function requires a matrix with gene expression data across multiple samples and a module list. In the following example artificial gene expression matrix and module list will be created and ROMA is executed. Just as the ROMA executable, only `ExpressionMatrix` and `ModuleList` are mandatory. All of the parameter of the function have the same function of the Java executable. Parameters that are not present in the argument list have not been implemented yet.
 
 ```{r, eval=TRUE}

@@ -20,6 +20,12 @@ install_github("Albluca/rROMA")
 Using rROMA
 -----------
 
+ROMA can be a bit memory hungry, so it si advisable to increse the amout of memory available to the JVM using the `"-Xmx` options to at least 2 Gb. This can be done with the following command.
+
+``` r
+options(java.parameters = "-Xmx2g")
+```
+
 rROMA exports the single function `rRoma` which provides a subset of the functionalites of ROMA. The function requires a matrix with gene expression data across multiple samples and a module list. In the following example artificial gene expression matrix and module list will be created and ROMA is executed. Just as the ROMA executable, only `ExpressionMatrix` and `ModuleList` are mandatory. All of the parameter of the function have the same function of the Java executable. Parameters that are not present in the argument list have not been implemented yet.
 
 ``` r
@@ -79,11 +85,11 @@ Tables$module_scores.xls
 
     ##      [,1]       [,2]          [,3]        [,4]             
     ## [1,] "MODULE"   "L1"          "L1/L2"     "NUMBER_OF_GENES"
-    ## [2,] "Module 1" "0.03751716"  "1.0511351" "94"             
-    ## [3,] "Module 2" "0.038088135" "0.9692078" "94"             
-    ## [4,] "Module 3" "0.036027104" "1.0404766" "95"             
-    ## [5,] "Module 4" "0.038958933" "1.0217744" "93"             
-    ## [6,] "Module 5" "0.03880043"  "1.0502253" "96"
+    ## [2,] "Module 1" "0.0360559"   "1.016872"  "98"             
+    ## [3,] "Module 2" "0.041513696" "1.1108363" "91"             
+    ## [4,] "Module 3" "0.03605702"  "1.0113988" "95"             
+    ## [5,] "Module 4" "0.036480423" "1.0411091" "98"             
+    ## [6,] "Module 5" "0.037239566" "1.0192244" "97"
 
 Note that `ModuleList` must possess exactly three fields: `Name`, which is the name of the module, `Desc`, which is a description string, and `Genes`, which is an array of genes. Gene weights can be specified as in GMT files by appending the value encloded in a square parenthesis to the gene name, e.g., "Gene\_1\[+5\]".
 
