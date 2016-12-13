@@ -27,12 +27,12 @@ install_github("Albluca/rROMA")
 
 ## Using rROMA
 
-rROMA exports the single function `rRoma` which provides a subset of the functionalites of ROMA. The function requires a matrix with gene expression data across multiple samples and a module list. In the folllwing example artificial gene expression matrix and module list will be created 
+rROMA exports the single function `rRoma` which provides a subset of the functionalites of ROMA. The function requires a matrix with gene expression data across multiple samples and a module list. In the following example artificial gene expression matrix and module list will be created and ROMA is executed. Just as the ROMA executable, only `ExpressionMatrix` and `ModuleList` are mandatory. All of the parameter of the function have the same function of the Java executable. Parameters that are not present in the argument list have not been implemented yet.
 
 ```{r, eval=TRUE}
 library(rRoma)
 
-nGenes <- 1500
+nGenes <- 300
 nSamples <- 100
 nModules <- 5
 GenesPerModule <- 100
@@ -51,13 +51,20 @@ for(i in 1:nModules){
 }
 
 
-Tables <- rRoma(ExpressionMatrix = ExpressionMatrix, ModuleList = ModuleList, fillMissingValues = 1, centerData = TRUE, doubleCenterData = FALSE,
-                  minimalNumberOfGenesInModule = 3, maximalNumberOfGenesInModule = 5000, numberOfPermutations = 50, typeOfModuleFile = 0)
+Tables <- rRoma(ExpressionMatrix = ExpressionMatrix, ModuleList = ModuleList, fillMissingValues = 0, centerData = TRUE,
+                doubleCenterData = FALSE, outlierThreshold = 2, typeOfPCAUsage = 0, robustPCAcalculation = TRUE,
+                robustPCAcalculationForSampling = TRUE, numberOfGeneSetSizesToSample = 5, mostContributingGenesZthreshold = 1,
+                diffSpotGenesZthreshold = 1, correlationThreshold = 0.6, graphicalOutputThreshold = 0.05,
+                minimalNumberOfGenesInModule = 10, maximalNumberOfGenesInModule = 1000, minimalNumberOfGenesInModuleFound = 8,
+                numberOfPermutations = 0, typeOfModuleFile = 0, saveDecomposedFiles = TRUE)
 
 ```
 
+After running the function, `Tables` will be a list containing the tables that the Java command wuold have produced, with the only exclusion of numerical ".dat" files, which are ignored. The names of the elements of the list indicates the name of the file produced by the Java executable. For example the module scures can be obtained by typing
 
-
+```{r}
+Tables$module_scores.xls
+```
 
 
 

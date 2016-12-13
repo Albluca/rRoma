@@ -16,7 +16,10 @@
 #'
 #' @examples
 rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValues = 0, centerData = TRUE, doubleCenterData = FALSE,
-                  minimalNumberOfGenesInModule = 3, maximalNumberOfGenesInModule = 5000, numberOfPermutations = 0, typeOfModuleFile = 0) {
+                  outlierThreshold = 2, typeOfPCAUsage = 0, robustPCAcalculation = TRUE, robustPCAcalculationForSampling = TRUE, numberOfGeneSetSizesToSample = 5,
+                  mostContributingGenesZthreshold = 1, diffSpotGenesZthreshold = 1, correlationThreshold = 0.6, graphicalOutputThreshold = 0.05,
+                  minimalNumberOfGenesInModule = 10, maximalNumberOfGenesInModule = 1000, minimalNumberOfGenesInModuleFound = 8,
+                  numberOfPermutations = 0, typeOfModuleFile = 0, saveDecomposedFiles = TRUE) {
   
   STANDARD_GMT = 0
   GMT_WITH_WEIGHTS = 1
@@ -45,6 +48,34 @@ rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValu
   TabUtils <- .jnew(class = "fr.curie.ROMA.TableUtils")
   SimpleProcedures <- .jnew(class = "vdaoengine.utils.VSimpleProcedures")
   
+  PCAMet <- new(J(class = "vdaoengine.analysis.PCAMethod"))
+  PCAMetFC <- new(J(class = "vdaoengine.analysis.PCAMethodFixedCenter"))
+
+  print("Setting up working parameters") 
+  
+  
+  PCAMet$verboseMode <- TRUE
+  PCAMetFC$verboseMode <- TRUE
+  
+  TopModuleAnalysis$fillMissingValues = as.integer(fillMissingValues)
+  TopModuleAnalysis$centerData = centerData
+  TopModuleAnalysis$doubleCenterData = doubleCenterData
+  TopModuleAnalysis$outlierThreshold = .jfloat(outlierThreshold)
+  TopModuleAnalysis$typeOfPCAUsage = as.integer(typeOfPCAUsage)
+  TopModuleAnalysis$robustPCAcalculation = robustPCAcalculation
+  TopModuleAnalysis$robustPCAcalculationForSampling = robustPCAcalculationForSampling
+  TopModuleAnalysis$numberOfGeneSetSizesToSample = as.integer(numberOfGeneSetSizesToSample)
+  TopModuleAnalysis$mostContributingGenesZthreshold = .jfloat(mostContributingGenesZthreshold)
+  TopModuleAnalysis$diffSpotGenesZthreshold = .jfloat(diffSpotGenesZthreshold)
+  TopModuleAnalysis$correlationThreshold = .jfloat(correlationThreshold)
+  TopModuleAnalysis$graphicalOutputThreshold = .jfloat(graphicalOutputThreshold)
+  TopModuleAnalysis$minimalNumberOfGenesInModule = as.integer(minimalNumberOfGenesInModule)
+  TopModuleAnalysis$maximalNumberOfGenesInModule = as.integer(maximalNumberOfGenesInModule)
+  TopModuleAnalysis$minimalNumberOfGenesInModuleFound = as.integer(minimalNumberOfGenesInModuleFound)
+  TopModuleAnalysis$numberOfPermutations = as.integer(numberOfPermutations)
+  TopModuleAnalysis$typeOfModuleFile = as.integer(typeOfModuleFile)
+  TopModuleAnalysis$saveDecomposedFiles = saveDecomposedFiles
+  
   print("Loading gene expression information")
   
   TopModuleAnalysis$table$InjectDoubleTable(as.integer(nRow), as.integer(nCol),
@@ -62,13 +93,13 @@ rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValu
   TabUtils$findAllNumericalColumns(TopModuleAnalysis$table)
   
   print("Filling up missing values")
-  if(fillMissingValues>0){
-    print(paste("Filling missing values using first", fillMissingValues, "principal components..."))
+  if(TopModuleAnalysis$fillMissingValues>0){
+    print(paste("Filling missing values using first", TopModuleAnalysis$fillMissingValues, "principal components..."))
     TopModuleAnalysis$table = TabUtils$fillMissingValues(TopModuleAnalysis$table, as.integer(fillMissingValues))
   }
   
   
-  if(centerData){
+  if(TopModuleAnalysis$centerData){
     print("Centering data (zero mean for any gene)...")
     print("The operation is performed by R")
     
@@ -97,7 +128,7 @@ rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValu
   
   # Double Center Data
   
-  if(doubleCenterData){
+  if(TopModuleAnalysis$doubleCenterData){
     print("Double centering data (zero mean for any gene and for any sample)...")
     print("The operation is performed by Java. It is probably going to take some time")
     # vd <- .jnew(class = "vdaoengine.data.VDataSet")
@@ -185,13 +216,7 @@ rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValu
   
   
   
-  PCAMet <- new(J(class = "vdaoengine.analysis.PCAMethod"))
-  PCAMetFC <- new(J(class = "vdaoengine.analysis.PCAMethodFixedCenter"))
-  
-  PCAMet$verboseMode <- TRUE
-  PCAMetFC$verboseMode <- TRUE
-  
-  TopModuleAnalysis$saveDecomposedFiles <- TRUE
+
   
   ReturnData <- list()
   
@@ -325,8 +350,6 @@ rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValu
   #     lab2.add(st.nextToken());
   #   findDiffGenes(fieldForDiffAnalysis,lab1,lab2);			
   # }
-  
-  
   
 }
 
