@@ -32,7 +32,7 @@ rROMA exports the single function `rRoma` which provides a subset of the functio
 ```{r, eval=TRUE}
 library(rRoma)
 
-nGenes <- 300
+nGenes <- 1500
 nSamples <- 100
 nModules <- 5
 GenesPerModule <- 100
