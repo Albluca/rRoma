@@ -31,7 +31,7 @@ rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValu
   ColDescription <- rep("", nCol)
   RowNames <- unlist(ExpressionMatrix[,1])
   
-  ExpressionMatrix <- data.matrix(ExpressionMatrix[,-1])
+  ExpressionMatrix <- apply(ExpressionMatrix[,-1], 2, as.numeric)
   nRow <- nrow(ExpressionMatrix)
   nCol <- ncol(ExpressionMatrix)
   
