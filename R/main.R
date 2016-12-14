@@ -112,7 +112,7 @@ rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValu
     ColNames <- TopModuleAnalysis$table$fieldNames
     RowNames <- ExpressionMatrix[,1]
     
-    ExpressionMatrix <- scale(apply(ExpressionMatrix[,-1], 2, as.numeric), center = TRUE, scale = FALSE)
+    ExpressionMatrix <- t(scale(t(apply(ExpressionMatrix[,-1], 2, as.numeric)), center = TRUE, scale = FALSE))
     
     TopModuleAnalysis$table$InjectDoubleTable(as.integer(nRow), as.integer(nCol),
                                               .jarray(ColNames, dispatch = TRUE),
