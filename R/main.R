@@ -42,20 +42,22 @@ rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValu
   nCol <- ncol(ExpressionMatrix)
   
   
-  
   print("Constructing basic classes")
   
-  TopModuleAnalysis <- new(J("fr.curie.ROMA.ModuleActivityAnalysis"))
-  TopModuleAnalysis$table <- new(J("vdaoengine.data.VDataTable"))
   ReadWrite <- .jnew(class = "vdaoengine.data.io.VDatReadWrite")
   TabUtils <- .jnew(class = "fr.curie.ROMA.TableUtils")
   SimpleProcedures <- .jnew(class = "vdaoengine.utils.VSimpleProcedures")
-  
   PCAMet <- new(J(class = "vdaoengine.analysis.PCAMethod"))
   PCAMetFC <- new(J(class = "vdaoengine.analysis.PCAMethodFixedCenter"))
+  
+  
+  TopModuleAnalysis <- new(J("fr.curie.ROMA.ModuleActivityAnalysis"))
+  print("Inizializing")
+  TopModuleAnalysis$DestroyAll()
+  TopModuleAnalysis$table <- new(J("vdaoengine.data.VDataTable"))
+  
 
   print("Setting up working parameters") 
-  
   
   PCAMet$verboseMode <- FALSE
   PCAMetFC$verboseMode <- FALSE
