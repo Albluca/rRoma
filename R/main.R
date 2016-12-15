@@ -15,11 +15,14 @@
 #' @export
 #'
 #' @examples
-rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValues = 0, centerData = TRUE, doubleCenterData = FALSE,
-                  outlierThreshold = 2, typeOfPCAUsage = 0, robustPCAcalculation = TRUE, robustPCAcalculationForSampling = TRUE, numberOfGeneSetSizesToSample = 5,
+rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValues = 0,
+                  centerData = TRUE, doubleCenterData = FALSE,
+                  outlierThreshold = 2,
+                  typeOfPCAUsage = 1, robustPCAcalculation = TRUE, robustPCAcalculationForSampling = TRUE,
+                  numberOfGeneSetSizesToSample = 5,
                   mostContributingGenesZthreshold = 1, diffSpotGenesZthreshold = 1, correlationThreshold = 0.6, graphicalOutputThreshold = 0.05,
                   minimalNumberOfGenesInModule = 10, maximalNumberOfGenesInModule = 1000, minimalNumberOfGenesInModuleFound = 8,
-                  numberOfPermutations = 0, typeOfModuleFile = 0, saveDecomposedFiles = TRUE) {
+                  numberOfPermutations = 100, typeOfModuleFile = 0, saveDecomposedFiles = TRUE) {
   
   STANDARD_GMT = 0
   GMT_WITH_WEIGHTS = 1
@@ -54,25 +57,32 @@ rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValu
   print("Setting up working parameters") 
   
   
-  PCAMet$verboseMode <- TRUE
-  PCAMetFC$verboseMode <- TRUE
+  PCAMet$verboseMode <- FALSE
+  PCAMetFC$verboseMode <- FALSE
   
   TopModuleAnalysis$fillMissingValues = as.integer(fillMissingValues)
+  
   TopModuleAnalysis$centerData = centerData
   TopModuleAnalysis$doubleCenterData = doubleCenterData
   TopModuleAnalysis$outlierThreshold = .jfloat(outlierThreshold)
+  
   TopModuleAnalysis$typeOfPCAUsage = as.integer(typeOfPCAUsage)
   TopModuleAnalysis$robustPCAcalculation = robustPCAcalculation
   TopModuleAnalysis$robustPCAcalculationForSampling = robustPCAcalculationForSampling
+  
   TopModuleAnalysis$numberOfGeneSetSizesToSample = as.integer(numberOfGeneSetSizesToSample)
+  TopModuleAnalysis$numberOfPermutations = as.integer(numberOfPermutations)
+  
   TopModuleAnalysis$mostContributingGenesZthreshold = .jfloat(mostContributingGenesZthreshold)
   TopModuleAnalysis$diffSpotGenesZthreshold = .jfloat(diffSpotGenesZthreshold)
   TopModuleAnalysis$correlationThreshold = .jfloat(correlationThreshold)
+  
   TopModuleAnalysis$graphicalOutputThreshold = .jfloat(graphicalOutputThreshold)
+  
   TopModuleAnalysis$minimalNumberOfGenesInModule = as.integer(minimalNumberOfGenesInModule)
   TopModuleAnalysis$maximalNumberOfGenesInModule = as.integer(maximalNumberOfGenesInModule)
   TopModuleAnalysis$minimalNumberOfGenesInModuleFound = as.integer(minimalNumberOfGenesInModuleFound)
-  TopModuleAnalysis$numberOfPermutations = as.integer(numberOfPermutations)
+  
   TopModuleAnalysis$typeOfModuleFile = as.integer(typeOfModuleFile)
   TopModuleAnalysis$saveDecomposedFiles = saveDecomposedFiles
   
@@ -226,6 +236,9 @@ rRoma <- function(ExpressionMatrix, ModuleList, SampleInfo=NULL, fillMissingValu
   for(i in 1:DataVector$size()){
     ReturnData[[length(ReturnData)+1]] <- .jevalArray(DataVector$get(as.integer(i-1)), simplify = TRUE)
   }
+  
+  PCAMet$verboseMode <- FALSE
+  PCAMetFC$verboseMode <- FALSE
   
   TopModuleAnalysis$numberOfPermutations <- as.integer(numberOfPermutations)
   
