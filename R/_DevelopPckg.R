@@ -1,3 +1,7 @@
+# devtools::install_github("gabraham/flashpca/flashpcaR")
+
+
+
 # install.packages(c("roxygen2", "testthat", "knitr", "rstudioapi"))
 # devtools::install_github("hadley/devtools")
 

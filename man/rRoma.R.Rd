@@ -8,7 +8,7 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
   MinGenes = 10, MaxGenes = 1000, nSamples = 100, OutGeneNumber = 5,
   Ncomp = 10, OutGeneSpace = 5, FixedCenter = TRUE,
   GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All",
-  MoreInfo = FALSE, PlotData = FALSE)
+  SampleFilter = FALSE, MoreInfo = FALSE, PlotData = FALSE)
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -41,6 +41,8 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
 minimal percentage variation (L1OutVarPerc), or minimal median-absolute-deviations}
 
 \item{GeneSelMode}{character scalar, mode used to sample genes: all available genes ("All") or genes not present in the module ("Others")}
+
+\item{SampleFilter}{logical, should outlier detection be applied to sampled to sample data as well?}
 
 \item{MoreInfo}{logical, shuold detailed information on the computation by printed?}
 

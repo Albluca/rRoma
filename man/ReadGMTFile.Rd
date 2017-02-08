@@ -2,7 +2,7 @@
 % Please edit documentation in R/GMT.R
 \name{ReadGMTFile}
 \alias{ReadGMTFile}
-\title{Title}
+\title{Load a GMT file from disc}
 \usage{
 ReadGMTFile(FileLocation)
 }
@@ -10,5 +10,5 @@ ReadGMTFile(FileLocation)
 \item{FileLocation}{}
 }
 \description{
-Title
+Load a GMT file from disc
 }
