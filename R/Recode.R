@@ -309,12 +309,18 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     print("Computing samples")
     
+    if(SampleFilter){
+      GeneToSample <- length(SelGenes)
+    } else {
+      GeneToSample <- CompatibleGenes
+    }
+    
     if(GeneSelMode == "All"){
-      SampledsGeneList <- lapply(as.list(1:nSamples), function(i){sample(x = rownames(ExpressionMatrix), size = length(SelGenes), replace = FALSE)})
+      SampledsGeneList <- lapply(as.list(1:nSamples), function(i){sample(x = rownames(ExpressionMatrix), size = GeneToSample, replace = FALSE)})
     }
     
     if(GeneSelMode == "Others"){
-      SampledsGeneList <- lapply(as.list(1:nSamples), function(i){sample(x = setdiff(rownames(ExpressionMatrix), SelGenes), size = length(SelGenes), replace = FALSE)})
+      SampledsGeneList <- lapply(as.list(1:nSamples), function(i){sample(x = setdiff(rownames(ExpressionMatrix), SelGenes), size = GeneToSample, replace = FALSE)})
     }
     
     if(!exists("SampledsGeneList")){
@@ -339,6 +345,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     if(SampleFilter){
       pb <- txtProgressBar(min = 0, max = nSamples, initial = 0, style = 3)
     }
+    
+    
     
     SampledExp <- sapply(as.list(1:length(SampledsGeneList)), function(i){
       if(SampleFilter){
