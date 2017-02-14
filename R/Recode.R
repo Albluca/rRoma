@@ -202,12 +202,14 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
 #' @param PC1Rotation vector, numeric Principal component values
 #' @param Wei vector, numeric optional vector of weigths
 #' @param Mode scalar, character. Mode to correct the sign
+#' @param Thr 
 #'
 #' @return
 #' @export
 #'
 #' @examples
-FixPCSign <- function(PC1Rotation, Wei = NULL, Mode) {
+FixPCSign <- function(PC1Rotation, Wei = NULL, Mode, Thr = NULL) {
+  
   
 }
 
