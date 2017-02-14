@@ -6,7 +6,7 @@
 \usage{
 SelectOverDispersedGeneSet(GeneExpressionMatrix, nSamples, nGenes,
   GeneOutDetection = "none", GeneOutThr = 1, CenterPCA = FALSE,
-  PlotData = FALSE, ModuleName = "", PrintInfo = FALSE)
+  PlotData = FALSE, ModuleName = "", PrintInfo = FALSE, PCADims = 2)
 }
 \arguments{
 \item{GeneExpressionMatrix}{}

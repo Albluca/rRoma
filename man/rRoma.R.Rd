@@ -8,7 +8,7 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
   MinGenes = 10, MaxGenes = 1000, nSamples = 100, OutGeneNumber = 5,
   Ncomp = 10, OutGeneSpace = 5, FixedCenter = TRUE,
   GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All",
-  SampleFilter = FALSE, MoreInfo = FALSE, PlotData = FALSE)
+  SampleFilter = FALSE, MoreInfo = FALSE, PlotData = FALSE, PCADims = 2)
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -38,7 +38,7 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
 "L1OutVarDC" (Dendrogram clustering statistics on variance explained supported by a leave one out approach)}
 
 \item{GeneOutThr}{scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("PC1DC" and "L1OutVarDC"),
-minimal percentage variation (L1OutVarPerc), or minimal median-absolute-deviations}
+minimal percentage variation (L1OutVarPerc), or minimal median-absolute-deviations.}
 
 \item{GeneSelMode}{character scalar, mode used to sample genes: all available genes ("All") or genes not present in the module ("Others")}
 
@@ -47,6 +47,9 @@ minimal percentage variation (L1OutVarPerc), or minimal median-absolute-deviatio
 \item{MoreInfo}{logical, shuold detailed information on the computation by printed?}
 
 \item{PlotData}{logical, shuold debugging plots by produced ?}
+
+\item{PCADims}{integer, the number of PCA dimensions to compute. Should be >= 2.
+Larger values decrease the error in the estimation of the explained variance but increase the computation time.}
 }
 \description{
 Perform ROMA on a datasets

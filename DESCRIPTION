@@ -8,7 +8,7 @@ Depends:
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.0
+RoxygenNote: 6.0.1
 Imports:
       scater,
       irlba
