@@ -104,8 +104,9 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     # Computing all the PC1
     AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
       PC1Var <- irlba::prcomp_irlba(x = ExpressionData[-i, ], n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
-      return(PC1Var/sum(diag(cov(scale(ExpressionData[-i, ], center = ModulePCACenter, scale = FALSE)))))
+      return(PC1Var/sum(apply(scale(ExpressionData[-i, ], center = ModulePCACenter, scale = FALSE), 2, var)))
     })
+    
     
     # Getting the distance from the median PC1
     GenesOut <- abs(AllPCA1-median(AllPCA1)) > GeneOutThr/100
@@ -140,7 +141,7 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     # Computing all the PC1
     AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
       PC1Var <- irlba::prcomp_irlba(x = ExpressionData[-i, ], n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
-      return(PC1Var/sum(diag(cov(scale(ExpressionData[-i, ], center = ModulePCACenter, scale = FALSE)))))
+      return(PC1Var/sum(apply(scale(ExpressionData[-i, ], center = ModulePCACenter, scale = FALSE), 2, var)))
     })
     
     
@@ -182,6 +183,22 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
   return(SelGenes)
   
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -331,13 +348,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     # Computing PCs
 
     PCBase <- irlba::prcomp_irlba(x = ExpressionMatrix[CompatibleGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
-    ExpVar <- (PCBase$sdev^2)/sum(diag(cov(scale(ExpressionMatrix[CompatibleGenes, ], center = ModulePCACenter, scale = FALSE))))
+    ExpVar <- (PCBase$sdev^2)/sum(apply(scale(ExpressionData[CompatibleGenes, ], center = ModulePCACenter, scale = FALSE), 2, var))
     
     print("Pre-filter data")
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
     
     PCBase <- irlba::prcomp_irlba(x = ExpressionMatrix[SelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
-    ExpVar <- (PCBase$sdev^2)/sum(diag(cov(scale(ExpressionMatrix[SelGenes, ], center = ModulePCACenter, scale = FALSE))))
+    ExpVar <- (PCBase$sdev^2)/sum(apply(scale(ExpressionData[SelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var))
     
     print("Post-filter data")
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
@@ -358,7 +375,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         SampleSelGenes <- SampledsGeneList[[i]]
       }
       PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
-      return((PCSamp$sdev^2)/sum(diag(cov(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE)))))
+      return((PCSamp$sdev^2)/sum(apply(scale(ExpressionData[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
     })
     
     SampledExp <- rbind(SampledExp[1,], SampledExp[1,]/SampledExp[2,])
@@ -456,7 +473,7 @@ SelectOverDispersedGeneSet <- function(GeneExpressionMatrix, nSamples, nGenes, G
       SelGenes <- SampledsGeneList[[i]]
     }
     PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SelGenes, ], n = PCADims, center = CenterPCA, scale. = FALSE)
-    return((PCSamp$sdev^2)/sum(diag(cov(scale(ExpressionMatrix[SelGenes, ], center = CenterPCA, scale = FALSE)))))
+    return((PCSamp$sdev^2)/sum(apply(scale(ExpressionData[SelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
   })
   
   SampledExp <- rbind(SampledExp[1,], SampledExp[1,]/SampledExp[2,])
