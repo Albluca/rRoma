@@ -542,7 +542,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     ModuleSummary[[i]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
                                UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase,
-                               ExpVarBase = ExpVar, PVVect = PVVect)
+                               ExpVarBase = ExpVar, PVVect = PVVect, SampledExp = SampledExp)
   
     
   }
