@@ -314,6 +314,17 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   
   OutLiersList <- list()
   
+  
+  # Filter genes for compatibility with the expression matrix
+  
+  for(i in 1:length(ModuleList)){
+    Preserve <- ModuleList[[i]]$Genes %in% rownames(ExpressionMatrix)
+    ModuleList[[i]]$Genes <- ModuleList[[i]]$Genes[Preserve]
+    ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
+  }
+    
+    
+  
   ModuleList <- ModuleList[order(unlist(lapply(lapply(ModuleList, "[[", "Genes"), length)))]
   
   OldSamplesLen <- 0
@@ -372,6 +383,9 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     print("Post-filter data")
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
     
+    print(paste("Previous sample size:", OldSamplesLen))
+    print(paste("Nex sample size:", length(CompatibleGenes)))
+    
     # Comparison with sample genesets
     if(SampleFilter){
       
@@ -422,6 +436,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         SampledExp <- rbind(SampledExp[1,], SampledExp[1,]/SampledExp[2,])
         
       }
+      
+      OldSamplesLen <- length(CompatibleGenes)
       
     }
     
