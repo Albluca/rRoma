@@ -13,7 +13,7 @@ FixPCSign(PC1Rotation, Wei = NULL, Mode, Thr = NULL)
 
 \item{Mode}{scalar, character. Mode to correct the sign}
 
-\item{Thr}{}
+\item{Thr}{scalar, numeric quantile threshold}
 }
 \description{
 Correct the sign of the principal component

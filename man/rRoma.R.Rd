@@ -5,10 +5,11 @@
 \title{Perform ROMA on a datasets}
 \usage{
 rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
-  MinGenes = 10, MaxGenes = 1000, nSamples = 100, OutGeneNumber = 5,
-  Ncomp = 10, OutGeneSpace = 5, FixedCenter = TRUE,
-  GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All",
-  SampleFilter = FALSE, MoreInfo = FALSE, PlotData = FALSE, PCADims = 2)
+  UseWeigths = FALSE, DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000,
+  ApproxSamples = 2, nSamples = 100, OutGeneNumber = 5, Ncomp = 10,
+  OutGeneSpace = 5, FixedCenter = TRUE, GeneOutDetection = "PC1IQR",
+  GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
+  MoreInfo = FALSE, PlotData = FALSE, PCADims = 2)
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -19,9 +20,13 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
 
 \item{ModuleList}{list, gene module list}
 
+\item{UseWeigths}{logical, should the weigths be used}
+
 \item{MinGenes}{integer, the minimum number of genes reported by a module available in the expression matrix to process the module}
 
 \item{MaxGenes}{integer, the maximum number of genes reported by a module available in the expression matrix to process the module}
+
+\item{ApproxSamples}{integer, the approximation parameter to reuse samples}
 
 \item{nSamples}{integer, the number of randomized gene sampled (per module)}
 
@@ -50,6 +55,8 @@ minimal percentage variation (L1OutVarPerc), or minimal median-absolute-deviatio
 
 \item{PCADims}{integer, the number of PCA dimensions to compute. Should be >= 2.
 Larger values decrease the error in the estimation of the explained variance but increase the computation time.}
+
+\item{DefaultWeigt}{integer, the value to use when gene weigth is not present}
 }
 \description{
 Perform ROMA on a datasets
