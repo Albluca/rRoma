@@ -208,10 +208,53 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
 #' @export
 #'
 #' @examples
-FixPCSign <- function(PC1Rotation, Wei = NULL, Mode ='none', Thr = NULL) {
+FixPCSign <- function(PC1Projections, Wei = NULL, Mode ='none', DefWei = 1, Thr = NULL) {
 
-  if(Mode = 'none'){
-    return(PC1Rotation)
+  if(Mode == 'none'){
+    return(1)
+  }
+  
+  if(Mode == 'PreferActivation'){
+    
+    ToUse <- rep(TRUE, length(PC1Projections))
+    if(!is.null(Thr)){
+      ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr) 
+    }
+      
+    if(sum(PC1Projections[ToUse])<0){
+      return(-1)
+    } else {
+      return(+1)
+    }
+  }
+  
+  if(Mode == 'UseAllWeigths'){
+    Wei[is.na(Wei)] <- DeafaultWei
+    
+    ToUse <- rep(TRUE, length(PC1Projections))
+    if(!is.null(Thr)){
+      ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr) 
+    }
+    
+    if(sum(Wei[ToUse]*PC1Projections[ToUse])<0){
+      return(-1)
+    } else {
+      return(+1)
+    }
+  }
+  
+  if(Mode == 'UseKnownWeigths'){
+    
+    ToUse <- rep(TRUE, length(PC1Projections))
+    if(!is.null(Thr)){
+      ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr) 
+    }
+    
+    if(sum(Wei[is.na(Wei) & ToUse]*PC1Projections[is.na(Wei) & ToUse])<0){
+      return(-1)
+    } else {
+      return(+1)
+    }
   }
   
 }
@@ -263,11 +306,24 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                     DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000, ApproxSamples = 2,
                     nSamples = 100, OutGeneNumber = 5, Ncomp = 10, OutGeneSpace = 5, FixedCenter = TRUE,
                     GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
-                    MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, Mode ='none', Thr = NULL) {
+                    MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode ='none', PC1SignThr = NULL) {
 
-  if(any(duplicated(rownames(ExpressionMatrix)))){
-    warning("Duplicated gene names detected. This may create inconsistency. Consider fixing this problem.")
-    
+  AllGenes <- NULL
+  for(i in 1:length(ModuleList)){
+    AllGenes <- c(AllGenes, ModuleList[[i]]$Genes)
+  }
+  
+  
+  AllGenesModule <- unique(AllGenes)
+  AllGenesMatrix <- rownames(ExpressionMatrix)
+  
+  if(any(AllGenesMatrix[duplicated(AllGenesMatrix)] %in% AllGenesModule)){
+    stop("Module gene are not unique in the matrix. Impossible to proceed.")
+  }
+  
+  if(any(duplicated(AllGenesMatrix))){
+    warning("Duplicated gene names detected. This may create inconsistencies in the analysis. Consider fixing this problem.")
+    readline("Press any key")
   }
   
   # Cleanup data
@@ -341,7 +397,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     print(paste("Working on", ModuleList[[i]]$Name, "-", ModuleList[[i]]$Desc))
     
-    CompatibleGenes <- ModuleList[[i]]$Genes[ModuleList[[i]]$Genes %in% rownames(ExpressionMatrix)]
+    CompatibleGenes <- ModuleList[[i]]$Genes
     
     print(paste(length(CompatibleGenes), "genes available for analysis"))
     
@@ -472,15 +528,22 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                           c(ExpVar[1], sum(sign(SampledExp[1,] - ExpVar[1])==1)/nSamples,
                             ExpVar[1]/ExpVar[2], sum(sign(SampledExp[2,] - ExpVar[1]/ExpVar[2])==1)/nSamples))
     
-    ModProjGenes <- PCBase$x[,1]
+    ###### WORK HERE
+    
+    CorrectSign <- FixPCSign(PCBase$x[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
+                             Mode = PC1SignMode, DefWei = DefaultWeight, Thr = PC1SignThr)
+    
+    ModProjGenes <- CorrectSign*PCBase$x[,1]
     names(ModProjGenes) <- SelGenes
     
     ProjLists[[i]] <- ModProjGenes
-    PC1Matrix <- rbind(PC1Matrix, FixPCSign(PCBase$rotation[,1], Wei = Correction, Mode ='none', Thr = NULL))
+    
+    PC1Matrix <- rbind(PC1Matrix, CorrectSign*PCBase$rotation[,1])
     
     ModuleSummary[[i]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
                                UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase,
                                ExpVarBase = ExpVar, PVVect = PVVect)
+  
     
   }
   
