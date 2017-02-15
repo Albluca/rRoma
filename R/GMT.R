@@ -33,9 +33,11 @@ ReadGMTFile <- function(FileLocation) {
       GeneNames <- unlist(lapply(tGenes, "[[", 1))
       
       Weigths <- rep(NA, length(GeneNames))
+
       if(any(lapply(tGenes, length) > 1)){
         Weigths[lapply(tGenes, length) > 1] <- unlist(lapply(tGenes[lapply(tGenes, length) > 1], "[[", 2))
       }
+
       
       GeneList[[Idx]] <- list(Name = tLine[1], Desc = tLine[2], Genes = GeneNames, Weigths = Weigths)
     }
