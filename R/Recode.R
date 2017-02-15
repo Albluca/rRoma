@@ -208,8 +208,11 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
 #' @export
 #'
 #' @examples
-FixPCSign <- function(PC1Rotation, Wei = NULL, Mode, Thr = NULL) {
+FixPCSign <- function(PC1Rotation, Wei = NULL, Mode ='none', Thr = NULL) {
 
+  if(Mode = 'none'){
+    return(PC1Rotation)
+  }
   
 }
 
@@ -249,6 +252,8 @@ FixPCSign <- function(PC1Rotation, Wei = NULL, Mode, Thr = NULL) {
 #' @param SampleFilter logical, should outlier detection be applied to sampled to sample data as well?
 #' @param PCADims integer, the number of PCA dimensions to compute. Should be >= 2.
 #' Larger values decrease the error in the estimation of the explained variance but increase the computation time.
+#' @param Mode scalar, string. The mode to be used to correct the sign of the 1st PC (Not implemented yet)
+#' @param Thr scalar, numeric, the threshould to be used whn correcting the 1st PC (Not implemented yet) 
 #'
 #' @return
 #' @export
@@ -258,8 +263,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                     DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000, ApproxSamples = 2,
                     nSamples = 100, OutGeneNumber = 5, Ncomp = 10, OutGeneSpace = 5, FixedCenter = TRUE,
                     GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
-                    MoreInfo = FALSE, PlotData = FALSE, PCADims = 2) {
+                    MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, Mode ='none', Thr = NULL) {
 
+  if(any(duplicated(rownames(ExpressionMatrix)))){
+    warning("Duplicated gene names detected. This may create inconsistency. Consider fixing this problem.")
+    
+  }
+  
   # Cleanup data
   
   if(ExpFilter){
@@ -322,8 +332,6 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     ModuleList[[i]]$Genes <- ModuleList[[i]]$Genes[Preserve]
     ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
   }
-    
-    
   
   ModuleList <- ModuleList[order(unlist(lapply(lapply(ModuleList, "[[", "Genes"), length)))]
   
@@ -468,7 +476,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     names(ModProjGenes) <- SelGenes
     
     ProjLists[[i]] <- ModProjGenes
-    PC1Matrix <- rbind(PC1Matrix, PCBase$rotation[,1])
+    PC1Matrix <- rbind(PC1Matrix, FixPCSign(PCBase$rotation[,1], Wei = Correction, Mode ='none', Thr = NULL))
     
     ModuleSummary[[i]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
                                UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase,
