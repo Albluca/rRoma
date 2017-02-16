@@ -500,7 +500,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           return((PCSamp$sdev^2)/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
         })
         
-        SampledExp <- rbind(SampledExp[1,], SampledExp[1,]/SampledExp[2,])
+        SampledExp <- rbind(SampledExp[1,], SampledExp[1,]/SampledExp[2,], SampledExp[2,])
+        names(SampledExp) <- c("Sampled L1", "Sampled L1/L2", "Sampled L2")
         
       }
       
@@ -544,15 +545,18 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     PC1Matrix <- rbind(PC1Matrix, CorrectSign*PCBase$rotation[,1])
     
     ModuleSummary[[i]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
-                               UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase,
-                               ExpVarBase = ExpVar, PVVect = PVVect, SampledExp = SampledExp, PC1Projections = PCBase$x[,1])
+                               UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase, CorrectSign = CorrectSign,
+                               ExpVarBase = ExpVar, SampledExp = SampledExp, PC1Projections.SignFixed = CorrectSign*PCBase$x[,1])
   
     
   }
   
   colnames(ModuleMatrix) <- c("L1", "ppv L1", "L1/L2", "ppv L1/L2")
+  rownames(ModuleMatrix) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
+  
   colnames(PVVectMat) <- c("L1 WT less pv", "L1 WT greater pv", "L1/L2 WT less pv", "L1/2 WT greater pv")
-
+  rownames(PVVectMat) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
+  
   colnames(PC1Matrix) <- colnames(ExpressionMatrix)
   rownames(PC1Matrix) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
   
