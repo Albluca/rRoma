@@ -9,7 +9,8 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
   ApproxSamples = 2, nSamples = 100, OutGeneNumber = 5, Ncomp = 10,
   OutGeneSpace = 5, FixedCenter = TRUE, GeneOutDetection = "PC1IQR",
   GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
-  MoreInfo = FALSE, PlotData = FALSE, PCADims = 2)
+  MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode = "none",
+  PC1SignThr = NULL)
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -57,6 +58,10 @@ minimal percentage variation (L1OutVarPerc), or minimal median-absolute-deviatio
 Larger values decrease the error in the estimation of the explained variance but increase the computation time.}
 
 \item{DefaultWeigt}{integer, the value to use when gene weigth is not present}
+
+\item{Mode}{scalar, string. The mode to be used to correct the sign of the 1st PC (Not implemented yet)}
+
+\item{Thr}{scalar, numeric, the threshould to be used whn correcting the 1st PC (Not implemented yet)}
 }
 \description{
 Perform ROMA on a datasets

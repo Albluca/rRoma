@@ -4,16 +4,17 @@
 \alias{FixPCSign}
 \title{Correct the sign of the principal component}
 \usage{
-FixPCSign(PC1Rotation, Wei = NULL, Mode, Thr = NULL)
+FixPCSign(PC1Projections, Wei = NULL, Mode = "none", DefWei = 1,
+  Thr = NULL)
 }
 \arguments{
-\item{PC1Rotation}{vector, numeric Principal component values}
-
 \item{Wei}{vector, numeric optional vector of weigths}
 
 \item{Mode}{scalar, character. Mode to correct the sign}
 
 \item{Thr}{scalar, numeric quantile threshold}
+
+\item{PC1Rotation}{vector, numeric Principal component values}
 }
 \description{
 Correct the sign of the principal component

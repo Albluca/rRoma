@@ -380,6 +380,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   
   OutLiersList <- list()
   
+  UsedModules <- NULL
   
   # Filter genes for compatibility with the expression matrix
   
@@ -405,6 +406,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       print("Number of genes outside the specified range")
       print("Skipping module")
       next()
+    } else {
+      UsedModules <- c(UsedModules, i)
     }
     
     if(MoreInfo){
@@ -542,7 +545,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     ModuleSummary[[i]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
                                UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase,
-                               ExpVarBase = ExpVar, PVVect = PVVect, SampledExp = SampledExp)
+                               ExpVarBase = ExpVar, PVVect = PVVect, SampledExp = SampledExp, PC1Projections = PCBase$x[,1])
   
     
   }
@@ -551,6 +554,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   colnames(PVVectMat) <- c("L1 WT less pv", "L1 WT greater pv", "L1/L2 WT less pv", "L1/2 WT greater pv")
 
   colnames(PC1Matrix) <- colnames(ExpressionMatrix)
+  rownames(PC1Matrix) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
   
   return(list(ModuleMatrix = ModuleMatrix, PC1Matrix = PC1Matrix, ModuleSummary = ModuleSummary,
               ProjLists = ProjLists, PVVectMat = PVVectMat, OutLiersList = OutLiersList))
