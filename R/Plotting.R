@@ -148,3 +148,36 @@ Plot.Underdispersed <- function(RomaData, Thr = 1, Mode = "Wil", GenesetMargin =
                     margins = c(SampleMargin, GenesetMargin), trace = 'none',
                     col = colorRamps::blue2red)
 }
+
+
+
+
+
+#' Title
+#'
+#' @param RomaData 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+PlotGeneProjections <- function(RomaData){
+  
+  for(i in 1:length(RomaData$ModuleSummary)){
+    names(RomaData$ModuleSummary[[i]]$PC1Projections.SignFixed) <- RomaData$ModuleSummary[[i]]$UsedGenes
+    SortedPC1 <- sort(RomaData$ModuleSummary[[i]]$PC1Projections.SignFixed)
+    nGenes <- length(RomaData$ModuleSummary[[i]]$UsedGenes)
+    plot(1:nGenes, SortedPC1, type = 'n', xlab = '', xaxt = 'n', ylab = "PC1 projection",
+         main = RomaData$ModuleSummary[[i]]$ModuleName)
+    abline(h=0)
+    Cols = rep('red', nGenes)
+    Cols[SortedPC1>0] <- "blue"
+    text(x = 1:nGenes, y = SortedPC1,
+         labels = names(SortedPC1), srt= 90, col = Cols)
+  }
+  
+}
+
+
+
+
