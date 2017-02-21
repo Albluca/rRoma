@@ -229,7 +229,7 @@ FixPCSign <- function(PC1Projections, Wei = NULL, Mode ='none', DefWei = 1, Thr 
   }
   
   if(Mode == 'UseAllWeigths'){
-    Wei[is.na(Wei)] <- DeafaultWei
+    Wei[is.na(Wei)] <- DefWei
     
     ToUse <- rep(TRUE, length(PC1Projections))
     if(!is.null(Thr)){
