@@ -161,19 +161,44 @@ Plot.Underdispersed <- function(RomaData, Thr = 1, Mode = "Wil", GenesetMargin =
 #' @export
 #'
 #' @examples
-PlotGeneProjections <- function(RomaData){
+PlotGeneProjections <- function(RomaData, PlotGenes = 40){
   
   for(i in 1:length(RomaData$ModuleSummary)){
-    names(RomaData$ModuleSummary[[i]]$PC1Projections.SignFixed) <- RomaData$ModuleSummary[[i]]$UsedGenes
-    SortedPC1 <- sort(RomaData$ModuleSummary[[i]]$PC1Projections.SignFixed)
-    nGenes <- length(RomaData$ModuleSummary[[i]]$UsedGenes)
-    plot(1:nGenes, SortedPC1, type = 'n', xlab = '', xaxt = 'n', ylab = "PC1 projection",
-         main = RomaData$ModuleSummary[[i]]$ModuleName)
-    abline(h=0)
-    Cols = rep('red', nGenes)
-    Cols[SortedPC1>0] <- "blue"
-    text(x = 1:nGenes, y = SortedPC1,
-         labels = names(SortedPC1), srt= 90, col = Cols)
+    
+    FiltGenes <- RomaData$ModuleSummary[[i]]$PC1Projections.SignFixed
+    names(FiltGenes) <- RomaData$ModuleSummary[[i]]$UsedGenes
+    
+    GeneNames <- RomaData$ModuleSummary[[i]]$UsedGenes
+    
+    nGenes <- min(PlotGenes, length(GeneNames))
+    
+    PC1FilStr <- rep(NA, length(GeneNames))
+    names(PC1FilStr) <- GeneNames
+    PC1FilStr[names(FiltGenes)] <- FiltGenes
+    
+    DF <- data.frame(cbind(1:length(PC1FilStr), GeneNames[order(PC1FilStr)],
+                           PC1FilStr[order(PC1FilStr)],
+                           rep("Original", length(PC1FilStr))
+                           ),
+                     row.names = NULL)
+    
+    DF <- DF[order(abs(PC1FilStr))[1:nGenes],]
+    
+    colnames(DF) <- c("Position", "Gene", "Value", "Filter")
+    
+    DF$Position <- as.numeric(as.character(DF$Position))
+    DF$Value <- as.numeric(as.character(DF$Value))
+    
+    DF$Position <- rank(DF$Position, ties.method = "min")
+    
+    p <- ggplot2::ggplot(data = DF, ggplot2::aes(y = Position, x = Value)) + ggplot2::geom_point() +
+      ggplot2::scale_y_continuous(breaks = DF$Position[1:nGenes], labels = DF$Gene[1:nGenes]) +
+      ggplot2::ggtitle(RomaData$ModuleSummary[[i]]$ModuleName) +
+      ggplot2::labs(x = "PC1 projection", y = "Gene") +
+      ggplot2::theme(panel.grid.minor = ggplot2::element_line(colour = NA))
+    
+    print(p)
+    
   }
   
 }

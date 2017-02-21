@@ -440,6 +440,9 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     PCBase <- irlba::prcomp_irlba(x = Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
     ExpVar <- (PCBase$sdev^2)/sum(apply(scale(Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ], center = ModulePCACenter, scale = FALSE), 2, var))
     
+    PCBaseUnf <- PCBase
+    ExpVarUnf <- ExpVar
+    
     print("Pre-filter data")
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
     
@@ -451,7 +454,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
     
     print(paste("Previous sample size:", OldSamplesLen))
-    print(paste("Nex sample size:", length(CompatibleGenes)))
+    print(paste("Next sample size:", length(CompatibleGenes)))
     
     # Comparison with sample genesets
     if(SampleFilter){
@@ -532,7 +535,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                           c(ExpVar[1], sum(sign(SampledExp[1,] - ExpVar[1])==1)/nSamples,
                             ExpVar[1]/ExpVar[2], sum(sign(SampledExp[2,] - ExpVar[1]/ExpVar[2])==1)/nSamples))
     
-    ###### WORK HERE
+    CorrectSignUnf <- FixPCSign(PCBaseUnf$x[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
+                             Mode = PC1SignMode, DefWei = DefaultWeight, Thr = PC1SignThr)
     
     CorrectSign <- FixPCSign(PCBase$x[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
                              Mode = PC1SignMode, DefWei = DefaultWeight, Thr = PC1SignThr)
@@ -541,12 +545,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     names(ModProjGenes) <- SelGenes
     
     ProjLists[[i]] <- ModProjGenes
-    
     PC1Matrix <- rbind(PC1Matrix, CorrectSign*PCBase$rotation[,1])
     
     ModuleSummary[[i]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
-                               UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase, CorrectSign = CorrectSign,
-                               ExpVarBase = ExpVar, SampledExp = SampledExp, PC1Projections.SignFixed = CorrectSign*PCBase$x[,1])
+                               OriginalGenes = CompatibleGenes, UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase, PCBaseUnf = PCBaseUnf,
+                               CorrectSign = CorrectSign, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
+                               PC1Projections.SignFixed = CorrectSign*PCBase$x[,1], PC1ProjectionsUnf.SignFixed = CorrectSignUnf*PCBaseUnf$x[,1])
   
     
   }
