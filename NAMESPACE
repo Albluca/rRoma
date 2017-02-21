@@ -2,6 +2,7 @@
 
 export(DetectOutliers)
 export(FixPCSign)
+export(InferBinaryWeigth)
 export(Plot.Overdispersed)
 export(Plot.Underdispersed)
 export(ReadGMTFile)

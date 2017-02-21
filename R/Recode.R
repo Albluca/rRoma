@@ -623,3 +623,40 @@ SelectOverDispersedGeneSet <- function(GeneExpressionMatrix, nSamples, nGenes, G
 }
 
 
+
+
+
+#' Infer weigths from expression data
+#'
+#' @param ExpressionMatrix 
+#' @param ModuleList 
+#' @param FillAllNA 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+InferBinaryWeigth <- function(ExpressionMatrix, ModuleList, FillAllNA = TRUE) {
+  
+  MedianExpr <- apply(ExpressionMatrix, 1, median)
+  GeneWei <- as.integer(cut(MedianExpr, breaks = c(min(MedianExpr)-1, median(MedianExpr), max(MedianExpr)+1)))-1
+  GeneWei[GeneWei == 0] <- -1
+  names(GeneWei) <- names(MedianExpr)
+  
+  for(i in 1:length(ModuleList)){
+    
+    if(FillAllNA & any(!is.na(ModuleList[[i]]$Weigths))){
+      next
+    }
+    
+    ModuleList[[i]]$Weigths[is.na(ModuleList[[i]]$Weigths)] <- (GeneWei[ModuleList[[i]]$Genes])[is.na(ModuleList[[i]]$Weigths)]
+    
+  }
+  
+  return(ModuleList)
+  
+}
+
+
+
+
