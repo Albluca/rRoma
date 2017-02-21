@@ -208,56 +208,60 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
 #' @export
 #'
 #' @examples
-FixPCSign <- function(PC1Projections, Wei = NULL, Mode ='none', DefWei = 1, Thr = NULL) {
-
-  if(Mode == 'none'){
-    return(1)
-  }
-  
-  if(Mode == 'PreferActivation'){
+FixPCSign <-
+  function(PC1Projections,
+           Wei = NULL,
+           Mode = 'none',
+           DefWei = 1,
+           Thr = NULL) {
     
-    ToUse <- rep(TRUE, length(PC1Projections))
-    if(!is.null(Thr)){
-      ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr) 
+    if (Mode == 'none') {
+      return(1)
     }
+    
+    if (Mode == 'PreferActivation') {
+      ToUse <- rep(TRUE, length(PC1Projections))
+      if (!is.null(Thr)) {
+        ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr)
+      }
       
-    if(sum(PC1Projections[ToUse])<0){
-      return(-1)
-    } else {
-      return(+1)
+      if (sum(PC1Projections[ToUse]) < 0) {
+        return(-1)
+      } else {
+        return(+1)
+      }
     }
+    
+    if (Mode == 'UseAllWeigths') {
+      Wei[is.na(Wei)] <- DefWei
+      
+      ToUse <- rep(TRUE, length(PC1Projections))
+      if (!is.null(Thr)) {
+        ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr)
+      }
+      
+      if (sum(Wei[ToUse] * PC1Projections[ToUse]) < 0) {
+        return(-1)
+      } else {
+        return(+1)
+      }
+    }
+    
+    if (Mode == 'UseKnownWeigths') {
+      ToUse <- rep(TRUE, length(PC1Projections))
+      if (!is.null(Thr)) {
+        ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr)
+      }
+      
+      if (sum(Wei[is.na(Wei) &
+                  ToUse] * PC1Projections[is.na(Wei) & ToUse]) < 0) {
+        return(-1)
+      } else {
+        return(+1)
+      }
+    }
+    
   }
-  
-  if(Mode == 'UseAllWeigths'){
-    Wei[is.na(Wei)] <- DefWei
-    
-    ToUse <- rep(TRUE, length(PC1Projections))
-    if(!is.null(Thr)){
-      ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr) 
-    }
-    
-    if(sum(Wei[ToUse]*PC1Projections[ToUse])<0){
-      return(-1)
-    } else {
-      return(+1)
-    }
-  }
-  
-  if(Mode == 'UseKnownWeigths'){
-    
-    ToUse <- rep(TRUE, length(PC1Projections))
-    if(!is.null(Thr)){
-      ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr) 
-    }
-    
-    if(sum(Wei[is.na(Wei) & ToUse]*PC1Projections[is.na(Wei) & ToUse])<0){
-      return(-1)
-    } else {
-      return(+1)
-    }
-  }
-  
-}
 
 
 
@@ -273,7 +277,6 @@ FixPCSign <- function(PC1Projections, Wei = NULL, Mode ='none', DefWei = 1, Thr 
 #' @param ExpressionMatrix matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.
 #' @param ModuleList list, gene module list
 #' @param UseWeigths logical, should the weigths be used
-#' @param DefaultWeigt integer, the value to use when gene weigth is not present
 #' @param ExpFilter logical, should the samples be filtered?
 #' @param MinGenes integer, the minimum number of genes reported by a module available in the expression matrix to process the module
 #' @param MaxGenes integer, the maximum number of genes reported by a module available in the expression matrix to process the module
@@ -295,9 +298,14 @@ FixPCSign <- function(PC1Projections, Wei = NULL, Mode ='none', DefWei = 1, Thr 
 #' @param SampleFilter logical, should outlier detection be applied to sampled to sample data as well?
 #' @param PCADims integer, the number of PCA dimensions to compute. Should be >= 2.
 #' Larger values decrease the error in the estimation of the explained variance but increase the computation time.
-#' @param Mode scalar, string. The mode to be used to correct the sign of the 1st PC (Not implemented yet)
-#' @param Thr scalar, numeric, the threshould to be used whn correcting the 1st PC (Not implemented yet) 
-#'
+#' @param DefaultWeight integer scalar, the default weigth to us if no weith is specified by the modile file and an algorithm requiring weigths is used
+#' @param PC1SignMode characrter scalar, the modality to use to determine the direction of the 1st principal component. The following options are currentlhy available:
+#' 'none' (The direction is chosen at random), 'PreferActivation' (the direction is chosen in such a way that the sum of the projection is positive),
+#' 'UseAllWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weith are set to DefaultWeight),
+#' 'UseKnownWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weigth are set to 0)
+#' @param PC1SignThr numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
+#' only the 10% of genes with the largest projection in absolugte value will be considered.
+#' 
 #' @return
 #' @export
 #'

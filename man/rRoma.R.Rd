@@ -23,6 +23,8 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
 
 \item{UseWeigths}{logical, should the weigths be used}
 
+\item{DefaultWeight}{integer scalar, the default weigth to us if no weith is specified by the modile file and an algorithm requiring weigths is used}
+
 \item{MinGenes}{integer, the minimum number of genes reported by a module available in the expression matrix to process the module}
 
 \item{MaxGenes}{integer, the maximum number of genes reported by a module available in the expression matrix to process the module}
@@ -57,11 +59,13 @@ minimal percentage variation (L1OutVarPerc), or minimal median-absolute-deviatio
 \item{PCADims}{integer, the number of PCA dimensions to compute. Should be >= 2.
 Larger values decrease the error in the estimation of the explained variance but increase the computation time.}
 
-\item{DefaultWeigt}{integer, the value to use when gene weigth is not present}
+\item{PC1SignMode}{characrter scalar, the modality to use to determine the direction of the 1st principal component. The following options are currentlhy available:
+'none' (The direction is chosen at random), 'PreferActivation' (the direction is chosen in such a way that the sum of the projection is positive),
+'UseAllWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weith are set to DefaultWeight),
+'UseKnownWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weigth are set to 0)}
 
-\item{Mode}{scalar, string. The mode to be used to correct the sign of the 1st PC (Not implemented yet)}
-
-\item{Thr}{scalar, numeric, the threshould to be used whn correcting the 1st PC (Not implemented yet)}
+\item{PC1SignThr}{numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
+only the 10% of genes with the largest projection in absolugte value will be considered.}
 }
 \description{
 Perform ROMA on a datasets

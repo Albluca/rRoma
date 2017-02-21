@@ -4,7 +4,7 @@
 \alias{PlotGeneProjections}
 \title{Title}
 \usage{
-PlotGeneProjections(RomaData)
+PlotGeneProjections(RomaData, PlotGenes = 40)
 }
 \arguments{
 \item{RomaData}{}
