@@ -316,13 +316,6 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                     GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
                     MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode ='none', PC1SignThr = NULL,
                     UseParallel = FALSE) {
-
-  if(UseParallel){
-    
-    # Calculate the number of cores
-    no_cores <- parallel::detectCores() - 1
-    
-  }
   
   SAMPLE_WARNING <- 10
   
@@ -335,10 +328,6 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   AllGenesModule <- unique(AllGenes)
   AllGenesMatrix <- rownames(ExpressionMatrix)
   
-  if(any(AllGenesMatrix[duplicated(AllGenesMatrix)] %in% AllGenesModule)){
-    stop("Module gene are not unique in the matrix. Impossible to proceed.")
-  }
-  
   if(ncol(ExpressionMatrix) <= SAMPLE_WARNING){
     print(paste("Only", ncol(ExpressionMatrix), "sample found"))
     print("The number of samples is too small to guarantee a reliable analysis")
@@ -346,6 +335,10 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     if(Ans != "y" & Ans != "Y"){
       return(NULL)
     }
+  }
+  
+  if(any(AllGenesMatrix[duplicated(AllGenesMatrix)] %in% AllGenesModule)){
+    stop("Module gene are not unique in the matrix. Impossible to proceed.")
   }
   
   if(any(duplicated(AllGenesMatrix))){
@@ -415,6 +408,19 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     Preserve <- ModuleList[[i]]$Genes %in% rownames(ExpressionMatrix)
     ModuleList[[i]]$Genes <- ModuleList[[i]]$Genes[Preserve]
     ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
+  }
+  
+  if(UseParallel){
+    
+    # Calculate the number of cores
+    no_cores <- parallel::detectCores() - 1
+    
+    # Initiate cluster
+    cl <- parallel::makeCluster(no_cores)
+    
+    parallel::clusterExport(cl=cl, varlist=c("SampleFilter", "GeneOutDetection", "GeneOutThr",
+                                   "ModulePCACenter", "ExpressionMatrix", "DetectOutliers",
+                                   "PCADims"), envir = environment())
   }
   
   ModuleList <- ModuleList[order(unlist(lapply(lapply(ModuleList, "[[", "Genes"), length)))]
@@ -534,31 +540,20 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           
         } else {
           
-          # Initiate cluster
-          cl <- parallel::makeCluster(no_cores)
-          
-          clusterExport(cl=cl, varlist=c("SampleFilter", "SampledsGeneList", "GeneOutDetection", "GeneOutThr",
-                                         "ModulePCACenter", "SampledsGeneList", "ExpressionMatrix", "DetectOutliers",
-                                         "PCADims"))
-          
-          SampledExp <- parallel::parSapply(cl, as.list(1:length(SampledsGeneList)), function(i){
+          SampledExp <- parallel::parSapply(cl, SampledsGeneList, function(Gl){
             library(irlba)
             if(SampleFilter){
               SampleSelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
-                                               CompatibleGenes = SampledsGeneList[[i]], ExpressionData = ExpressionMatrix[SampledsGeneList[[i]], ], PlotData = FALSE,
+                                               CompatibleGenes = Gl, ExpressionData = ExpressionMatrix[Gl, ], PlotData = FALSE,
                                                ModuleName = '', PrintInfo = FALSE)
             } else {
-              SampleSelGenes <- SampledsGeneList[[i]]
+              SampleSelGenes <- Gl
             }
             PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
             return((PCSamp$sdev^2)/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
           })
-          
-          stopCluster(cl)
 
         }
-        
-        
         
         SampledExp <- rbind(SampledExp[1,], SampledExp[1,]/SampledExp[2,], SampledExp[2,])
         names(SampledExp) <- c("Sampled L1", "Sampled L1/L2", "Sampled L2")
@@ -609,6 +604,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                                CorrectSign = CorrectSign, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
                                PC1Projections.SignFixed = CorrectSign*PCBase$x[,1], PC1ProjectionsUnf.SignFixed = CorrectSignUnf*PCBaseUnf$x[,1])
   
+    
+  }
+  
+  if(UseParallel){
+    
+    # Stop cluster
+    parallel::stopCluster(cl)
     
   }
   
