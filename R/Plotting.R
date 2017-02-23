@@ -219,9 +219,9 @@ PlotGeneProjections <- function(RomaData, PlotGenes = 40,
         p1 <- p1 + ggplot2::scale_y_log10()
       }
       
-      gridExtra::grid.arrange(p, p1, ncol=2, top=ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+      gridExtra::grid.arrange(p, p1, ncol=2, top=paste(RomaData$ModuleSummary[[i]]$ModuleName,
                                                                "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
-                                                               "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))))
+                                                               "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3)))
       
       # boxplot(t(ExpressionMatrix[as.character(DF$Gene[1:nGenes])[order(DF$Position[1:nGenes])], ]))
       
@@ -309,9 +309,9 @@ PlotSampleWeigth <- function(RomaData, PlotSamples = 40,
         p1 <- p1 + ggplot2::scale_y_log10()
       }
       
-      gridExtra::grid.arrange(p, p1, ncol=2, top=ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+      gridExtra::grid.arrange(p, p1, ncol=2, top=paste(RomaData$ModuleSummary[[i]]$ModuleName,
                                                                "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
-                                                               "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))))
+                                                               "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3)))
       
       # boxplot(t(ExpressionMatrix[as.character(DF$Gene[1:nGenes])[order(DF$Position[1:nGenes])], ]))
       
