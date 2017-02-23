@@ -317,6 +317,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                     MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode ='none', PC1SignThr = NULL,
                     UseParallel = FALSE) {
 
+  if(UseParallel){
+    
+    # Calculate the number of cores
+    no_cores <- parallel::detectCores() - 1
+    
+  }
+  
   SAMPLE_WARNING <- 10
   
   AllGenes <- NULL
@@ -491,7 +498,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         
         print("Computing samples")
         
-        if(SampleFilter){
+        if(SampleFilter & !UseParallel){
           pb <- txtProgressBar(min = 0, max = nSamples, initial = 0, style = 3)
           GeneToSample <- length(SelGenes)
         } else {
@@ -510,18 +517,48 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           stop("Incorrect sampling mode")
         }
         
-        SampledExp <- sapply(as.list(1:length(SampledsGeneList)), function(i){
-          if(SampleFilter){
-            SampleSelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
-                                             CompatibleGenes = SampledsGeneList[[i]], ExpressionData = ExpressionMatrix[SampledsGeneList[[i]], ], PlotData = FALSE,
-                                             ModuleName = '', PrintInfo = FALSE)
-            setTxtProgressBar(pb, i)
-          } else {
-            SampleSelGenes <- SampledsGeneList[[i]]
-          }
-          PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
-          return((PCSamp$sdev^2)/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
-        })
+        if(!UseParallel){
+          
+          SampledExp <- sapply(as.list(1:length(SampledsGeneList)), function(i){
+            if(SampleFilter){
+              SampleSelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
+                                               CompatibleGenes = SampledsGeneList[[i]], ExpressionData = ExpressionMatrix[SampledsGeneList[[i]], ], PlotData = FALSE,
+                                               ModuleName = '', PrintInfo = FALSE)
+              setTxtProgressBar(pb, i)
+            } else {
+              SampleSelGenes <- SampledsGeneList[[i]]
+            }
+            PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
+            return((PCSamp$sdev^2)/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
+          })
+          
+        } else {
+          
+          # Initiate cluster
+          cl <- parallel::makeCluster(no_cores)
+          
+          clusterExport(cl=cl, varlist=c("SampleFilter", "SampledsGeneList", "GeneOutDetection", "GeneOutThr",
+                                         "ModulePCACenter", "SampledsGeneList", "ExpressionMatrix", "DetectOutliers",
+                                         "PCADims"))
+          
+          SampledExp <- parallel::parSapply(cl, as.list(1:length(SampledsGeneList)), function(i){
+            library(irlba)
+            if(SampleFilter){
+              SampleSelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
+                                               CompatibleGenes = SampledsGeneList[[i]], ExpressionData = ExpressionMatrix[SampledsGeneList[[i]], ], PlotData = FALSE,
+                                               ModuleName = '', PrintInfo = FALSE)
+            } else {
+              SampleSelGenes <- SampledsGeneList[[i]]
+            }
+            PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
+            return((PCSamp$sdev^2)/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
+          })
+          
+          stopCluster(cl)
+
+        }
+        
+        
         
         SampledExp <- rbind(SampledExp[1,], SampledExp[1,]/SampledExp[2,], SampledExp[2,])
         names(SampledExp) <- c("Sampled L1", "Sampled L1/L2", "Sampled L2")

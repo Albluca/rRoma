@@ -15,3 +15,4 @@ Imports:
       ggplot2,
       gridExtra,
       pheatmap,
+      parallel
