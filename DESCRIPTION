@@ -1,8 +1,8 @@
 Package: rRoma
-Title: An r interface to ROMA
-Version: 0.0.0.9000
+Title: An r implementation of ROMA
+Version: 0.0.1.0000
 Authors@R: person("Luca", "Albergante", email = "luca.albergante@gmail.com", role = c("aut", "cre"))
-Description: An R interface to ROMA
+Description: An R implementation of ROMA
 Depends:
     R (>= 3.3.1)
 License: What license is it under?
@@ -11,4 +11,7 @@ LazyData: true
 RoxygenNote: 6.0.1
 Imports:
       scater,
-      irlba
+      irlba,
+      ggplot2,
+      gridExtra,
+      pheatmap,
