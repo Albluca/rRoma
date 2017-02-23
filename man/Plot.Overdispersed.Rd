@@ -5,7 +5,8 @@
 \title{Plot overdispersed genesets}
 \usage{
 Plot.Overdispersed(RomaData, Thr = 1, Mode = "Wil", GenesetMargin = 4,
-  SampleMargin = 4)
+  SampleMargin = 4, ColorGradient = colorRamps::blue2red(50),
+  cluster_cols = FALSE)
 }
 \arguments{
 \item{RomaData}{}

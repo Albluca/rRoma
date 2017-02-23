@@ -304,7 +304,7 @@ FixPCSign <-
 #' 'UseAllWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weith are set to DefaultWeight),
 #' 'UseKnownWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weigth are set to 0)
 #' @param PC1SignThr numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
-#' only the 10% of genes with the largest projection in absolugte value will be considered.
+#' only the 10\% of genes with the largest projection in absolugte value will be considered.
 #' 
 #' @return
 #' @export
@@ -316,6 +316,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                     GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
                     MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode ='none', PC1SignThr = NULL) {
 
+  SAMPLE_WARNING <- 10
+  
   AllGenes <- NULL
   for(i in 1:length(ModuleList)){
     AllGenes <- c(AllGenes, ModuleList[[i]]$Genes)
@@ -327,6 +329,15 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   
   if(any(AllGenesMatrix[duplicated(AllGenesMatrix)] %in% AllGenesModule)){
     stop("Module gene are not unique in the matrix. Impossible to proceed.")
+  }
+  
+  if(ncol(ExpressionMatrix) <= SAMPLE_WARNING){
+    print(paste("Only", ncol(ExpressionMatrix), "sample found"))
+    print("The number of samples is too small to guarantee a reliable analysis")
+    Ans <- readline("Do you want to continue anyway (y/n)")
+    if(Ans != "y" & Ans != "Y"){
+      return(NULL)
+    }
   }
   
   if(any(duplicated(AllGenesMatrix))){

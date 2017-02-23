@@ -65,7 +65,7 @@ Larger values decrease the error in the estimation of the explained variance but
 'UseKnownWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weigth are set to 0)}
 
 \item{PC1SignThr}{numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
-only the 10% of genes with the largest projection in absolugte value will be considered.}
+only the 10\% of genes with the largest projection in absolugte value will be considered.}
 }
 \description{
 Perform ROMA on a datasets
