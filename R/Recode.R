@@ -314,7 +314,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                     DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000, ApproxSamples = 2,
                     nSamples = 100, OutGeneNumber = 5, Ncomp = 10, OutGeneSpace = 5, FixedCenter = TRUE,
                     GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
-                    MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode ='none', PC1SignThr = NULL) {
+                    MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode ='none', PC1SignThr = NULL,
+                    UseParallel = FALSE) {
 
   SAMPLE_WARNING <- 10
   
@@ -476,7 +477,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     print(paste("Next sample size:", length(CompatibleGenes)))
     
     # Comparison with sample genesets
-    if(SampleFilter){
+    if(nSamples > 0){
       
       if((length(CompatibleGenes) <= OldSamplesLen + ApproxSamples) & (OldSamplesLen > 0)){
         
