@@ -315,7 +315,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                     nSamples = 100, OutGeneNumber = 5, Ncomp = 10, OutGeneSpace = 5, FixedCenter = TRUE,
                     GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
                     MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode ='none', PC1SignThr = NULL,
-                    UseParallel = FALSE) {
+                    UseParallel = FALSE, nCores = NULL, ClusType = "PSOCK") {
   
   SAMPLE_WARNING <- 10
   
@@ -412,11 +412,19 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   
   if(UseParallel){
     
-    # Calculate the number of cores
-    no_cores <- parallel::detectCores() - 1
+    no_cores <- parallel::detectCores()
+    
+    if(is.null(nCores)){
+      # Calculate the number of cores
+      nCores = no_cores - 1
+    }
+    
+    if(nCores >= no_cores){
+      nCores = no_cores - 1
+    }
     
     # Initiate cluster
-    cl <- parallel::makeCluster(no_cores)
+    cl <- parallel::makeCluster(no_cores, type = ClusType)
     
     parallel::clusterExport(cl=cl, varlist=c("SampleFilter", "GeneOutDetection", "GeneOutThr",
                                    "ModulePCACenter", "ExpressionMatrix", "DetectOutliers",
