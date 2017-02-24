@@ -46,3 +46,22 @@ ReadGMTFile <- function(FileLocation) {
   return(GeneList)
 }
 
+
+
+
+
+
+#' Return a subset of Msigdb containing the provided search string
+#'
+#' @param SearchString string scalar, the keyword to search 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+SelectFromMSIGdb <- function(SearchString) {
+  print("Searching in MsigDB v5.2")
+  return(Msigdb.v5.2.symbols.all[grep(SearchString, unlist(lapply(AllModules, "[[", "Name")), ignore.case = TRUE, fixed = TRUE)])
+}
+
+
