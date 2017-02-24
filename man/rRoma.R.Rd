@@ -10,7 +10,8 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
   OutGeneSpace = 5, FixedCenter = TRUE, GeneOutDetection = "PC1IQR",
   GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
   MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode = "none",
-  PC1SignThr = NULL)
+  PC1SignThr = NULL, UseParallel = FALSE, nCores = NULL,
+  ClusType = "PSOCK")
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -66,6 +67,14 @@ Larger values decrease the error in the estimation of the explained variance but
 
 \item{PC1SignThr}{numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
 only the 10\% of genes with the largest projection in absolugte value will be considered.}
+
+\item{UseParallel}{boolean, shuold a parallel environment be used? Note that using a parallel environment will increase the memorey usage as a
+copy of the gene expression matrix is needed for each core}
+
+\item{nCores}{integer, the number of cores to use if UseParallel is TRUE. Set to NULL for auto-detection}
+
+\item{ClusType}{string, the cluster type to use. The default value ("PSOCK") should be available on most systems, unix-like environments also support the "PSOCK",
+which should be faster.}
 }
 \description{
 Perform ROMA on a datasets

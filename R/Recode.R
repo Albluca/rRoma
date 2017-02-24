@@ -305,6 +305,11 @@ FixPCSign <-
 #' 'UseKnownWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weigth are set to 0)
 #' @param PC1SignThr numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
 #' only the 10\% of genes with the largest projection in absolugte value will be considered.
+#' @param UseParallel boolean, shuold a parallel environment be used? Note that using a parallel environment will increase the memorey usage as a
+#' copy of the gene expression matrix is needed for each core
+#' @param nCores integer, the number of cores to use if UseParallel is TRUE. Set to NULL for auto-detection
+#' @param ClusType string, the cluster type to use. The default value ("PSOCK") should be available on most systems, unix-like environments also support the "PSOCK",
+#' which should be faster.
 #' 
 #' @return
 #' @export
