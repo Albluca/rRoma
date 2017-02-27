@@ -453,18 +453,25 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       print(CompatibleGenes)
     }
     
+    if(length(CompatibleGenes) > MaxGenes | length(CompatibleGenes) < MinGenes){
+      print("Number of specified genes outside the given range")
+      print("Skipping module")
+      next()
+    }
+    
     # Filtering genes
     SelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
                                CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ], PlotData = PlotData,
                                ModuleName = ModuleList[[i]]$Name)
     
     if(length(SelGenes) > MaxGenes | length(SelGenes) < MinGenes){
-      print("Number of genes outside the specified range")
+      print("Number of selected genes outside the specified range")
       print("Skipping module")
       next()
     } else {
       UsedModules <- c(UsedModules, i)
     }
+    
     
     # Keep track of outliers
     OutLiersList[[i]] <- setdiff(CompatibleGenes, SelGenes)
@@ -608,10 +615,10 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     ModProjGenes <- CorrectSign*PCBase$x[,1]
     names(ModProjGenes) <- SelGenes
     
-    ProjLists[[i]] <- ModProjGenes
+    ProjLists[[length(ProjLists)+1]] <- ModProjGenes
     PC1Matrix <- rbind(PC1Matrix, CorrectSign*PCBase$rotation[,1])
     
-    ModuleSummary[[i]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
+    ModuleSummary[[length(ModuleSummary)+1]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
                                OriginalGenes = CompatibleGenes, UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase, PCBaseUnf = PCBaseUnf,
                                CorrectSign = CorrectSign, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
                                PC1Projections.SignFixed = CorrectSign*PCBase$x[,1], PC1ProjectionsUnf.SignFixed = CorrectSignUnf*PCBaseUnf$x[,1])
