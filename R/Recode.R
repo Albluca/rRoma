@@ -549,11 +549,24 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               SampleSelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
                                                CompatibleGenes = SampledsGeneList[[i]], ExpressionData = ExpressionMatrix[SampledsGeneList[[i]], ], PlotData = FALSE,
                                                ModuleName = '', PrintInfo = FALSE)
+              if(length(SampleSelGenes)<PCADims){
+                warning(paste("Size of filtered sample geneset too small (",  length(SampleSelGenes), "). This may cause inconsitencies. Increase MinGenes to prevent the problem"))
+              }
               setTxtProgressBar(pb, i)
             } else {
               SampleSelGenes <- SampledsGeneList[[i]]
             }
-            PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
+            
+            if(length(SampleFilter) <= 1){
+              warning(paste("Size of filtered sample geneset extremely small (",  length(SampleSelGenes), "). This may cause inconsitencies. Increase MinGenes to prevent the problem"))
+              return(c(1, 0))
+            }
+            
+            if(length(SampleFilter) >= 5){
+              PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale. = FALSE)
+            } else {
+              PCSamp <- prcomp(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
+            }
             return((PCSamp$sdev^2)/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
           })
           
@@ -565,10 +578,23 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               SampleSelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
                                                CompatibleGenes = Gl, ExpressionData = ExpressionMatrix[Gl, ], PlotData = FALSE,
                                                ModuleName = '', PrintInfo = FALSE)
+              if(length(SampleSelGenes)<PCADims){
+                warning(paste("Size of filtered sample geneset too small (",  length(SampleSelGenes), "). This may cause inconsitencies. Increase MinGenes to prevent the problem"))
+              }
             } else {
               SampleSelGenes <- Gl
             }
-            PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
+            
+            if(length(SampleFilter) <= 1){
+              warning(paste("Size of filtered sample geneset extremely small (",  length(SampleSelGenes), "). This may cause inconsitencies. Increase MinGenes to prevent the problem"))
+              return(c(1, 0))
+            }
+            
+            if(length(SampleFilter) >= 5){
+              PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale. = FALSE)
+            } else {
+              PCSamp <- prcomp(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
+            }
             return((PCSamp$sdev^2)/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
           })
 
@@ -593,12 +619,23 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       points(x=1, y=ExpVar[1]/ExpVar[2], pch = 20, col="red", cex= 2)
     }
     
-    PVVect <- c(
-      wilcox.test(SampledExp[1,] - ExpVar[1], alternative = "less")$p.value,
-      wilcox.test(SampledExp[1,] - ExpVar[1], alternative = "greater")$p.value,
-      wilcox.test(SampledExp[2,] - ExpVar[1]/ExpVar[2], alternative = "less")$p.value,
-      wilcox.test(SampledExp[2,] - ExpVar[1]/ExpVar[2], alternative = "greater")$p.value
-    )
+    L1Vect <- SampledExp[1,] - ExpVar[1]
+    L1Vect <- L1Vect[is.finite(L1Vect)]
+    
+    L1L2Vect <- SampledExp[2,] - ExpVar[1]/ExpVar[2]
+    L1L2Vect <- L1L2Vect[is.finite(L1L2Vect)]
+    
+    PVVect <- rep(NA, 4)
+    
+    if(length(L1Vect) > 5){
+      PVVect[1] <- wilcox.test(L1Vect, alternative = "less")$p.value
+      PVVect[2] <- wilcox.test(L1Vect, alternative = "greater")$p.value
+    }
+    
+    if(length(L1L2Vect) > 5){
+      PVVect[1] <- wilcox.test(L1L2Vect, alternative = "less")$p.value
+      PVVect[2] <- wilcox.test(L1L2Vect, alternative = "greater")$p.value
+    }
     
     PVVectMat <- rbind(PVVectMat, PVVect)
     
