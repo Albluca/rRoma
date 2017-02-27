@@ -61,7 +61,9 @@ ReadGMTFile <- function(FileLocation) {
 #' @examples
 SelectFromMSIGdb <- function(SearchString) {
   print("Searching in MsigDB v5.2")
-  return(Msigdb.v5.2.symbols.all[grep(SearchString, unlist(lapply(AllModules, "[[", "Name")), ignore.case = TRUE, fixed = TRUE)])
+  return(Msigdb.v5.2.symbols.all[grep(pattern = tolower(SearchString),
+                                      x = tolower(unlist(lapply(Msigdb.v5.2.symbols.all, "[[", "Name"))),
+                                      fixed = TRUE)])
 }
 
 

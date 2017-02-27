@@ -448,14 +448,6 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     print(paste(length(CompatibleGenes), "genes available for analysis"))
     
-    if(length(CompatibleGenes) > MaxGenes | length(CompatibleGenes) < MinGenes){
-      print("Number of genes outside the specified range")
-      print("Skipping module")
-      next()
-    } else {
-      UsedModules <- c(UsedModules, i)
-    }
-    
     if(MoreInfo){
       print("The following genes will be used:")
       print(CompatibleGenes)
@@ -466,9 +458,16 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                                CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ], PlotData = PlotData,
                                ModuleName = ModuleList[[i]]$Name)
     
+    if(length(SelGenes) > MaxGenes | length(SelGenes) < MinGenes){
+      print("Number of genes outside the specified range")
+      print("Skipping module")
+      next()
+    } else {
+      UsedModules <- c(UsedModules, i)
+    }
+    
     # Keep track of outliers
     OutLiersList[[i]] <- setdiff(CompatibleGenes, SelGenes)
-    
     
     # Computing PC on the unfiltered data (only for reference)
     
