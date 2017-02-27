@@ -557,17 +557,28 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               SampleSelGenes <- SampledsGeneList[[i]]
             }
             
-            if(length(SampleFilter) <= 1){
+            if(length(SampleSelGenes) <= 1){
               warning(paste("Size of filtered sample geneset extremely small (",  length(SampleSelGenes), "). This may cause inconsitencies. Increase MinGenes to prevent the problem"))
-              return(c(1, 0))
+              return(c(1, rep(0, PCADims - 1)))
             }
             
-            if(length(SampleFilter) >= 5){
-              PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale. = FALSE)
+            if(length(SampleSelGenes) >= 3*PCADims){
+              PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
             } else {
-              PCSamp <- prcomp(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
+              PCSamp <- prcomp(x = ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale. = FALSE)
             }
-            return((PCSamp$sdev^2)/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
+            
+            VarVect <- PCSamp$sdev^2
+            
+            if(length(VarVect)>PCADims){
+              VarVect <- VarVect[1:PCADims]
+            }
+            
+            if(length(VarVect)<PCADims){
+              VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
+            }
+            
+            return(VarVect/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
           })
           
         } else {
@@ -585,17 +596,28 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               SampleSelGenes <- Gl
             }
             
-            if(length(SampleFilter) <= 1){
+            if(length(SampleSelGenes) <= 1){
               warning(paste("Size of filtered sample geneset extremely small (",  length(SampleSelGenes), "). This may cause inconsitencies. Increase MinGenes to prevent the problem"))
-              return(c(1, 0))
+              return(c(1, rep(0, PCADims - 1)))
             }
             
-            if(length(SampleFilter) >= 5){
-              PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale. = FALSE)
+            if(length(SampleSelGenes) >= 3*PCADims){
+              PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
             } else {
-              PCSamp <- prcomp(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
+              PCSamp <- prcomp(x = ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale. = FALSE)
             }
-            return((PCSamp$sdev^2)/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
+            
+            VarVect <- PCSamp$sdev^2
+            
+            if(length(VarVect)>PCADims){
+              VarVect <- VarVect[1:PCADims]
+            }
+            
+            if(length(VarVect)<PCADims){
+              VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
+            }
+            
+            return(VarVect/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
           })
 
         }
@@ -633,8 +655,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     }
     
     if(length(L1L2Vect) > 5){
-      PVVect[1] <- wilcox.test(L1L2Vect, alternative = "less")$p.value
-      PVVect[2] <- wilcox.test(L1L2Vect, alternative = "greater")$p.value
+      PVVect[3] <- wilcox.test(L1L2Vect, alternative = "less")$p.value
+      PVVect[4] <- wilcox.test(L1L2Vect, alternative = "greater")$p.value
     }
     
     PVVectMat <- rbind(PVVectMat, PVVect)
@@ -777,5 +799,38 @@ InferBinaryWeigth <- function(ExpressionMatrix, ModuleList, FillAllNA = TRUE) {
 }
 
 
+
+
+
+
+
+
+
+GetTopContrib <- function(RomaData, Thr = 1, Mode = "Wil") {
+  
+  while(1){
+    
+    if(Mode == 'Wil'){
+      Selected <- RomaData$PVVectMat[,1]<Thr
+      break
+    }
+    
+    if(Mode == 'PPV'){
+      Selected <- RomaData$ModuleMatrix[,2]<Thr
+      break
+    }
+    
+    return(NULL)
+  }
+  
+  OrderList <- lapply(lapply(lapply(RomaData$ProjLists[Selected], abs), order, decreasing = TRUE), "[", 1:10)
+  
+  # GeneMatVal <- mapply("[", RomaData$ProjLists, OrderList)
+  # GeneMatVal[is.na(GeneMatVal)] <- 0
+  
+  GeneMatName <- mapply("[", lapply(RomaData$ProjLists[which(Selected)], names), OrderList)
+  colnames(GeneMatName) <- unlist(lapply(RomaData$ModuleSummary[Selected], "[[", "ModuleName"))
+  
+}
 
 
