@@ -297,7 +297,7 @@ PlotSampleWeigth <- function(RomaData, PlotSamples = 40,
       
     } else {
       
-      ReshapedData <- reshape::melt(ExpressionMatrix[GeneNames, DF$Samples])
+      ReshapedData <- reshape::melt(ExpressionMatrix[GeneNames, as.character(DF$Samples)])
       
       ReshapedData$X2 <- factor(as.character(ReshapedData$X2), levels = levels(DF$Samples))
       
