@@ -107,7 +107,7 @@ Plot.Underdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
     }
     
     if(Mode == 'PPV'){
-      Selected <- RomaData$ModuleMatrix[,2]>Thr
+      Selected <- RomaData$ModuleMatrix[,2]<1-Thr
       break
     }
     

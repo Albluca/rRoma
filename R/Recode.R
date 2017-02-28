@@ -806,31 +806,85 @@ InferBinaryWeigth <- function(ExpressionMatrix, ModuleList, FillAllNA = TRUE) {
 
 
 
-GetTopContrib <- function(RomaData, Thr = 1, Mode = "Wil") {
+#' Title
+#'
+#' @param RomaData 
+#' @param Thr 
+#' @param Mode 
+#' @param Type 
+#' @param nGenes 
+#' @param OrderType 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetTopContrib <- function(RomaData, Thr = 1, Mode = "Wil", Type = "Over", nGenes = 10, OrderType = "Abs") {
   
   while(1){
     
-    if(Mode == 'Wil'){
+    if(Mode == 'Wil' & Type == "Over"){
       Selected <- RomaData$PVVectMat[,1]<Thr
       break
     }
     
-    if(Mode == 'PPV'){
+    if(Mode == 'Wil' & Type == "Under"){
+      Selected <- RomaData$PVVectMat[,2]<Thr
+      break
+    }
+    
+    if(Mode == 'PPV' & Type == "Over"){
       Selected <- RomaData$ModuleMatrix[,2]<Thr
+      break
+    }
+    
+    if(Mode == 'PPV' & Type == "Over"){
+      Selected <- RomaData$ModuleMatrix[,2]<1-Thr
       break
     }
     
     return(NULL)
   }
   
-  OrderList <- lapply(lapply(lapply(RomaData$ProjLists[Selected], abs), order, decreasing = TRUE), "[", 1:10)
+  if(OrderType == "Abs"){
+    OrderList <- lapply(lapply(lapply(RomaData$ProjLists[Selected], abs), order, decreasing = TRUE), "[", 1:nGenes)
+  }
+  
+  if(OrderType == "Pos"){
+    OrderList <- lapply(lapply(RomaData$ProjLists[Selected], order, decreasing = TRUE), "[", 1:nGenes)
+  }
+  
+  if(OrderType == "Neg"){
+    OrderList <- lapply(lapply(RomaData$ProjLists[Selected], order, decreasing = FALSE), "[", 1:nGenes)
+  }
   
   # GeneMatVal <- mapply("[", RomaData$ProjLists, OrderList)
   # GeneMatVal[is.na(GeneMatVal)] <- 0
   
   GeneMatName <- mapply("[", lapply(RomaData$ProjLists[which(Selected)], names), OrderList)
+  GeneMatVal <- sign(mapply("[", RomaData$ProjLists[which(Selected)], OrderList))
   colnames(GeneMatName) <- unlist(lapply(RomaData$ModuleSummary[Selected], "[[", "ModuleName"))
   
+  CombData <- cbind(reshape::melt(GeneMatName), reshape::melt(GeneMatVal)$value)
+  
+  DupGenes <- names(which(table(GeneMatName) > 1))
+  
+  # IdxsToLookAt <- which(colSums(apply(GeneMatName, 2, "%in%", DupGenes)) > 0)
+  
+  PlotMat <- matrix(rep(0, ncol(GeneMatName)*length(unique(GeneMatName))), ncol = ncol(GeneMatName))
+  
+  colnames(PlotMat) <- colnames(GeneMatName)
+  rownames(PlotMat) <- unique(GeneMatName)
+  
+  lapply(as.list(1:ncol(GeneMatName)), function(i){
+    PlotMat[GeneMatName[,i],colnames(GeneMatName)[i]] <<- CombData[CombData[,2]==colnames(GeneMatName)[i] &
+                                                                     CombData[,3] %in% GeneMatName[,i],4]
+  })
+  
+  PlotMat <- PlotMat[rowSums(PlotMat != 0) > 0,]
+  pheatmap::pheatmap(t(PlotMat))
+  
+  return(GeneMatName)
 }
 
 
