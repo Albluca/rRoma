@@ -46,18 +46,19 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
     return(NULL)
   }
   
-  if(length(Selected)<1){
+  if(sum(Selected)<1){
     print("No Genset significant at the level selected")
     return(NULL)
   }
   
-  MeltData <- reshape::melt(RomaData$PC1Matrix[Selected,])
+  tMat <- RomaData$PC1Matrix[Selected,]
+  colnames(tMat) <- Groups
   
-  MeltData <- cbind(MeltData, paste(Groups))
+  MeltData <- reshape::melt(tMat)
   
-  MeltData <- data.frame(MeltData)
+  # MeltData <- data.frame(MeltData)
   
-  colnames(MeltData) <- c("GeneSet", "Sample", "Value", "Group") 
+  colnames(MeltData) <- c("GeneSet", "Group", "Value") 
   
   if(TestMode == "Aov+Tuk"){
     
@@ -72,6 +73,14 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
     SumData <- summary(AOVFitTypeI)
     print(SumData)
     
+    
+    p <- ggplot2::ggplot(MeltData, ggplot2::aes(y=Value, x=Group, fill=Group)) +
+      ggplot2::geom_boxplot() + ggplot2::guides(fill = "none") +
+      ggplot2::labs(y="PC1 weigth", x="Groups", title = "Groups")
+    
+    print(p)
+    
+    
     if(SumData[[1]][1,5] < TestPV1){
       print("A significant difference is observed across groups")
       
@@ -82,13 +91,6 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
       if(PlotDiag){
         plot(TukTest)
       }
-      
-      p <- ggplot2::ggplot(MeltData, ggplot2::aes(y=Value, x=Group, fill=Group)) +
-        ggplot2::geom_boxplot() + ggplot2::guides(fill = "none") +
-        ggplot2::labs(y="PC1 weigth", x="Groups", title = "Groups")
-      
-      print(p)
-      
       
       Diffs <- TukTest$Group
       Diffs <- data.frame(Diffs[Diffs[,4] < TestPV2,])
@@ -133,6 +135,20 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
     SumData <- summary(AOVFitTypeI)
     print(SumData)
     
+    Sep <- seq(from = 1, to = length(unique(MeltData$GeneSet)), by = 4)
+    if(max(Sep) < length(unique(MeltData$GeneSet))+1) Sep <- c(Sep, length(unique(MeltData$GeneSet))+1)
+    
+    for(i in 2:length(Sep)){
+      
+      p <- ggplot2::ggplot(MeltData[as.integer(MeltData$GeneSet) %in% Sep[i-1]:(Sep[i]-1),],
+                           ggplot2::aes(y=Value, x=Group, fill=Group)) + ggplot2::geom_boxplot() +
+        ggplot2::labs(y="PC1 weight", x="Groups", title = paste("Geneset VS Groups - Part", i-1)) +
+        ggplot2::facet_wrap( ~ GeneSet, ncol = 2) + ggplot2::theme(strip.text.x = ggplot2::element_text(size=6, face = "bold")) +
+        ggplot2::guides(fill = "none")
+      
+      print(p)
+    }
+    
     if(SumData[[1]][2,5] < TestPV1){
       print("A significant difference is observed across groups and metagenes")
       
@@ -144,19 +160,6 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
         plot(TukTest, las=2)
       }
       
-      Sep <- seq(from = 1, to = length(unique(MeltData$GeneSet)), by = 4)
-      if(max(Sep) < length(unique(MeltData$GeneSet))+1) Sep <- c(Sep, length(unique(MeltData$GeneSet))+1)
-      
-      for(i in 2:length(Sep)){
-        
-        p <- ggplot2::ggplot(MeltData[as.integer(MeltData$GeneSet) %in% Sep[i-1]:(Sep[i]-1),],
-                    ggplot2::aes(y=Value, x=Group, fill=Group)) + ggplot2::geom_boxplot() +
-          ggplot2::labs(y="PC1 weight", x="Groups", title = paste("Geneset VS Groups - Part", i-1)) +
-          ggplot2::facet_wrap( ~ GeneSet, ncol = 2) + ggplot2::theme(strip.text.x = ggplot2::element_text(size=6, face = "bold")) +
-          ggplot2::guides(fill = "none")
-        
-        print(p)
-      }
       
       Diffs <- TukTest$`Group:GeneSet`
       Diffs <- data.frame(Diffs[Diffs[,4] < TestPV2,])
