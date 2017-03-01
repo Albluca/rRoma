@@ -824,21 +824,25 @@ GetTopContrib <- function(RomaData, Thr = 1, Mode = "Wil", Type = "Over", nGenes
   while(1){
     
     if(Mode == 'Wil' & Type == "Over"){
+      print(paste("Using genestes overdispersed according to Wilcoxon test. Thr =", Thr))
       Selected <- RomaData$PVVectMat[,1]<Thr
       break
     }
     
     if(Mode == 'Wil' & Type == "Under"){
+      print(paste("Using genestes underdispersed according to Wilcoxon test. Thr =", Thr))
       Selected <- RomaData$PVVectMat[,2]<Thr
       break
     }
     
     if(Mode == 'PPV' & Type == "Over"){
+      print(paste("Using genestes underdispersed according to pseudo pv. Thr =", Thr))
       Selected <- RomaData$ModuleMatrix[,2]<Thr
       break
     }
     
     if(Mode == 'PPV' & Type == "Over"){
+      print(paste("Using genestes underdispersed according to pseudo pv. Thr =", Thr))
       Selected <- RomaData$ModuleMatrix[,2]<1-Thr
       break
     }
