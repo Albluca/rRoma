@@ -222,7 +222,7 @@ FixPCSign <-
     if (Mode == 'PreferActivation') {
       ToUse <- rep(TRUE, length(PC1Projections))
       if (!is.null(Thr)) {
-        ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr)
+        ToUse <- abs(PC1Projections) >= quantile(abs(PC1Projections), Thr)
       }
       
       if (sum(PC1Projections[ToUse]) < 0) {
@@ -237,7 +237,7 @@ FixPCSign <-
       
       ToUse <- rep(TRUE, length(PC1Projections))
       if (!is.null(Thr)) {
-        ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr)
+        ToUse <- abs(PC1Projections) >= quantile(abs(PC1Projections), Thr)
       }
       
       if (sum(Wei[ToUse] * PC1Projections[ToUse]) < 0) {
@@ -250,7 +250,7 @@ FixPCSign <-
     if (Mode == 'UseKnownWeigths') {
       ToUse <- rep(TRUE, length(PC1Projections))
       if (!is.null(Thr)) {
-        ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr)
+        ToUse <- abs(PC1Projections) >= quantile(abs(PC1Projections), Thr)
       }
       
       if (sum(Wei[!is.na(Wei) & ToUse] * PC1Projections[!is.na(Wei) & ToUse]) < 0) {
