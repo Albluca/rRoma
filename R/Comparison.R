@@ -138,7 +138,7 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
         
         p <- ggplot2::ggplot(MeltData[as.integer(MeltData$GeneSet) %in% Sep[i-1]:(Sep[i]-1),],
                     ggplot2::aes(y=Value, x=Group, fill=Group)) + ggplot2::geom_boxplot() +
-          ggplot2::labs(y="PC1 weight", x="Groups", ggplot2::title = paste("Geneset VS Groups - Part", i-1)) +
+          ggplot2::labs(y="PC1 weight", x="Groups", title = paste("Geneset VS Groups - Part", i-1)) +
           ggplot2::facet_wrap( ~ GeneSet, ncol = 2) + ggplot2::theme(strip.text.x = ggplot2::element_text(size=6, face = "bold")) +
           ggplot2::guides(fill = "none")
         
