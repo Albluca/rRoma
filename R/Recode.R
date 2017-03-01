@@ -785,7 +785,7 @@ InferBinaryWeigth <- function(ExpressionMatrix, ModuleList, FillAllNA = TRUE) {
   
   for(i in 1:length(ModuleList)){
     
-    if(FillAllNA & any(!is.na(ModuleList[[i]]$Weigths))){
+    if(!FillAllNA & any(!is.na(ModuleList[[i]]$Weigths))){
       next
     }
     
