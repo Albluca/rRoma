@@ -253,8 +253,7 @@ FixPCSign <-
         ToUse <- abs(PC1Projections) > quantile(abs(PC1Projections), Thr)
       }
       
-      if (sum(Wei[is.na(Wei) &
-                  ToUse] * PC1Projections[is.na(Wei) & ToUse]) < 0) {
+      if (sum(Wei[!is.na(Wei) & ToUse] * PC1Projections[!is.na(Wei) & ToUse]) < 0) {
         return(-1)
       } else {
         return(+1)
