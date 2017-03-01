@@ -788,8 +788,12 @@ InferBinaryWeigth <- function(ExpressionMatrix, ModuleList, FillAllNA = TRUE) {
     if(!FillAllNA & any(!is.na(ModuleList[[i]]$Weigths))){
       next
     }
+
+    ModuleList[[i]]$Weigths[is.na(ModuleList[[i]]$Weigths)] <- GeneWei[ModuleList[[i]]$Genes[is.na(ModuleList[[i]]$Weigths)]]
     
-    ModuleList[[i]]$Weigths[is.na(ModuleList[[i]]$Weigths)] <- (GeneWei[ModuleList[[i]]$Genes])[is.na(ModuleList[[i]]$Weigths)]
+    if(any(is.na(ModuleList[[i]]$Weigths))){
+      print(paste("Warning:", sum(is.na(ModuleList[[i]]$Weigths)), "gene(s) not found in the expression matrix"))
+    }
     
   }
   
