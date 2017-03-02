@@ -6,7 +6,7 @@
 \usage{
 CompareAcrossSamples(RomaData, Groups, GSThr = 0.001, Mode = "Wil",
   Type = "Over", TestMode = "Aov+Tuk", TestPV1 = 0.05, TestPV2 = 0.05,
-  PlotDiag = FALSE)
+  PlotDiag = FALSE, PlotXGSDiff = FALSE)
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
@@ -26,6 +26,8 @@ CompareAcrossSamples(RomaData, Groups, GSThr = 0.001, Mode = "Wil",
 \item{TestPV2}{numeric between 0 and 1, the threshold PV for Tukey}
 
 \item{PlotDiag}{boolean, should diagnostic plot be displyed?}
+
+\item{PlotXGSDiff}{boolean, should all the significant differences by considered?}
 }
 \description{
 Title

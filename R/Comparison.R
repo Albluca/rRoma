@@ -9,6 +9,7 @@
 #' @param TestPV1 numeric between 0 and 1, the threshold PV for Anova
 #' @param TestPV2 numeric between 0 and 1, the threshold PV for Tukey
 #' @param PlotDiag boolean, should diagnostic plot be displyed?
+#' @param PlotXGSDiff boolean, should all the significant differences by considered?
 #'
 #' @return
 #' @export
