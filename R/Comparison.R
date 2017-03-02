@@ -15,9 +15,10 @@
 #'
 #' @examples
 CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", Type = "Over",
-                                 TestMode = "Aov+Tuk", TestPV1 = 5e-2, TestPV2 = 5e-2, PlotDiag = FALSE) {
+                                 TestMode = "Aov+Tuk", TestPV1 = 5e-2, TestPV2 = 5e-2,
+                                 PlotDiag = FALSE, PlotXGSDiff = FALSE) {
   
-  while(1){
+  while(1){ 
     
     if(Mode == 'Wil' & Type == "Over"){
       print(paste("Using genestes overdispersed according to Wilcoxon test. GSThr =", GSThr))
@@ -49,16 +50,20 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
   if(sum(Selected)<1){
     print("No Genset significant at the level selected")
     return(NULL)
+  } else {
+    print(paste(sum(Selected), "geneset selected"))
   }
   
   tMat <- RomaData$PC1Matrix[Selected,]
-  colnames(tMat) <- Groups
+  names(Groups) <- colnames(tMat)
   
   MeltData <- reshape::melt(tMat)
+  MeltData <- cbind(MeltData, Groups[as.character(MeltData$X2)])
+  
   
   # MeltData <- data.frame(MeltData)
   
-  colnames(MeltData) <- c("GeneSet", "Group", "Value") 
+  colnames(MeltData) <- c("GeneSet", "Sample", "Value", "Group") 
   
   if(TestMode == "Aov+Tuk"){
     
@@ -80,6 +85,13 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
     
     print(p)
     
+    p <- ggplot2::ggplot(MeltData, ggplot2::aes(y=Value, x=Sample, fill=Group)) +
+      ggplot2::geom_boxplot() + ggplot2::coord_flip() +
+      ggplot2::labs(y="PC1 weigth", x="Samples", title = "Groups") +
+      ggplot2::theme(axis.text.y = ggplot2::element_blank())
+        
+    print(p)
+    
     
     if(SumData[[1]][1,5] < TestPV1){
       print("A significant difference is observed across groups")
@@ -96,6 +108,8 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
       Diffs <- data.frame(Diffs[Diffs[,4] < TestPV2,])
       Diffs <- cbind(rownames(Diffs), Diffs)
       colnames(Diffs)[1] <- "GDiff"
+      
+      print(paste(nrow(Diffs), "significant differences found"))
       
       if(nrow(Diffs)>1){
         
@@ -160,34 +174,55 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
         plot(TukTest, las=2)
       }
       
-      
       Diffs <- TukTest$`Group:GeneSet`
       Diffs <- data.frame(Diffs[Diffs[,4] < TestPV2,])
       Diffs <- cbind(rownames(Diffs), Diffs)
       colnames(Diffs)[1] <- "GGDiff"
       
-      SameGS <- unlist(
-        lapply(
-          lapply(
-            lapply(
-              strsplit(gsub(":", "-", as.character(Diffs$GGDiff)), c("-")),
-              "[", c(2,4)),
-            duplicated),
-          any))
+      GSPairs <- lapply(strsplit(gsub(":", "-", as.character(Diffs$GGDiff)), c("-")),"[", c(2,4))
+      SameGS <- unlist(lapply(lapply(GSPairs,duplicated),any))
+      GSVect <- unlist(lapply(GSPairs[SameGS], "[[", 1), use.names = FALSE)
       
+      print(paste(nrow(Diffs), "significant differences found"))
       
       if(nrow(Diffs)>0){
         
-        Sep <- seq(from = 1, to = nrow(Diffs), by = 10)
-        if(max(Sep) < nrow(Diffs)) Sep <- c(Sep, nrow(Diffs))
+        if(PlotXGSDiff){
+          
+          Sep <- seq(from = 1, to = nrow(Diffs), by = 10)
+          if(max(Sep) < nrow(Diffs)) Sep <- c(Sep, nrow(Diffs))
+          
+          
+          for(i in 2:length(Sep)){
+            p <- ggplot2::ggplot(Diffs[Sep[i-1]:Sep[i],],
+                                 ggplot2::aes(x = GGDiff, y = diff, ymin = lwr, ymax = upr)) +
+              ggplot2::geom_point() + ggplot2::geom_errorbar(width=0.25) + ggplot2::coord_flip() +
+              ggplot2::facet_wrap( ~ GGDiff, scales = "free_y", ncol = 1) +
+              ggplot2::labs(y="Mean difference", x="Categories", title = paste("Groups VS Genesets - Part", i-1)) +
+              ggplot2::theme(
+                # axis.text.x = element_blank(),
+                axis.text.y = ggplot2::element_blank(),
+                axis.ticks = ggplot2::element_blank(),
+                strip.text.x = ggplot2::element_text(size=6, face = "bold"))
+            
+            print(p)
+          }
+          
+        }
         
+        SplitDiff <- split(Diffs[SameGS,], GSVect)
         
-        for(i in 2:length(Sep)){
-          p <- ggplot2::ggplot(Diffs[Sep[i-1]:Sep[i],],
-                               ggplot2::aes(x = GGDiff, y = diff, ymin = lwr, ymax = upr)) +
+        for(i in 1:length(SplitDiff)){
+          
+          if(nrow(SplitDiff[[i]])<1){
+            next
+          }
+          
+          p <- ggplot2::ggplot(SplitDiff[[i]], ggplot2::aes(x = GGDiff, y = diff, ymin = lwr, ymax = upr)) +
             ggplot2::geom_point() + ggplot2::geom_errorbar(width=0.25) + ggplot2::coord_flip() +
             ggplot2::facet_wrap( ~ GGDiff, scales = "free_y", ncol = 1) +
-            ggplot2::labs(y="Mean difference", x="Categories", title = paste("Groups VS Genesets - Part", i-1)) +
+            ggplot2::labs(y="Mean difference", x="Categories",
+                          title = paste("Groups within", names(SplitDiff)[i])) +
             ggplot2::theme(
               # axis.text.x = element_blank(),
               axis.text.y = ggplot2::element_blank(),
@@ -198,17 +233,6 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
         }
         
         
-        p <- ggplot2::ggplot(Diffs[SameGS,], ggplot2::aes(x = GGDiff, y = diff, ymin = lwr, ymax = upr)) +
-          ggplot2::geom_point() + ggplot2::geom_errorbar(width=0.25) + ggplot2::coord_flip() +
-          ggplot2::facet_wrap( ~ GGDiff, scales = "free_y", ncol = 1) +
-          ggplot2::labs(y="Mean difference", x="Categories", title = "Groups within Genesets") +
-          ggplot2::theme(
-            # axis.text.x = element_blank(),
-            axis.text.y = ggplot2::element_blank(),
-            axis.ticks = ggplot2::element_blank(),
-            strip.text.x = ggplot2::element_text(size=6, face = "bold"))
-        
-        print(p)
         
       }
       
