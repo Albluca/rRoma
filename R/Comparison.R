@@ -1,14 +1,14 @@
 #' Title
 #'
-#' @param RomaData 
-#' @param Groups 
-#' @param GSThr 
-#' @param Mode 
-#' @param Type 
-#' @param TestMode 
-#' @param TestPV1 
-#' @param TestPV2 
-#' @param PlotDiag 
+#' @param RomaData list, the analysis returned by rRoma
+#' @param Groups string vector, a vector of group identifier described by strings
+#' @param Type string, wether to use overdispersed ("Over") or underdispersed ("Under") geneset
+#' @param Mode string, the mode used to detect over- or under-dispersed gene. Can be Willcox ("Wil") or pseudo pv ("PPV)
+#' @param GSThr numeric between 0 and 1, the threshould for significance of the test 
+#' @param TestMode string, the type of statistical methodology to assess sample difference. Currentyl only ANOVA + Tukey is implemented ("Aov+Tuk")
+#' @param TestPV1 numeric between 0 and 1, the threshold PV for Anova
+#' @param TestPV2 numeric between 0 and 1, the threshold PV for Tukey
+#' @param PlotDiag boolean, should diagnostic plot be displyed?
 #'
 #' @return
 #' @export

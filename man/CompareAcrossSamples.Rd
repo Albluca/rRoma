@@ -9,23 +9,23 @@ CompareAcrossSamples(RomaData, Groups, GSThr = 0.001, Mode = "Wil",
   PlotDiag = FALSE)
 }
 \arguments{
-\item{RomaData}{}
+\item{RomaData}{list, the analysis returned by rRoma}
 
-\item{Groups}{}
+\item{Groups}{string vector, a vector of group identifier described by strings}
 
-\item{GSThr}{}
+\item{GSThr}{numeric between 0 and 1, the threshould for significance of the test}
 
-\item{Mode}{}
+\item{Mode}{string, the mode used to detect over- or under-dispersed gene. Can be Willcox ("Wil") or pseudo pv ("PPV)}
 
-\item{Type}{}
+\item{Type}{string, wether to use overdispersed ("Over") or underdispersed ("Under") geneset}
 
-\item{TestMode}{}
+\item{TestMode}{string, the type of statistical methodology to assess sample difference. Currentyl only ANOVA + Tukey is implemented ("Aov+Tuk")}
 
-\item{TestPV1}{}
+\item{TestPV1}{numeric between 0 and 1, the threshold PV for Anova}
 
-\item{TestPV2}{}
+\item{TestPV2}{numeric between 0 and 1, the threshold PV for Tukey}
 
-\item{PlotDiag}{}
+\item{PlotDiag}{boolean, should diagnostic plot be displyed?}
 }
 \description{
 Title
