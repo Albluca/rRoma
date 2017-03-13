@@ -457,7 +457,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     # Comparison with sample genesets
     if(nSamples > 0){
       
-      if((length(CompatibleGenes) <= OldSamplesLen + ApproxSamples) & (OldSamplesLen > 0)){
+      if((length(CompatibleGenes)*(100-ApproxSamples)/100 <= OldSamplesLen) & (OldSamplesLen > 0)){
         
         if(length(CompatibleGenes) == OldSamplesLen){
           print("Reusing previous sampling (Same metagene size)")
@@ -615,8 +615,6 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                           c(ExpVar[1], sum(sign(SampledExp[1,] - ExpVar[1])==1)/nSamples,
                             ExpVar[1]/ExpVar[2], sum(sign(SampledExp[2,] - ExpVar[1]/ExpVar[2])==1)/nSamples))
     
-    # TO FIX FROM HERE
-    
     CorrectSignUnf <- FixPCSign(PCBaseUnf$rotation[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
                              Mode = PC1SignMode, DefWei = DefaultWeight, Thr = PC1SignThr)
     
@@ -640,7 +638,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     ModuleSummary[[length(ModuleSummary)+1]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
                                OriginalGenes = CompatibleGenes, UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase, PCBaseUnf = PCBaseUnf,
                                CorrectSign = CorrectSign, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
-                               PC1Projections.SignFixed = tWeigths, PC1ProjectionsUnf.SignFixed = tWeigthsUnf)
+                               PC1Weight.SignFixed = tWeigths, PC1WeightUnf.SignFixed = tWeigthsUnf)
   
   }
   

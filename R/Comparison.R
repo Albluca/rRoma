@@ -55,7 +55,7 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
     print(paste(sum(Selected), "geneset selected"))
   }
   
-  tMat <- RomaData$PC1Matrix[Selected,]
+  tMat <- RomaData$ProjMatrix[Selected,]
   names(Groups) <- colnames(tMat)
   
   MeltData <- reshape::melt(tMat)
@@ -82,13 +82,13 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
     
     p <- ggplot2::ggplot(MeltData, ggplot2::aes(y=Value, x=Group, fill=Group)) +
       ggplot2::geom_boxplot() + ggplot2::guides(fill = "none") +
-      ggplot2::labs(y="PC1 weigth", x="Groups", title = "Groups")
+      ggplot2::labs(y="PC1 projection", x="Groups", title = "Groups")
     
     print(p)
     
     p <- ggplot2::ggplot(MeltData, ggplot2::aes(y=Value, x=Sample, fill=Group)) +
       ggplot2::geom_boxplot() + ggplot2::coord_flip() +
-      ggplot2::labs(y="PC1 weigth", x="Samples", title = "Groups") +
+      ggplot2::labs(y="PC1 projection", x="Samples", title = "Groups") +
       ggplot2::theme(axis.text.y = ggplot2::element_blank())
         
     print(p)
@@ -157,7 +157,7 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
       
       p <- ggplot2::ggplot(MeltData[as.integer(MeltData$GeneSet) %in% Sep[i-1]:(Sep[i]-1),],
                            ggplot2::aes(y=Value, x=Group, fill=Group)) + ggplot2::geom_boxplot() +
-        ggplot2::labs(y="PC1 weight", x="Groups", title = paste("Geneset VS Groups - Part", i-1)) +
+        ggplot2::labs(y="PC1 projection", x="Groups", title = paste("Geneset VS Groups - Part", i-1)) +
         ggplot2::facet_wrap( ~ GeneSet, ncol = 2) + ggplot2::theme(strip.text.x = ggplot2::element_text(size=6, face = "bold")) +
         ggplot2::guides(fill = "none")
       

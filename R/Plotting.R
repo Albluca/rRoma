@@ -40,13 +40,14 @@ Plot.Overdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
   
   par(op)
   
-  PC1ProjList <- RomaData$ProjLists
   
-  PC1ProjList.Scaled <- lapply(PC1ProjList, function(x){
-    x[x>0] <- log10(x[x>0])
-    x[x<0] <- -log10(-x[x<0])
-    return(x)
-  }) 
+  # PC1ProjList <- RomaData$ProjLists
+  # 
+  # PC1ProjList.Scaled <- lapply(PC1ProjList, function(x){
+  #   x[x>0] <- log10(x[x>0])
+  #   x[x<0] <- -log10(-x[x<0])
+  #   return(x)
+  # }) 
   
   # for(i in 1:sum(Selected)){
   #   
@@ -64,7 +65,7 @@ Plot.Overdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
   #   #      srt=0, cex=.5, col='red')
   # }
   
-  pheatmap::pheatmap(RomaData$PC1Matrix[Selected,], color = ColorGradient,
+  pheatmap::pheatmap(RomaData$ProjMatrix[Selected,], color = ColorGradient,
                      main = "Overdispersed genesets", cluster_cols = cluster_cols)
 
 }
@@ -97,6 +98,7 @@ Plot.Overdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
 Plot.Underdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
                                 GenesetMargin = 4, SampleMargin = 4,
                                 ColorGradient = colorRamps::blue2red(50),
+                                # ExpressionMatrix = NULL,
                                 cluster_cols = FALSE){
   
   while(1){
@@ -124,14 +126,31 @@ Plot.Underdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
   
   par(op)
   
-  PC1ProjList <- RomaData$ProjLists
-  
-  PC1ProjList.Scaled <- lapply(PC1ProjList, function(x){
-    x[x>0] <- log10(x[x>0])
-    x[x<0] <- -log10(-x[x<0])
-    return(x)
-  }) 
-  
+  # if(!is.null(ExpressionMatrix)){
+  #   
+  #   MedianByGS <- sapply(lapply(RomaData$ModuleSummary[Selected], "[[", "UsedGenes"), function(gl){
+  #     median(ExpressionMatrix[gl,])
+  #   })
+  #   
+  #   MedianByGSAll <- sapply(lapply(RomaData$ModuleSummary, "[[", "UsedGenes"), function(gl){
+  #     median(ExpressionMatrix[gl,])
+  #   })
+  #   
+  #   
+  #   boxplot(MedianByGSAll)
+  #   points(MedianByGS, col='red', pch=20)
+  #   
+  #   
+  # }
+  # 
+  # PC1ProjList <- RomaData$ProjLists
+  # 
+  # PC1ProjList.Scaled <- lapply(PC1ProjList, function(x){
+  #   x[x>0] <- log10(x[x>0])
+  #   x[x<0] <- -log10(-x[x<0])
+  #   return(x)
+  # }) 
+  # 
   # for(i in 1:sum(Selected)){
   #   SortIds <- sort(PC1ProjList.Scaled[[i]], index.return=TRUE)
   #   
@@ -148,7 +167,7 @@ Plot.Underdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
   #   #      srt=0, cex=.5, col='red')
   # }
   
-  pheatmap::pheatmap(RomaData$PC1Matrix[Selected,], color = ColorGradient,
+  pheatmap::pheatmap(RomaData$ProjMatrix[Selected,], color = ColorGradient,
                      main = "Underdispersed genesets", cluster_cols = cluster_cols)
   
 }
@@ -165,7 +184,7 @@ Plot.Underdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
 #' @export
 #'
 #' @examples
-PlotGeneProjections <- function(RomaData, PlotGenes = 40,
+PlotGeneWeight <- function(RomaData, PlotGenes = 40,
                                 ExpressionMatrix = NULL, LogExpression = TRUE,
                                 ModuleToPlot = NULL){
   
@@ -175,7 +194,7 @@ PlotGeneProjections <- function(RomaData, PlotGenes = 40,
   
   for(i in ModuleToPlot){
     
-    FiltGenes <- RomaData$ModuleSummary[[i]]$PC1Projections.SignFixed
+    FiltGenes <- RomaData$ModuleSummary[[i]]$PC1Weight.SignFixed
     names(FiltGenes) <- RomaData$ModuleSummary[[i]]$UsedGenes
     
     GeneNames <- RomaData$ModuleSummary[[i]]$UsedGenes
@@ -196,7 +215,7 @@ PlotGeneProjections <- function(RomaData, PlotGenes = 40,
     p <- ggplot2::ggplot(data = DF, ggplot2::aes(y = Gene, x = Value)) + ggplot2::geom_point() +
       # ggplot2::scale_y_continuous(breaks = DF$Position[1:nGenes], labels = DF$Gene[1:nGenes]) +
       # ggplot2::scale_y_discrete(breaks=levels(DF$Gene)) +
-      ggplot2::labs(x = "PC1 projection", y = "Gene") +
+      ggplot2::labs(x = "PC1 weight", y = "Gene") +
       ggplot2::theme(panel.grid.minor = ggplot2::element_line(colour = NA))
     
     if(is.null(ExpressionMatrix)){
@@ -255,7 +274,7 @@ PlotGeneProjections <- function(RomaData, PlotGenes = 40,
 #' @export
 #'
 #' @examples
-PlotSampleWeigth <- function(RomaData, PlotSamples = 40,
+PlotSampleProjections <- function(RomaData, PlotSamples = 40,
                                 ExpressionMatrix = NULL, LogExpression = TRUE,
                                 ModuleToPlot = NULL){
   
@@ -265,8 +284,8 @@ PlotSampleWeigth <- function(RomaData, PlotSamples = 40,
   
   for(i in ModuleToPlot){
     
-    FiltSamp <- RomaData$ModuleSummary[[i]]$PCABase$rotation[,"PC1"]
-    names(FiltSamp) <- colnames(RomaData$PC1Matrix)
+    FiltSamp <- RomaData$ModuleSummary[[i]]$PCABase$x[,"PC1"]
+    names(FiltSamp) <- colnames(RomaData$ProjMatrix)
     
     GeneNames <- RomaData$ModuleSummary[[i]]$UsedGenes
     
@@ -286,7 +305,7 @@ PlotSampleWeigth <- function(RomaData, PlotSamples = 40,
     p <- ggplot2::ggplot(data = DF, ggplot2::aes(y = Samples, x = Value)) + ggplot2::geom_point() +
       # ggplot2::scale_y_continuous(breaks = DF$Position[1:nGenes], labels = DF$Gene[1:nGenes]) +
       # ggplot2::scale_y_discrete(breaks=levels(DF$Gene)) +
-      ggplot2::labs(x = "PC1 weight", y = "Sample") +
+      ggplot2::labs(x = "PC1 projection", y = "Sample") +
       ggplot2::theme(panel.grid.minor = ggplot2::element_line(colour = NA))
     
     if(is.null(ExpressionMatrix)){
