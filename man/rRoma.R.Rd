@@ -42,12 +42,12 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
 
 \item{FixedCenter}{logical, should PCA with fixed center be used?}
 
-\item{GeneOutDetection}{character scalar, the algorithm used to filter genes in a module. Possible values are "PC1IQR" (Projection on PC1, order statistics),
-"PC1DC" (Projection on PC1, dendrogram clustering), "L1OutVarPerc" (Percentage variation relative to the median variance explained supporgted by a leave one out approach), and
+\item{GeneOutDetection}{character scalar, the algorithm used to filter genes in a module. Possible values are
+"L1OutVarPerc" (Percentage variation relative to the median variance explained supporgted by a leave one out approach), and
 "L1OutVarDC" (Dendrogram clustering statistics on variance explained supported by a leave one out approach)}
 
-\item{GeneOutThr}{scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("PC1DC" and "L1OutVarDC"),
-minimal percentage variation (L1OutVarPerc), or minimal median-absolute-deviations.}
+\item{GeneOutThr}{scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC") or
+minimal percentage variation (L1OutVarPerc).}
 
 \item{GeneSelMode}{character scalar, mode used to sample genes: all available genes ("All") or genes not present in the module ("Others")}
 

@@ -13,87 +13,10 @@
 #' @export
 #'
 #' @examples
-DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, CompatibleGenes, ExpressionData, PlotData = FALSE, ModuleName = '', PrintInfo = TRUE) {
+DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, CompatibleGenes, ExpressionData,
+                           PlotData = FALSE, ModuleName = '', PrintInfo = TRUE) {
   
   SelGenes <- CompatibleGenes
-  
-  if(GeneOutDetection == "PC1IQR"){
-    if(PrintInfo){
-      print("Detecting outliers using order statistics on PC1")
-    }
-    
-    
-    # Computing PC1 over samples
-    PCA1Genes <- irlba::prcomp_irlba(x = ExpressionData, n = 1, center = ModulePCACenter, scale. = FALSE, retx = TRUE)$x
-    
-    
-    if(PlotData){
-      # Plotting rotated genes over PC1
-      B <- boxplot(x = PCA1Genes, at = 1, horizontal = FALSE, ylab = "PC1 projection", main = ModuleName)
-    }
-    
-    # Selecting outliers using mean and sd
-    # Use Rank statistics
-    GenesOut <- scater::isOutlier(PCA1Genes, nmads = GeneOutThr)
-    
-    if(PrintInfo){
-      print(paste(sum(GenesOut), "genes will be filtered:"))
-      if(sum(GenesOut)>0){
-        print(CompatibleGenes[GenesOut])
-      }
-    }
-    
-    if(PlotData){
-      # Highliting outliers
-      points(y= PCA1Genes[GenesOut], x=rep(1, sum(GenesOut)), col='red', pch=20)
-      legend("center", pch = 20, col='red', legend = "Outlier(s)")
-    }
-    
-    # Updating gene list
-    SelGenes <- CompatibleGenes[!GenesOut]
-  }
-  
-  if(GeneOutDetection == "PC1DC"){
-    if(PrintInfo){
-      print("Detecting outliers using dendrogram clusterization on distanc from the center of PC1")
-    }
-    
-    # Computing PC1 over samples
-    PCA1Genes <- as.vector(irlba::prcomp_irlba(x = ExpressionData, n = 1, center = ModulePCACenter, scale. = FALSE, retx = TRUE)$x)
-    PCA1GenesABS <- abs(PCA1Genes)
-    names(PCA1GenesABS) <- CompatibleGenes
-    
-    HC <- hclust(dist(PCA1GenesABS))
-    
-    if(PlotData){
-      # Plotting rotated genes over PC1
-      plot(HC, xlab = "Genes", main = ModuleName)
-    }
-    
-    DGroup <- cutree(HC, k = 2)
-    G1 <- which(DGroup == 1)
-    G2 <- which(DGroup == 2)
-    
-    if(length(G1) <= GeneOutThr | length(G2) <= GeneOutThr){
-      
-      if(length(G1) < length(G2)){
-        GenesOut <- DGroup == 1
-      } else {
-        GenesOut <- DGroup == 2
-      }
-      
-    }
-    
-    if(PrintInfo){
-      print(paste(sum(GenesOut), "genes will be filtered:"))
-      if(sum(GenesOut)>0){
-        print(CompatibleGenes[GenesOut])
-      }
-    }
-    
-    # Updating gene list
-    SelGenes <- CompatibleGenes[!GenesOut]
-  }
   
   if(GeneOutDetection == "L1OutVarPerc"){
     
@@ -103,8 +26,9 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     
     # Computing all the PC1
     AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      PC1Var <- irlba::prcomp_irlba(x = ExpressionData[-i, ], n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
-      return(PC1Var/sum(apply(scale(ExpressionData[-i, ], center = ModulePCACenter, scale = FALSE), 2, var)))
+      tData <- t(ExpressionData[-i, ])
+      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
+      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
     })
     
     
@@ -140,8 +64,9 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     
     # Computing all the PC1
     AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      PC1Var <- irlba::prcomp_irlba(x = ExpressionData[-i, ], n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
-      return(PC1Var/sum(apply(scale(ExpressionData[-i, ], center = ModulePCACenter, scale = FALSE), 2, var)))
+      tData <- t(ExpressionData[-i, ])
+      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
+      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
     })
     
     
@@ -162,13 +87,12 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     if(length(G1) <= GeneOutThr | length(G2) <= GeneOutThr){
       
       if(length(G1) < length(G2)){
-        GenesOut <- DGroup == 1
+        GenesOut <- (DGroup == 1)
       } else {
-        GenesOut <- DGroup == 2
+        GenesOut <- (DGroup == 2)
       }
       
     }
-    
     
     print(paste(sum(GenesOut), "genes will be filtered:"))
     if(sum(GenesOut)>0){
@@ -209,7 +133,7 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
 #'
 #' @examples
 FixPCSign <-
-  function(PC1Projections,
+  function(PC1Weigth,
            Wei = NULL,
            Mode = 'none',
            DefWei = 1,
@@ -220,12 +144,12 @@ FixPCSign <-
     }
     
     if (Mode == 'PreferActivation') {
-      ToUse <- rep(TRUE, length(PC1Projections))
+      ToUse <- rep(TRUE, length(PC1Weigth))
       if (!is.null(Thr)) {
-        ToUse <- abs(PC1Projections) >= quantile(abs(PC1Projections), Thr)
+        ToUse <- abs(PC1Weigth) >= quantile(abs(PC1Weigth), Thr)
       }
       
-      if (sum(PC1Projections[ToUse]) < 0) {
+      if (sum(PC1Weigth[ToUse]) < 0) {
         return(-1)
       } else {
         return(+1)
@@ -235,12 +159,12 @@ FixPCSign <-
     if (Mode == 'UseAllWeigths') {
       Wei[is.na(Wei)] <- DefWei
       
-      ToUse <- rep(TRUE, length(PC1Projections))
+      ToUse <- rep(TRUE, length(PC1Weigth))
       if (!is.null(Thr)) {
-        ToUse <- abs(PC1Projections) >= quantile(abs(PC1Projections), Thr)
+        ToUse <- abs(PC1Weigth) >= quantile(abs(PC1Weigth), Thr)
       }
       
-      if (sum(Wei[ToUse] * PC1Projections[ToUse]) < 0) {
+      if (sum(Wei[ToUse] * PC1Weigth[ToUse]) < 0) {
         return(-1)
       } else {
         return(+1)
@@ -248,12 +172,12 @@ FixPCSign <-
     }
     
     if (Mode == 'UseKnownWeigths') {
-      ToUse <- rep(TRUE, length(PC1Projections))
+      ToUse <- rep(TRUE, length(PC1Weigth))
       if (!is.null(Thr)) {
-        ToUse <- abs(PC1Projections) >= quantile(abs(PC1Projections), Thr)
+        ToUse <- abs(PC1Weigth) >= quantile(abs(PC1Weigth), Thr)
       }
       
-      if (sum(Wei[!is.na(Wei) & ToUse] * PC1Projections[!is.na(Wei) & ToUse]) < 0) {
+      if (sum(Wei[!is.na(Wei) & ToUse] * PC1Weigth[!is.na(Wei) & ToUse]) < 0) {
         return(-1)
       } else {
         return(+1)
@@ -285,11 +209,11 @@ FixPCSign <-
 #' @param Ncomp iteger, number of principal components used to filter samples in the gene expression space
 #' @param OutGeneSpace scalar, number of median-absolute-deviations away from median required for in a sample to be called an outlier in the gene expression space
 #' @param FixedCenter logical, should PCA with fixed center be used?
-#' @param GeneOutDetection character scalar, the algorithm used to filter genes in a module. Possible values are "PC1IQR" (Projection on PC1, order statistics),
-#' "PC1DC" (Projection on PC1, dendrogram clustering), "L1OutVarPerc" (Percentage variation relative to the median variance explained supporgted by a leave one out approach), and
+#' @param GeneOutDetection character scalar, the algorithm used to filter genes in a module. Possible values are
+#' "L1OutVarPerc" (Percentage variation relative to the median variance explained supporgted by a leave one out approach), and
 #' "L1OutVarDC" (Dendrogram clustering statistics on variance explained supported by a leave one out approach)
-#' @param GeneOutThr scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("PC1DC" and "L1OutVarDC"),
-#' minimal percentage variation (L1OutVarPerc), or minimal median-absolute-deviations.
+#' @param GeneOutThr scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC") or
+#' minimal percentage variation (L1OutVarPerc).
 #' @param GeneSelMode character scalar, mode used to sample genes: all available genes ("All") or genes not present in the module ("Others")
 #' @param centerData logical, should the gene expression values be centered over the samples?
 #' @param MoreInfo logical, shuold detailed information on the computation by printed?
@@ -384,6 +308,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   if(centerData){
     print("Centering gene expression over samples")
     ExpressionMatrix <- t(scale(t(ExpressionMatrix), center = centerData, scale = FALSE))
+  } else {
+    warning("Centering gene expression over samples. This will generate inconsistencies if the data are not already centered.")
   }
   
   if(FixedCenter){
@@ -397,8 +323,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   ModuleSummary <- list()
   ModuleMatrix <- NULL
   
-  ProjLists <- list()
-  PC1Matrix <- NULL
+  ProjMatrix <- NULL
+  WeigthList <- list()
   
   PVVectMat <- NULL
   
@@ -435,7 +361,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                                    "PCADims"), envir = environment())
   }
   
-  ModuleList <- ModuleList[order(unlist(lapply(lapply(ModuleList, "[[", "Genes"), length)))]
+  ModuleOrder <- order(unlist(lapply(lapply(ModuleList, "[[", "Genes"), length)))
+  ModuleList <- ModuleList[ModuleOrder]
   
   OldSamplesLen <- 0
   
@@ -488,8 +415,15 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       names(Correction) <- CompatibleGenes
     }
     
-    PCBase <- irlba::prcomp_irlba(x = Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
-    ExpVar <- (PCBase$sdev^2)/sum(apply(scale(Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ], center = ModulePCACenter, scale = FALSE), 2, var))
+    BaseMatrix <- t(Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ])
+    
+    if(PCADims > min(dim(ExpressionMatrix[CompatibleGenes, ])/3)){
+      PCBase <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE)
+    } else {
+      PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000)
+    }
+    
+    ExpVar <- (PCBase$sdev^2)/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var))
     
     PCBaseUnf <- PCBase
     ExpVarUnf <- ExpVar
@@ -498,8 +432,21 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
     
     # Computing PC on the filtered data
-    PCBase <- irlba::prcomp_irlba(x = Correction[SelGenes]*ExpressionMatrix[SelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
-    ExpVar <- (PCBase$sdev^2)/sum(apply(scale(Correction[SelGenes]*ExpressionMatrix[SelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var))
+    
+    BaseMatrix <- t(Correction[SelGenes]*ExpressionMatrix[SelGenes, ])
+    
+    if(PCADims > min(dim(ExpressionMatrix[SelGenes, ])/3)){
+      PCBase <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE)
+    } else {
+      PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000)
+    }
+    
+    ExpVar <- (PCBase$sdev^2)/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var))
+    
+    # ExpVar <- c(
+    #   1/sum(apply(scale(Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)/PCBase$sdev[1]^2),
+    #   1/sum(apply(scale(Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)/PCBase$sdev[2]^2)
+    # )
     
     print("Post-filter data")
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
@@ -561,10 +508,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               return(c(1, rep(0, PCADims - 1)))
             }
             
+            BaseMatrix <- t(ExpressionMatrix[SampleSelGenes, ])
+            
             if(length(SampleSelGenes) >= 3*PCADims){
-              PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
+              PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE)
             } else {
-              PCSamp <- prcomp(x = ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale. = FALSE)
+              PCSamp <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE)
             }
             
             VarVect <- PCSamp$sdev^2
@@ -577,7 +526,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
             }
             
-            return(VarVect/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
+            return(VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)))
           })
           
         } else {
@@ -600,10 +549,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               return(c(1, rep(0, PCADims - 1)))
             }
             
+            BaseMatrix <- t(ExpressionMatrix[SampleSelGenes, ])
+            
             if(length(SampleSelGenes) >= 3*PCADims){
-              PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SampleSelGenes, ], n = PCADims, center = ModulePCACenter, scale. = FALSE)
+              PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE)
             } else {
-              PCSamp <- prcomp(x = ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale. = FALSE)
+              PCSamp <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE)
             }
             
             VarVect <- PCSamp$sdev^2
@@ -616,7 +567,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
             }
             
-            return(VarVect/sum(apply(scale(ExpressionMatrix[SampleSelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
+            return(VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)))
           })
 
         }
@@ -664,24 +615,33 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                           c(ExpVar[1], sum(sign(SampledExp[1,] - ExpVar[1])==1)/nSamples,
                             ExpVar[1]/ExpVar[2], sum(sign(SampledExp[2,] - ExpVar[1]/ExpVar[2])==1)/nSamples))
     
-    CorrectSignUnf <- FixPCSign(PCBaseUnf$x[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
+    # TO FIX FROM HERE
+    
+    CorrectSignUnf <- FixPCSign(PCBaseUnf$rotation[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
                              Mode = PC1SignMode, DefWei = DefaultWeight, Thr = PC1SignThr)
     
-    CorrectSign <- FixPCSign(PCBase$x[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
+    CorrectSign <- FixPCSign(PCBase$rotation[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
                              Mode = PC1SignMode, DefWei = DefaultWeight, Thr = PC1SignThr)
     
-    ModProjGenes <- CorrectSign*PCBase$x[,1]
-    names(ModProjGenes) <- SelGenes
+    ModProjSamples <- CorrectSign*PCBase$x[,1]
+    names(ModProjSamples) <- colnames(ExpressionMatrix)
     
-    ProjLists[[length(ProjLists)+1]] <- ModProjGenes
-    PC1Matrix <- rbind(PC1Matrix, CorrectSign*PCBase$rotation[,1])
+    ProjMatrix <- rbind(ProjMatrix, ModProjSamples)
+    
+    tWeigths <- CorrectSign*PCBase$rotation[,1]
+    names(tWeigths) <- SelGenes
+    
+    tWeigthsUnf <- CorrectSign*PCBaseUnf$rotation[,1]
+    names(tWeigthsUnf) <- CompatibleGenes
+    
+    WeigthList[[length(WeigthList)+1]] <- CorrectSign*PCBase$rotation[,1]
+    
     
     ModuleSummary[[length(ModuleSummary)+1]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
                                OriginalGenes = CompatibleGenes, UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase, PCBaseUnf = PCBaseUnf,
                                CorrectSign = CorrectSign, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
-                               PC1Projections.SignFixed = CorrectSign*PCBase$x[,1], PC1ProjectionsUnf.SignFixed = CorrectSignUnf*PCBaseUnf$x[,1])
+                               PC1Projections.SignFixed = tWeigths, PC1ProjectionsUnf.SignFixed = tWeigthsUnf)
   
-    
   }
   
   if(UseParallel){
@@ -697,11 +657,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   colnames(PVVectMat) <- c("L1 WT less pv", "L1 WT greater pv", "L1/L2 WT less pv", "L1/2 WT greater pv")
   rownames(PVVectMat) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
   
-  colnames(PC1Matrix) <- colnames(ExpressionMatrix)
-  rownames(PC1Matrix) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
+  colnames(ProjMatrix) <- colnames(ExpressionMatrix)
+  rownames(ProjMatrix) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
   
-  return(list(ModuleMatrix = ModuleMatrix, PC1Matrix = PC1Matrix, ModuleSummary = ModuleSummary,
-              ProjLists = ProjLists, PVVectMat = PVVectMat, OutLiersList = OutLiersList))
+  ReorderIdxs <- order(ModuleOrder[UsedModules])
+  
+  return(list(ModuleMatrix = ModuleMatrix[ReorderIdxs,], ProjMatrix = ProjMatrix[ReorderIdxs,], ModuleSummary = ModuleSummary[ReorderIdxs],
+              WeigthList = WeigthList[ReorderIdxs], PVVectMat = PVVectMat[ReorderIdxs,], OutLiersList = OutLiersList[ReorderIdxs]))
   
 }
 

@@ -4,8 +4,7 @@
 \alias{FixPCSign}
 \title{Correct the sign of the principal component}
 \usage{
-FixPCSign(PC1Projections, Wei = NULL, Mode = "none", DefWei = 1,
-  Thr = NULL)
+FixPCSign(PC1Weigth, Wei = NULL, Mode = "none", DefWei = 1, Thr = NULL)
 }
 \arguments{
 \item{Wei}{vector, numeric optional vector of weigths}

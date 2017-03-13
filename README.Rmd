@@ -7,14 +7,40 @@ output:
     variant: markdown_github
 ---
 
-The rROMA package is being developed as an alternative to the use of the java interface to [ROMA](https://github.com/sysbio-curie/Roma). It is currently under development and is only marginally functional.
+This package provides an R implementation of [ROMA](http://journal.frontiersin.org/article/10.3389/fgene.2016.00018/full). The package is under active development and is currently not stable.
+
+A Java implementation developed by Andrei Zynovyev and is also [available](https://github.com/sysbio-curie/Roma).
 
 ## Intalling rROMA
 
-The rRoma package can be installed using `devtools`
+The rRoma package relies on the `scater` package, which is available only on BioConductor. This package can be installed with the following command
+
+```{r, eval=FALSE}
+source("https://bioconductor.org/biocLite.R")
+biocLite("scater")
+```
+
+rRoma ccan then be installed using `devtools`
 
 ```{r, eval=FALSE}
 install.packages("devtools")
 library(devtools)
 install_github("Albluca/rROMA")
 ```
+
+## Using rROMA
+
+The package can be loaded with the usual syntax, i.e., by typing
+
+```{r}
+library(rRoma)
+```
+
+rRoma requires a gene expression matrix - with column names indicating samples and row names indicating gene names - and a module file containing information on the genesets that need to be evaluated. The module file can be loaded from a GMT file. Functions to automate the generation of then GMT file are also available.
+
+```{r}
+
+
+
+```
+
