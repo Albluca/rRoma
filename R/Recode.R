@@ -575,9 +575,11 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         SampledExp <- rbind(SampledExp[1,], SampledExp[1,]/SampledExp[2,], SampledExp[2,])
         names(SampledExp) <- c("Sampled L1", "Sampled L1/L2", "Sampled L2")
         
+        OldSamplesLen <- length(CompatibleGenes)
+        
       }
       
-      OldSamplesLen <- length(CompatibleGenes)
+      
       
     }
     
