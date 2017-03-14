@@ -330,7 +330,6 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   PVVectMat <- NULL
   
   OutLiersList <- list()
-  
   UsedModules <- NULL
   
   # Filter genes for compatibility with the expression matrix
@@ -510,16 +509,16 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             if(length(SampleSelGenes) <= 1){
               SampMedian <- median(ExpressionMatrix[SampleSelGenes])
               warning(paste("Size of filtered sample geneset extremely small (",  length(SampleSelGenes), "). This may cause inconsitencies. Increase MinGenes to prevent the problem"))
-              return(list("ExpVar"=c(1, rep(0, PCADims - 1), "MedianExp"= SampMedian)))
+              return(list("ExpVar"=c(1, rep(0, PCADims - 1), "MedianExp"= SampMedian, "PCProj"=NA)))
             }
             
             BaseMatrix <- t(ExpressionMatrix[SampleSelGenes, ])
             SampMedian <- median(BaseMatrix)
             
             if(length(SampleSelGenes) >= 3*PCADims){
-              PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE)
+              PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
             } else {
-              PCSamp <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE)
+              PCSamp <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
             }
             
             VarVect <- PCSamp$sdev^2
@@ -533,7 +532,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             }
             
             return(list("ExpVar"=VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)),
-                        "MedianExp"= SampMedian))
+                        "MedianExp"= SampMedian, "PCProj"=PCSamp$x[,1:2]))
           })
           
         } else {
@@ -561,9 +560,9 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             SampMedian <- median(BaseMatrix)
             
             if(length(SampleSelGenes) >= 3*PCADims){
-              PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE)
+              PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
             } else {
-              PCSamp <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE)
+              PCSamp <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
             }
             
             VarVect <- PCSamp$sdev^2
@@ -577,7 +576,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             }
             
             return(list("ExpVar"=VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)),
-                        "MedianExp"=SampMedian))
+                        "MedianExp"=SampMedian, "PCProj"=PCSamp$x[,1:2]))
           })
 
         }

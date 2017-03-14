@@ -278,6 +278,65 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
       
     }
     
+    
+    PrjList <- lapply(RomaData$ModuleSummary[[i]]$SampledExp, "[[", "PCProj")
+    PC1Sample <- unlist(lapply(PrjList, function(x){if(all(!is.na(x))) x[,1]}), use.names = FALSE)
+    PC2Sample <- unlist(lapply(PrjList, function(x){if(all(!is.na(x))) x[,2]}), use.names = FALSE)
+    
+    PC1Data <- RomaData$ModuleSummary[[i]]$PCABase$x[,1]
+    PC2Data <- RomaData$ModuleSummary[[i]]$PCABase$x[,2]
+    
+    DF <- data.frame(PC1 = c(PC1Sample, PC1Data), PC2 = c(PC2Sample, PC2Data),
+                     Source = c(rep("Sampling", length(PC1Sample)),
+                                    rep("Data", length(PC1Data))
+                                )
+                     )
+    
+    XLims <- quantile(PC1Sample, c(.01, .99))
+    XLims[1] <- min(XLims[1], min(PC1Data))
+    XLims[2] <- max(XLims[2], max(PC1Data))
+    
+    YLims <- quantile(PC2Sample, c(.01, .99))
+    YLims[1] <- min(YLims[1], min(PC2Data))
+    YLims[2] <- max(YLims[2], max(PC2Data))
+    
+    p <- ggplot2::ggplot(DF, ggplot2::aes(x = PC1, y = PC2, colour = Source, alpha=Source)) + ggplot2::geom_point() +
+      ggplot2::scale_alpha_manual(values=c(Data=1, Sampling=.2), guide=FALSE) +
+      ggplot2::scale_x_continuous(limits = XLims) +
+      ggplot2::scale_y_continuous(limits = YLims) +
+      ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+                             "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
+                             "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
+      ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0)
+    
+    print(p)
+    
+    
+    p <- ggplot2::ggplot(DF[DF$Source=="Sampling",], ggplot2::aes(x = PC1, y = PC2)) +
+      ggplot2::stat_density_2d(ggplot2::aes(fill = ..density..), geom="raster", contour = FALSE, n = 250) +
+      ggplot2::scale_x_continuous(limits = XLims) +
+      ggplot2::scale_y_continuous(limits = YLims) +
+      ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+                             "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
+                             "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
+      ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0) +
+      ggplot2::geom_point(data = DF[DF$Source=="Data",], mapping = ggplot2::aes(x = PC1, y = PC2), color="red")
+
+    print(p)
+    
+    
+    p <- ggplot2::ggplot(DF[DF$Source=="Sampling",], ggplot2::aes(x = PC1, y = PC2)) +
+      ggplot2::geom_bin2d(bins=75) +
+      ggplot2::scale_x_continuous(limits = XLims) +
+      ggplot2::scale_y_continuous(limits = YLims) +
+      ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+                             "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
+                             "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
+      ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0) +
+      ggplot2::geom_point(data = DF[DF$Source=="Data",], mapping = ggplot2::aes(x = PC1, y = PC2), color="red")
+    
+    print(p)
+    
   }
   
 }
