@@ -5,10 +5,20 @@
 \title{Title}
 \usage{
 PlotGeneWeight(RomaData, PlotGenes = 40, ExpressionMatrix = NULL,
-  LogExpression = TRUE, ModuleToPlot = NULL)
+  LogExpression = TRUE, Selected = NULL, PlotWeigthSign = FALSE)
 }
 \arguments{
 \item{RomaData}{}
+
+\item{PlotGenes}{}
+
+\item{ExpressionMatrix}{}
+
+\item{LogExpression}{}
+
+\item{Selected}{}
+
+\item{PlotWeigthSign}{}
 }
 \description{
 Title

@@ -4,8 +4,8 @@
 \alias{CompareAcrossSamples}
 \title{Title}
 \usage{
-CompareAcrossSamples(RomaData, Groups, GSThr = 0.001, Mode = "Wil",
-  Type = "Over", TestMode = "Aov+Tuk", TestPV1 = 0.05, TestPV2 = 0.05,
+CompareAcrossSamples(RomaData, Groups, Selected = NULL,
+  TestMode = "Aov+Tuk", TestPV1 = 0.05, TestPV2 = 0.05,
   PlotDiag = FALSE, PlotXGSDiff = FALSE)
 }
 \arguments{
@@ -13,11 +13,7 @@ CompareAcrossSamples(RomaData, Groups, GSThr = 0.001, Mode = "Wil",
 
 \item{Groups}{string vector, a vector of group identifier described by strings}
 
-\item{GSThr}{numeric between 0 and 1, the threshould for significance of the test}
-
-\item{Mode}{string, the mode used to detect over- or under-dispersed gene. Can be Willcox ("Wil") or pseudo pv ("PPV)}
-
-\item{Type}{string, wether to use overdispersed ("Over") or underdispersed ("Under") geneset}
+\item{Selected}{The genesets used to perform the analysis}
 
 \item{TestMode}{string, the type of statistical methodology to assess sample difference. Currentyl only ANOVA + Tukey is implemented ("Aov+Tuk")}
 

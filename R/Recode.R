@@ -430,6 +430,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     print("Pre-filter data")
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
+    print(paste("Median expression:", median(BaseMatrix)))
     
     # Computing PC on the filtered data
     
@@ -448,8 +449,10 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     #   1/sum(apply(scale(Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)/PCBase$sdev[2]^2)
     # )
     
+    MadianExp <- median(BaseMatrix)
     print("Post-filter data")
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
+    print(paste("Median expression:", MadianExp))
     
     print(paste("Previous sample size:", OldSamplesLen))
     print(paste("Next sample size:", length(CompatibleGenes)))
@@ -490,7 +493,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         
         if(!UseParallel){
           
-          SampledExp <- sapply(as.list(1:length(SampledsGeneList)), function(i){
+          SampledExp <- lapply(as.list(1:length(SampledsGeneList)), function(i){
             if(SampleFilter){
               SampleSelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
                                                CompatibleGenes = SampledsGeneList[[i]], ExpressionData = ExpressionMatrix[SampledsGeneList[[i]], ], PlotData = FALSE,
@@ -504,11 +507,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             }
             
             if(length(SampleSelGenes) <= 1){
+              SampMedian <- median(ExpressionMatrix[SampleSelGenes])
               warning(paste("Size of filtered sample geneset extremely small (",  length(SampleSelGenes), "). This may cause inconsitencies. Increase MinGenes to prevent the problem"))
-              return(c(1, rep(0, PCADims - 1)))
+              return(list("ExpVar"=c(1, rep(0, PCADims - 1), "MedianExp"= SampMedian)))
             }
             
             BaseMatrix <- t(ExpressionMatrix[SampleSelGenes, ])
+            SampMedian <- median(BaseMatrix)
             
             if(length(SampleSelGenes) >= 3*PCADims){
               PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE)
@@ -526,12 +531,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
             }
             
-            return(VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)))
+            return(list("ExpVar"=VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)),
+                        "MedianExp"= SampMedian))
           })
           
         } else {
           
-          SampledExp <- parallel::parSapply(cl, SampledsGeneList, function(Gl){
+          SampledExp <- parallel::parLapply(cl, SampledsGeneList, function(Gl){
             library(irlba)
             if(SampleFilter){
               SampleSelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
@@ -545,11 +551,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             }
             
             if(length(SampleSelGenes) <= 1){
+              SampMedian <- median(ExpressionMatrix[SampleSelGenes])
               warning(paste("Size of filtered sample geneset extremely small (",  length(SampleSelGenes), "). This may cause inconsitencies. Increase MinGenes to prevent the problem"))
-              return(c(1, rep(0, PCADims - 1)))
+              return(list("ExpVar"=c(1, rep(0, PCADims - 1)), "MedianExp"= SampMedian))
             }
             
             BaseMatrix <- t(ExpressionMatrix[SampleSelGenes, ])
+            SampMedian <- median(BaseMatrix)
             
             if(length(SampleSelGenes) >= 3*PCADims){
               PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE)
@@ -567,39 +575,50 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
             }
             
-            return(VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)))
+            return(list("ExpVar"=VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)),
+                        "MedianExp"=SampMedian))
           })
 
         }
         
-        SampledExp <- rbind(SampledExp[1,], SampledExp[1,]/SampledExp[2,], SampledExp[2,])
-        names(SampledExp) <- c("Sampled L1", "Sampled L1/L2", "Sampled L2")
+        SampleExpVar <- sapply(SampledExp, "[[", "ExpVar")
+        SampleMedianExp <- sapply(SampledExp, "[[", "MedianExp")
+
+        SampleExpVar <- rbind(SampleExpVar[1,], SampleExpVar[1,]/SampleExpVar[2,], SampleExpVar[2,])
+        rownames(SampleExpVar) <- c("Sampled L1", "Sampled L1/L2", "Sampled L2")
         
         OldSamplesLen <- length(CompatibleGenes)
         
       }
       
-      
-      
     }
+    
     
     if(PlotData){
-      boxplot(SampledExp[1,], at = 1, ylab = "Explained Variance",
+      boxplot(SampleExpVar[1,], at = 1, ylab = "Explained variance",
               main = ModuleList[[i]]$Name, ylim = c(0,1))
-      points(x=1, y=ExpVar[1], pch = 20, col="red", cex= 2)
+      points(x=1, y=SampleExpVar[1], pch = 20, col="red", cex= 2)
       
+      boxplot(SampleExpVar[2,], at = 1, ylab = "Explained variance (PC1) / Explained variance (PC2)",
+              log = "y", main = ModuleList[[i]]$Name, ylim=range(c(SampleExpVar[2,], SampleExpVar[1]/SampleExpVar[2])))
+      points(x=1, y=SampleExpVar[1]/SampleExpVar[2], pch = 20, col="red", cex= 2)
       
-      boxplot(SampledExp[2,], at = 1, ylab = "Explained variance (PC1) / Explained variance (PC2)", log = "y")
-      points(x=1, y=ExpVar[1]/ExpVar[2], pch = 20, col="red", cex= 2)
+      boxplot(SampleMedianExp, at = 1, ylab = "Median expression",
+              main = ModuleList[[i]]$Name, ylim=range(c(SampleMedianExp, median(BaseMatrix))))
+      points(x=1, y=MadianExp, pch = 20, col="red", cex= 2)
+      
     }
     
-    L1Vect <- SampledExp[1,] - ExpVar[1]
+    L1Vect <- SampleExpVar[1,] - ExpVar[1]
     L1Vect <- L1Vect[is.finite(L1Vect)]
     
-    L1L2Vect <- SampledExp[2,] - ExpVar[1]/ExpVar[2]
+    L1L2Vect <- SampleExpVar[2,] - ExpVar[1]/ExpVar[2]
     L1L2Vect <- L1L2Vect[is.finite(L1L2Vect)]
     
-    PVVect <- rep(NA, 4)
+    MedianVect <- SampleMedianExp - MadianExp
+    MedianVect <- MedianVect[is.finite(MedianVect)]
+    
+    PVVect <- rep(NA, 6)
     
     if(length(L1Vect) > 5){
       PVVect[1] <- wilcox.test(L1Vect, alternative = "less")$p.value
@@ -611,11 +630,17 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       PVVect[4] <- wilcox.test(L1L2Vect, alternative = "greater")$p.value
     }
     
+    if(length(MedianVect) > 5){
+      PVVect[5] <- wilcox.test(MedianVect, alternative = "less")$p.value
+      PVVect[6] <- wilcox.test(MedianVect, alternative = "greater")$p.value
+    }
+    
     PVVectMat <- rbind(PVVectMat, PVVect)
     
     ModuleMatrix <- rbind(ModuleMatrix,
-                          c(ExpVar[1], sum(sign(SampledExp[1,] - ExpVar[1])==1)/nSamples,
-                            ExpVar[1]/ExpVar[2], sum(sign(SampledExp[2,] - ExpVar[1]/ExpVar[2])==1)/nSamples))
+                          c(ExpVar[1], sum(sign(SampleExpVar[1,] - ExpVar[1])==1)/nSamples,
+                            ExpVar[1]/ExpVar[2], sum(sign(SampleExpVar[2,] - ExpVar[1]/ExpVar[2])==1)/nSamples,
+                            MadianExp, sum(sign(MedianVect - MadianExp)==1)/nSamples))
     
     CorrectSignUnf <- FixPCSign(PCBaseUnf$rotation[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
                              Mode = PC1SignMode, DefWei = DefaultWeight, Thr = PC1SignThr)
@@ -640,7 +665,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     ModuleSummary[[length(ModuleSummary)+1]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
                                OriginalGenes = CompatibleGenes, UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase, PCBaseUnf = PCBaseUnf,
                                CorrectSign = CorrectSign, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
-                               PC1Weight.SignFixed = tWeigths, PC1WeightUnf.SignFixed = tWeigthsUnf)
+                               PC1Weight.SignFixed = tWeigths, PC1WeightUnf.SignFixed = tWeigthsUnf,
+                               GMTWei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes])
   
   }
   
@@ -651,10 +677,11 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
   }
   
-  colnames(ModuleMatrix) <- c("L1", "ppv L1", "L1/L2", "ppv L1/L2")
+  colnames(ModuleMatrix) <- c("L1", "ppv L1", "L1/L2", "ppv L1/L2", "Median Exp", "ppv Median Exp")
   rownames(ModuleMatrix) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
   
-  colnames(PVVectMat) <- c("L1 WT less pv", "L1 WT greater pv", "L1/L2 WT less pv", "L1/2 WT greater pv")
+  colnames(PVVectMat) <- c("L1 WT less pv", "L1 WT greater pv", "L1/L2 WT less pv", "L1/2 WT greater pv",
+                           "Median Exp WT less pv", "Median Exp WT greater pv")
   rownames(PVVectMat) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
   
   colnames(ProjMatrix) <- colnames(ExpressionMatrix)

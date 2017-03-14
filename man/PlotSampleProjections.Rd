@@ -5,10 +5,18 @@
 \title{Title}
 \usage{
 PlotSampleProjections(RomaData, PlotSamples = 40, ExpressionMatrix = NULL,
-  LogExpression = TRUE, ModuleToPlot = NULL)
+  LogExpression = TRUE, Selected = NULL)
 }
 \arguments{
 \item{RomaData}{}
+
+\item{PlotSamples}{}
+
+\item{ExpressionMatrix}{}
+
+\item{LogExpression}{}
+
+\item{Selected}{}
 }
 \description{
 Title

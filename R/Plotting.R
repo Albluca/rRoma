@@ -1,72 +1,54 @@
-#' Plot overdispersed genesets
+#' Plot genesets
 #'
 #' @param RomaData 
-#' @param Thr 
-#' @param Mode 
+#' @param Selected 
 #' @param GenesetMargin 
 #' @param SampleMargin 
+#' @param ColorGradient 
+#' @param cluster_cols 
 #'
 #' @return
 #' @export
 #'
 #' @examples
-Plot.Overdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
+Plot.Genesets <- function(RomaData, Selected = NULL,
                                GenesetMargin = 4, SampleMargin = 4,
                                ColorGradient = colorRamps::blue2red(50),
                                cluster_cols = FALSE){
   
-  while(1){
-    
-    if(Mode == 'Wil'){
-      Selected <- RomaData$PVVectMat[,1]<Thr
-      break
-    }
-    
-    if(Mode == 'PPV'){
-      Selected <- RomaData$ModuleMatrix[,2]<Thr
-      break
-    }
-    
+  if(is.null(Selected)){
+    Selected <- 1:nrow(RomaData$ProjMatrix)
+  }
+  
+  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+    print("No Genset selected")
     return(NULL)
+  } else {
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
   }
   
   op <- par(mar=c(GenesetMargin, 5, 4, 2))
   
-  B <- boxplot(lapply(lapply(RomaData$ModuleSummary[Selected], "[[", "SampledExp"), function(x) x[1,]),
-               at = 1:sum(Selected), las = 2, ylab = "Explained variance", main = "Overdispersed genesets",
+  B <- boxplot(lapply(RomaData$ModuleSummary[Selected], function(x){
+    sapply(x$SampledExp, "[[", "ExpVar")[1,]
+  }), at = 1:length(Selected), las = 2, ylab = "Explained variance", main = "Selected genesets",
+  names = unlist(lapply(RomaData$ModuleSummary[Selected], "[[", "ModuleName")),
+  ylim = c(0,1))
+  points(x = 1:length(Selected), y = RomaData$ModuleMatrix[Selected,1], pch = 20, col="red", cex = 2)
+  
+  PlotData <- lapply(RomaData$ModuleSummary[Selected], function(x){
+    sapply(x$SampledExp, "[[", "MedianExp")
+    })
+  
+  B <- boxplot(PlotData, at = 1:length(Selected), las = 2, ylab = "Median expression", main = "Selected genesets",
                names = unlist(lapply(RomaData$ModuleSummary[Selected], "[[", "ModuleName")),
-               ylim = c(0,1))
-  points(x = 1:sum(Selected), y = RomaData$ModuleMatrix[Selected,1], pch = 20, col="red", cex = 2)
+               ylim = range(c(unlist(PlotData), RomaData$ModuleMatrix[Selected,5]), na.rm = TRUE))
+  points(x = 1:length(Selected), y = RomaData$ModuleMatrix[Selected,5], pch = 20, col="red", cex = 2)
   
   par(op)
   
-  
-  # PC1ProjList <- RomaData$ProjLists
-  # 
-  # PC1ProjList.Scaled <- lapply(PC1ProjList, function(x){
-  #   x[x>0] <- log10(x[x>0])
-  #   x[x<0] <- -log10(-x[x<0])
-  #   return(x)
-  # }) 
-  
-  # for(i in 1:sum(Selected)){
-  #   
-  #   SortIds <- sort(PC1ProjList.Scaled[[i]], index.return=TRUE)
-  #   
-  #   B <- boxplot(list("Activators"=SortIds$x[SortIds$x>0], "InHIbitors"=-SortIds$x[SortIds$x<0]),
-  #                main = RomaData$ModuleSummary[[which(Selected)[i]]]$ModuleName, ylab = "Controbution (Log10)")
-  #   
-  #   # B <- barplot(SortIds$x[SortIds$x>0], main = paste(RomaData$ModuleSummary[[which(Selected)[i]]]$ModuleName, "(Activators)"), horiz = TRUE)
-  #   # text(y = B, x = 0, labels = (RomaData$ModuleSummary[[which(Selected)[i]]]$UsedGenes)[SortIds$ix[SortIds$x>0]],
-  #   #      srt=0, cex=.5, col='red')
-  #   # 
-  #   # B <- barplot(-SortIds$x[SortIds$x<0], main = paste(RomaData$ModuleSummary[[which(Selected)[i]]]$ModuleName, "(Inhibitors)"), horiz = TRUE)
-  #   # text(y = B, x = 0, labels = (RomaData$ModuleSummary[[which(Selected)[i]]]$UsedGenes)[SortIds$ix[SortIds$x<0]],
-  #   #      srt=0, cex=.5, col='red')
-  # }
-  
   pheatmap::pheatmap(RomaData$ProjMatrix[Selected,], color = ColorGradient,
-                     main = "Overdispersed genesets", cluster_cols = cluster_cols)
+                     main = "Selected genesets", cluster_cols = cluster_cols)
 
 }
 
@@ -74,103 +56,6 @@ Plot.Overdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
 
 
 
-
-
-
-
-
-
-
-
-
-#' Plot underdispersed
-#'
-#' @param RomaData 
-#' @param Thr 
-#' @param Mode 
-#' @param GenesetMargin 
-#' @param SampleMargin 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-Plot.Underdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
-                                GenesetMargin = 4, SampleMargin = 4,
-                                ColorGradient = colorRamps::blue2red(50),
-                                # ExpressionMatrix = NULL,
-                                cluster_cols = FALSE){
-  
-  while(1){
-    
-    if(Mode == 'Wil'){
-      Selected <- RomaData$PVVectMat[,2]<Thr
-      break
-    }
-    
-    if(Mode == 'PPV'){
-      Selected <- RomaData$ModuleMatrix[,2]<1-Thr
-      break
-    }
-    
-    return(NULL)
-  }
-  
-  op <- par(mar=c(GenesetMargin, 5, 4, 2))
-  
-  B <- boxplot(lapply(lapply(RomaData$ModuleSummary[Selected], "[[", "SampledExp"), function(x) x[1,]),
-               at = 1:sum(Selected), las = 2, ylab = "Explained variance", main = "Underdispersed genesets",
-               names = unlist(lapply(RomaData$ModuleSummary[Selected], "[[", "ModuleName")),
-               ylim = c(0,1))
-  points(x = 1:sum(Selected), y = RomaData$ModuleMatrix[Selected,1], pch = 20, col="red", cex = 2)
-  
-  par(op)
-  
-  # if(!is.null(ExpressionMatrix)){
-  #   
-  #   MedianByGS <- sapply(lapply(RomaData$ModuleSummary[Selected], "[[", "UsedGenes"), function(gl){
-  #     median(ExpressionMatrix[gl,])
-  #   })
-  #   
-  #   MedianByGSAll <- sapply(lapply(RomaData$ModuleSummary, "[[", "UsedGenes"), function(gl){
-  #     median(ExpressionMatrix[gl,])
-  #   })
-  #   
-  #   
-  #   boxplot(MedianByGSAll)
-  #   points(MedianByGS, col='red', pch=20)
-  #   
-  #   
-  # }
-  # 
-  # PC1ProjList <- RomaData$ProjLists
-  # 
-  # PC1ProjList.Scaled <- lapply(PC1ProjList, function(x){
-  #   x[x>0] <- log10(x[x>0])
-  #   x[x<0] <- -log10(-x[x<0])
-  #   return(x)
-  # }) 
-  # 
-  # for(i in 1:sum(Selected)){
-  #   SortIds <- sort(PC1ProjList.Scaled[[i]], index.return=TRUE)
-  #   
-  #   B <- boxplot(list("Activators"=SortIds$x[SortIds$x>0], "Inhibitors"=-SortIds$x[SortIds$x<0]),
-  #                main = RomaData$ModuleSummary[[which(Selected)[i]]]$ModuleName, ylab = "Controbution (Log10)")
-  #   
-  #   
-  #   # B <- barplot(SortIds$x[SortIds$x>0], main = paste(RomaData$ModuleSummary[[which(Selected)[i]]]$ModuleName, "(Activators)"), horiz = TRUE)
-  #   # text(y = B, x = 0, labels = (RomaData$ModuleSummary[[which(Selected)[i]]]$UsedGenes)[SortIds$ix[SortIds$x>0]],
-  #   #      srt=0, cex=.5, col='red')
-  #   # 
-  #   # B <- barplot(-SortIds$x[SortIds$x<0], main = paste(RomaData$ModuleSummary[[which(Selected)[i]]]$ModuleName, "(Inhibitors)"), horiz = TRUE)
-  #   # text(y = B, x = 0, labels = (RomaData$ModuleSummary[[which(Selected)[i]]]$UsedGenes)[SortIds$ix[SortIds$x<0]],
-  #   #      srt=0, cex=.5, col='red')
-  # }
-  
-  pheatmap::pheatmap(RomaData$ProjMatrix[Selected,], color = ColorGradient,
-                     main = "Underdispersed genesets", cluster_cols = cluster_cols)
-  
-}
 
 
 
@@ -179,20 +64,33 @@ Plot.Underdispersed <- function(RomaData, Thr = 1, Mode = "Wil",
 #' Title
 #'
 #' @param RomaData 
+#' @param PlotGenes 
+#' @param ExpressionMatrix 
+#' @param LogExpression 
+#' @param Selected 
+#' @param PlotWeigthSign 
 #'
 #' @return
 #' @export
 #'
 #' @examples
 PlotGeneWeight <- function(RomaData, PlotGenes = 40,
-                                ExpressionMatrix = NULL, LogExpression = TRUE,
-                                ModuleToPlot = NULL){
+                           ExpressionMatrix = NULL, LogExpression = TRUE,
+                           Selected = NULL, PlotWeigthSign = FALSE){
   
-  if(is.null(ModuleToPlot)){
-    ModuleToPlot <- 1:length(RomaData$ModuleSummary)
-  } 
+  if(is.null(Selected)){
+    Selected <- 1:nrow(RomaData$ProjMatrix)
+  }
   
-  for(i in ModuleToPlot){
+  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+    print("No Genset selected")
+    return(NULL)
+  } else {
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
+  }
+  
+  
+  for(i in Selected){
     
     FiltGenes <- RomaData$ModuleSummary[[i]]$PC1Weight.SignFixed
     names(FiltGenes) <- RomaData$ModuleSummary[[i]]$UsedGenes
@@ -201,18 +99,37 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
     
     nGenes <- min(PlotGenes, length(GeneNames))
     
-    DF <- data.frame(cbind(names(FiltGenes),
-                           FiltGenes),
+    GMTWei = sign(RomaData$ModuleSummary[[i]]$GMTWei)
+    names(GMTWei) = names(FiltGenes)
+    GMTWei[is.na(GMTWei)] <- 0
+    
+    DF <- data.frame(cbind(names(FiltGenes), FiltGenes,
+                           GMTWei),
                      row.names = NULL)
-    colnames(DF) <- c("Gene", "Value")
+    colnames(DF) <- c("Gene", "Value", "Wei")
     
     DF$Value <- as.numeric(as.character(DF$Value))
     DF <- DF[order(abs(DF$Value), decreasing = TRUE)[1:nGenes],]
     DF <- DF[order(DF$Value), ]
     
     DF$Gene <- factor(as.character(DF$Gene), levels = DF$Gene)
+    DF$Wei <- factor(as.character(DF$Wei), levels = c("-1", "0", "1"))
     
-    p <- ggplot2::ggplot(data = DF, ggplot2::aes(y = Gene, x = Value)) + ggplot2::geom_point() +
+    if(PlotWeigthSign){
+      if(any(as.character(DF$Wei)=="0")){
+        p <- ggplot2::ggplot(data = DF, ggplot2::aes(y = Gene, x = Value, color = Wei)) +
+          ggplot2::scale_color_manual(values = c("red", "black", "blue"), guide=FALSE)
+      } else {
+        p <- ggplot2::ggplot(data = DF, ggplot2::aes(y = Gene, x = Value, color = Wei)) +
+          ggplot2::scale_color_manual(values = c("red", "blue"), guide=FALSE)
+      }
+      
+      
+    } else {
+      p <- ggplot2::ggplot(data = DF, ggplot2::aes(y = Gene, x = Value))
+    }
+    
+     p <- p + ggplot2::geom_point() +
       # ggplot2::scale_y_continuous(breaks = DF$Position[1:nGenes], labels = DF$Gene[1:nGenes]) +
       # ggplot2::scale_y_discrete(breaks=levels(DF$Gene)) +
       ggplot2::labs(x = "PC1 weight", y = "Gene") +
@@ -229,9 +146,23 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
       ReshapedData <- reshape::melt(ExpressionMatrix[as.character(DF$Gene), ])
       
       ReshapedData$X1 <- factor(as.character(ReshapedData$X1), levels = levels(DF$Gene))
+      ReshapedData <- cbind(ReshapedData, GMTWei[as.character(ReshapedData$X1)])
+      colnames(ReshapedData)[4] <- "Wei"
+      ReshapedData$Wei <- factor(as.character(ReshapedData$Wei), levels = c("-1", "0", "1"))
       
-      p1 <- ggplot2::ggplot(ReshapedData, ggplot2::aes(x=X1, y=value)) + 
-        ggplot2::geom_boxplot() + ggplot2::coord_flip() +
+      if(PlotWeigthSign){
+        if(any(as.character(ReshapedData$Wei)=="0")){
+          p1 <- ggplot2::ggplot(ReshapedData, ggplot2::aes(x=X1, y=value, fill=Wei)) +
+            ggplot2::scale_fill_manual(values = c("red", "white", "blue"), guide=FALSE)
+        } else {
+          p1 <- ggplot2::ggplot(ReshapedData, ggplot2::aes(x=X1, y=value, fill=Wei)) +
+            ggplot2::scale_fill_manual(values = c("red", "blue"), guide=FALSE)
+        }
+      } else {
+        p1 <- ggplot2::ggplot(ReshapedData, ggplot2::aes(x=X1, y=value))
+      }
+      
+      p1 <- p1 + ggplot2::geom_boxplot() + ggplot2::coord_flip() + 
         ggplot2::labs(x = "Gene", y = "Expression")
       
       if(LogExpression){
@@ -269,6 +200,10 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
 #' Title
 #'
 #' @param RomaData 
+#' @param PlotSamples 
+#' @param ExpressionMatrix 
+#' @param LogExpression 
+#' @param Selected 
 #'
 #' @return
 #' @export
@@ -276,13 +211,20 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
 #' @examples
 PlotSampleProjections <- function(RomaData, PlotSamples = 40,
                                 ExpressionMatrix = NULL, LogExpression = TRUE,
-                                ModuleToPlot = NULL){
+                                Selected = NULL){
   
-  if(is.null(ModuleToPlot)){
-    ModuleToPlot <- 1:length(RomaData$ModuleSummary)
+  if(is.null(Selected)){
+    Selected <- 1:nrow(RomaData$ProjMatrix)
+  }
+  
+  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+    print("No Genset selected")
+    return(NULL)
+  } else {
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
   } 
   
-  for(i in ModuleToPlot){
+  for(i in Selected){
     
     FiltSamp <- RomaData$ModuleSummary[[i]]$PCABase$x[,"PC1"]
     names(FiltSamp) <- colnames(RomaData$ProjMatrix)

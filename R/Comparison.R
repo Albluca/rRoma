@@ -2,9 +2,7 @@
 #'
 #' @param RomaData list, the analysis returned by rRoma
 #' @param Groups string vector, a vector of group identifier described by strings
-#' @param Type string, wether to use overdispersed ("Over") or underdispersed ("Under") geneset
-#' @param Mode string, the mode used to detect over- or under-dispersed gene. Can be Willcox ("Wil") or pseudo pv ("PPV)
-#' @param GSThr numeric between 0 and 1, the threshould for significance of the test 
+#' @param Selected The genesets used to perform the analysis 
 #' @param TestMode string, the type of statistical methodology to assess sample difference. Currentyl only ANOVA + Tukey is implemented ("Aov+Tuk")
 #' @param TestPV1 numeric between 0 and 1, the threshold PV for Anova
 #' @param TestPV2 numeric between 0 and 1, the threshold PV for Tukey
@@ -15,44 +13,19 @@
 #' @export
 #'
 #' @examples
-CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", Type = "Over",
+CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
                                  TestMode = "Aov+Tuk", TestPV1 = 5e-2, TestPV2 = 5e-2,
                                  PlotDiag = FALSE, PlotXGSDiff = FALSE) {
   
-  while(1){ 
-    
-    if(Mode == 'Wil' & Type == "Over"){
-      print(paste("Using genestes overdispersed according to Wilcoxon test. GSThr =", GSThr))
-      Selected <- RomaData$PVVectMat[,1]<GSThr
-      break
-    }
-    
-    if(Mode == 'Wil' & Type == "Under"){
-      print(paste("Using genestes underdispersed according to Wilcoxon test. GSThr =", GSThr))
-      Selected <- RomaData$PVVectMat[,2]<GSThr
-      break
-    }
-    
-    if(Mode == 'PPV' & Type == "Over"){
-      print(paste("Using genestes underdispersed according to pseudo pv. GSThr =", GSThr))
-      Selected <- RomaData$ModuleMatrix[,2]<GSThr
-      break
-    }
-    
-    if(Mode == 'PPV' & Type == "Over"){
-      print(paste("Using genestes underdispersed according to pseudo pv. GSThr =", GSThr))
-      Selected <- RomaData$ModuleMatrix[,2]<1-GSThr
-      break
-    }
-    
-    return(NULL)
+  if(is.null(Selected)){
+    Selected <- 1:nrow(RomaData$ProjMatrix)
   }
   
-  if(sum(Selected)<1){
-    print("No Genset significant at the level selected")
+  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+    print("No Genset selected")
     return(NULL)
   } else {
-    print(paste(sum(Selected), "geneset selected"))
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
   }
   
   tMat <- RomaData$ProjMatrix[Selected,]
@@ -266,3 +239,90 @@ CompareAcrossSamples <- function(RomaData, Groups, GSThr = 1e-3, Mode = "Wil", T
 
 }
 
+
+
+
+
+
+
+
+
+
+#' Select genesets accoding to specific conditions
+#'
+#' @param RomaData 
+#' @param GSThr 
+#' @param Mode 
+#' @param Type 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+SelectGeneSets <- function(RomaData, VarThr = 1e-3, VarMode = "Wil", VarType = "Over",
+                           MedThr = NULL, MedMode = "Wil", MedType = "Over") {
+  
+  while(1){ 
+    
+    if(VarMode == 'Wil' & VarType == "Over"){
+      print(paste("Using genestes overdispersed according to Wilcoxon test. VarThr =", VarThr))
+      Selected <- which(RomaData$PVVectMat[,1]<VarThr)
+      break
+    }
+    
+    if(VarMode == 'Wil' & VarType == "Under"){
+      print(paste("Using genestes underdispersed according to Wilcoxon test. VarThr =", VarThr))
+      Selected <- which(RomaData$PVVectMat[,2]<VarThr)
+      break
+    }
+    
+    if(VarMode == 'PPV' & VarType == "Over"){
+      print(paste("Using genestes underdispersed according to pseudo pv. VarThr =", VarThr))
+      Selected <- which(RomaData$ModuleMatrix[,2]<VarThr)
+      break
+    }
+    
+    if(VarMode == 'PPV' & VarType == "Over"){
+      print(paste("Using genestes underdispersed according to pseudo pv. VarThr =", VarThr))
+      Selected <- which(RomaData$ModuleMatrix[,2]<1-VarThr)
+      break
+    }
+    
+    Selected <- NULL
+    break
+  }
+  
+  while(!is.null(Selected) & !is.null(MedThr)){
+    
+    if(MedMode == 'Wil' & MedType == "Over"){
+      print(paste("Using genestes overdispersed according to Wilcoxon test. MedThr =", MedThr))
+      Selected <- intersect(which(RomaData$PVVectMat[,5]<MedThr), Selected)
+      break
+    }
+    
+    if(MedMode == 'Wil' & MedType == "Under"){
+      print(paste("Using genestes underdispersed according to Wilcoxon test. MedThr =", MedThr))
+      Selected <- intersect(which(RomaData$PVVectMat[,6]<MedThr), Selected)
+      break
+    }
+    
+    if(MedMode == 'PPV' & MedType == "Over"){
+      print(paste("Using genestes underdispersed according to pseudo pv. MedThr =", MedThr))
+      Selected <- intersect(which(RomaData$ModuleMatrix[,6]<MedThr), Selected)
+      break
+    }
+    
+    if(MedMode == 'PPV' & MedType == "Over"){
+      print(paste("Using genestes underdispersed according to pseudo pv. MedThr =", MedThr))
+      Selected <- intersect(which(RomaData$ModuleMatrix[,6]<1-MedThr), Selected)
+      break
+    }
+    
+    Selected <- NULL
+    break
+    
+  }
+  
+  return(Selected)
+  
+}
