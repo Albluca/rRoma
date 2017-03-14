@@ -223,11 +223,11 @@ FixPCSign <-
 #' @param PCADims integer, the number of PCA dimensions to compute. Should be >= 2.
 #' Larger values decrease the error in the estimation of the explained variance but increase the computation time.
 #' @param DefaultWeight integer scalar, the default weigth to us if no weith is specified by the modile file and an algorithm requiring weigths is used
-#' @param PC1SignMode characrter scalar, the modality to use to determine the direction of the 1st principal component. The following options are currentlhy available:
+#' @param PCSignMode characrter scalar, the modality to use to determine the direction of the principal components. The following options are currentlhy available:
 #' 'none' (The direction is chosen at random), 'PreferActivation' (the direction is chosen in such a way that the sum of the projection is positive),
 #' 'UseAllWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weith are set to DefaultWeight),
 #' 'UseKnownWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weigth are set to 0)
-#' @param PC1SignThr numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
+#' @param PCSignThr numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
 #' only the 10\% of genes with the largest projection in absolugte value will be considered.
 #' @param UseParallel boolean, shuold a parallel environment be used? Note that using a parallel environment will increase the memorey usage as a
 #' copy of the gene expression matrix is needed for each core
@@ -243,8 +243,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                     DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000, ApproxSamples = 2,
                     nSamples = 100, OutGeneNumber = 5, Ncomp = 10, OutGeneSpace = 5, FixedCenter = TRUE,
                     GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
-                    MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode ='none', PC1SignThr = NULL,
-                    UseParallel = FALSE, nCores = NULL, ClusType = "PSOCK") {
+                    MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PCSignMode ='none', PCSignThr = NULL,
+                    UseParallel = FALSE, nCores = NULL, ClusType = "PSOCK", SamplingGeneWeights = NULL) {
+  
+  if(is.null(SamplingGeneWeights)){
+    SamplingGeneWeights = rep(1, nrow(ExpressionMatrix))
+    names(SamplingGeneWeights) <- rownames(ExpressionMatrix)
+  }
   
   SAMPLE_WARNING <- 10
   
@@ -544,8 +549,16 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
             }
             
+            CorrectSign1 <- FixPCSign(PCSamp$rotation[,1], Wei = SamplingGeneWeights[SampleSelGenes],
+                                      Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr)
+            
+            CorrectSign2 <- FixPCSign(PCSamp$rotation[,2], Wei = SamplingGeneWeights[SampleSelGenes],
+                                      Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr)
+            
             return(list("ExpVar"=VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)),
-                        "MedianExp"= SampMedian, "PCProj"=PCSamp$x[,1:2]))
+                        "MedianExp"= SampMedian,
+                        "PCProj"=cbind(CorrectSign1*PCSamp$x[,1], CorrectSign2*PCSamp$x[,2]))
+                   )
           })
           
         } else {
@@ -588,8 +601,17 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
             }
             
+            CorrectSign1 <- FixPCSign(PCSamp$rotation[,1], Wei = SamplingGeneWeights[SampleSelGenes],
+                                      Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr)
+            
+            CorrectSign2 <- FixPCSign(PCSamp$rotation[,2], Wei = SamplingGeneWeights[SampleSelGenes],
+                                      Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr)
+            
             return(list("ExpVar"=VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)),
-                        "MedianExp"=SampMedian, "PCProj"=PCSamp$x[,1:2]))
+                        "MedianExp"= SampMedian,
+                        "PCProj"=cbind(CorrectSign1*PCSamp$x[,1], CorrectSign2*PCSamp$x[,2]))
+            )
+            
           })
 
         }
@@ -656,28 +678,31 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                             MedianExp, sum(sign(MedianVect - MedianExp)==1)/nSamples))
     
     CorrectSignUnf <- FixPCSign(PCBaseUnf$rotation[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
-                             Mode = PC1SignMode, DefWei = DefaultWeight, Thr = PC1SignThr)
+                             Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr)
     
-    CorrectSign <- FixPCSign(PCBase$rotation[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
-                             Mode = PC1SignMode, DefWei = DefaultWeight, Thr = PC1SignThr)
+    CorrectSign1 <- FixPCSign(PCBase$rotation[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
+                             Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr)
     
-    ModProjSamples <- CorrectSign*PCBase$x[,1]
+    CorrectSign2 <- FixPCSign(PCBase$rotation[,2], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
+                              Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr)
+    
+    ModProjSamples <- CorrectSign1*PCBase$x[,1]
     names(ModProjSamples) <- colnames(ExpressionMatrix)
     
     ProjMatrix <- rbind(ProjMatrix, ModProjSamples)
     
-    tWeigths <- CorrectSign*PCBase$rotation[,1]
+    tWeigths <- CorrectSign1*PCBase$rotation[,1]
     names(tWeigths) <- SelGenes
     
-    tWeigthsUnf <- CorrectSign*PCBaseUnf$rotation[,1]
+    tWeigthsUnf <- CorrectSign1*PCBaseUnf$rotation[,1]
     names(tWeigthsUnf) <- CompatibleGenes
     
-    WeigthList[[length(WeigthList)+1]] <- CorrectSign*PCBase$rotation[,1]
+    WeigthList[[length(WeigthList)+1]] <- CorrectSign1*PCBase$rotation[,1]
     
     
     ModuleSummary[[length(ModuleSummary)+1]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
                                OriginalGenes = CompatibleGenes, UsedGenes = SelGenes, SampledGenes = SampledsGeneList, PCABase = PCBase, PCBaseUnf = PCBaseUnf,
-                               CorrectSign = CorrectSign, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
+                               CorrectSign1 = CorrectSign1, CorrectSign2 = CorrectSign2, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
                                PC1Weight.SignFixed = tWeigths, PC1WeightUnf.SignFixed = tWeigthsUnf,
                                GMTWei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes])
   
@@ -781,8 +806,8 @@ SelectOverDispersedGeneSet <- function(GeneExpressionMatrix, nSamples, nGenes, G
 #' @examples
 InferBinaryWeigth <- function(ExpressionMatrix, ModuleList, FillAllNA = TRUE) {
   
-  MedianExpr <- apply(ExpressionMatrix, 1, median)
-  GeneWei <- as.integer(cut(MedianExpr, breaks = c(min(MedianExpr)-1, median(MedianExpr), max(MedianExpr)+1)))-1
+  MedianExpr <- apply(ExpressionMatrix, 1, median, na.rm=TRUE)
+  GeneWei <- as.integer(MedianExpr >= median(ExpressionMatrix))
   GeneWei[GeneWei == 0] <- -1
   names(GeneWei) <- names(MedianExpr)
   
@@ -792,7 +817,8 @@ InferBinaryWeigth <- function(ExpressionMatrix, ModuleList, FillAllNA = TRUE) {
       next
     }
 
-    ModuleList[[i]]$Weigths[is.na(ModuleList[[i]]$Weigths)] <- GeneWei[ModuleList[[i]]$Genes[is.na(ModuleList[[i]]$Weigths)]]
+    ModuleList[[i]]$Weigths[is.na(ModuleList[[i]]$Weigths)] <-
+      GeneWei[ModuleList[[i]]$Genes[is.na(ModuleList[[i]]$Weigths)]]
     
     if(any(is.na(ModuleList[[i]]$Weigths))){
       print(paste("Warning:", sum(is.na(ModuleList[[i]]$Weigths)), "gene(s) not found in the expression matrix"))

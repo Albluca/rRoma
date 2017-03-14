@@ -283,8 +283,8 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
     PC1Sample <- unlist(lapply(PrjList, function(x){if(all(!is.na(x))) x[,1]}), use.names = FALSE)
     PC2Sample <- unlist(lapply(PrjList, function(x){if(all(!is.na(x))) x[,2]}), use.names = FALSE)
     
-    PC1Data <- RomaData$ModuleSummary[[i]]$PCABase$x[,1]
-    PC2Data <- RomaData$ModuleSummary[[i]]$PCABase$x[,2]
+    PC1Data <- RomaData$ModuleSummary[[i]]$PCABase$x[,1]*RomaData$ModuleSummary[[i]]$CorrectSign1
+    PC2Data <- RomaData$ModuleSummary[[i]]$PCABase$x[,2]*RomaData$ModuleSummary[[i]]$CorrectSign2
     
     DF <- data.frame(PC1 = c(PC1Sample, PC1Data), PC2 = c(PC2Sample, PC2Data),
                      Source = c(rep("Sampling", length(PC1Sample)),
