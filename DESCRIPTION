@@ -1,6 +1,6 @@
 Package: rRoma
 Title: An r implementation of ROMA
-Version: 0.0.1.0000
+Version: 0.0.2.0000
 Authors@R: person("Luca", "Albergante", email = "luca.albergante@gmail.com", role = c("aut", "cre"))
 Description: An R implementation of ROMA
 Depends:
