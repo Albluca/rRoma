@@ -306,19 +306,27 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
   }
   
+  OrgExpMatrix = ExpressionMatrix
+  
   if(centerData){
     print("Centering gene expression over samples")
-    ExpressionMatrix <- t(scale(t(ExpressionMatrix), center = centerData, scale = FALSE))
+    ExpressionMatrix <- t(scale(t(ExpressionMatrix), center = TRUE, scale = FALSE))
+    GeneCenters <- attr(ExpressionMatrix, "scaled:center")
+    attr(ExpressionMatrix, "scaled:center") <- NULL
   } else {
     warning("Centering gene expression over samples. This will generate inconsistencies if the data are not already centered.")
+    GeneCenters = rep(0, nrow(ExpressionMatrix))
   }
   
   if(FixedCenter){
     print("Using global center")
     ExpressionMatrix <- scale(ExpressionMatrix, center = TRUE, scale = FALSE)
+    SampleCenters <- attr(ExpressionMatrix, "scaled:center")
+    attr(ExpressionMatrix, "scaled:center") <- NULL
     ModulePCACenter = FALSE
   } else {
     ModulePCACenter = TRUE
+    SampleCenters = rep(0, ncol(ExpressionMatrix))
   }
   
   ModuleSummary <- list()
@@ -358,7 +366,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     parallel::clusterExport(cl=cl, varlist=c("SampleFilter", "GeneOutDetection", "GeneOutThr",
                                    "ModulePCACenter", "ExpressionMatrix", "DetectOutliers",
-                                   "PCADims"), envir = environment())
+                                   "PCADims", "OrgExpMatrix"), envir = environment())
   }
   
   ModuleOrder <- order(unlist(lapply(lapply(ModuleList, "[[", "Genes"), length)))
@@ -428,9 +436,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     PCBaseUnf <- PCBase
     ExpVarUnf <- ExpVar
     
+    MedianExp <- median(OrgExpMatrix[CompatibleGenes, ])
+    
     print("Pre-filter data")
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
-    print(paste("Median expression:", median(BaseMatrix)))
+    print(paste("Median expression (uncentered):", MedianExp))
+    print(paste("Median expression (centered/weighted):", median(BaseMatrix)))
     
     # Computing PC on the filtered data
     
@@ -449,10 +460,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     #   1/sum(apply(scale(Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)/PCBase$sdev[2]^2)
     # )
     
-    MadianExp <- median(BaseMatrix)
+    MedianExp <- median(OrgExpMatrix[SelGenes, ])
+    
     print("Post-filter data")
     print(paste("L1 =", ExpVar[1], "L1/L2 =", ExpVar[1]/ExpVar[2]))
-    print(paste("Median expression:", MadianExp))
+    print(paste("Median expression (uncentered):", MedianExp))
+    print(paste("Median expression (centered/weighted):", median(BaseMatrix)))
     
     print(paste("Previous sample size:", OldSamplesLen))
     print(paste("Next sample size:", length(CompatibleGenes)))
@@ -513,7 +526,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             }
             
             BaseMatrix <- t(ExpressionMatrix[SampleSelGenes, ])
-            SampMedian <- median(BaseMatrix)
+            SampMedian <- median(OrgExpMatrix[SampleSelGenes, ])
             
             if(length(SampleSelGenes) >= 3*PCADims){
               PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
@@ -557,7 +570,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             }
             
             BaseMatrix <- t(ExpressionMatrix[SampleSelGenes, ])
-            SampMedian <- median(BaseMatrix)
+            SampMedian <- median(OrgExpMatrix[SampleSelGenes, ])
             
             if(length(SampleSelGenes) >= 3*PCADims){
               PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
@@ -605,7 +618,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       
       boxplot(SampleMedianExp, at = 1, ylab = "Median expression",
               main = ModuleList[[i]]$Name, ylim=range(c(SampleMedianExp, median(BaseMatrix))))
-      points(x=1, y=MadianExp, pch = 20, col="red", cex= 2)
+      points(x=1, y=MedianExp, pch = 20, col="red", cex= 2)
       
     }
     
@@ -615,7 +628,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     L1L2Vect <- SampleExpVar[2,] - ExpVar[1]/ExpVar[2]
     L1L2Vect <- L1L2Vect[is.finite(L1L2Vect)]
     
-    MedianVect <- SampleMedianExp - MadianExp
+    MedianVect <- SampleMedianExp - MedianExp
     MedianVect <- MedianVect[is.finite(MedianVect)]
     
     PVVect <- rep(NA, 6)
@@ -640,7 +653,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     ModuleMatrix <- rbind(ModuleMatrix,
                           c(ExpVar[1], sum(sign(SampleExpVar[1,] - ExpVar[1])==1)/nSamples,
                             ExpVar[1]/ExpVar[2], sum(sign(SampleExpVar[2,] - ExpVar[1]/ExpVar[2])==1)/nSamples,
-                            MadianExp, sum(sign(MedianVect - MadianExp)==1)/nSamples))
+                            MedianExp, sum(sign(MedianVect - MedianExp)==1)/nSamples))
     
     CorrectSignUnf <- FixPCSign(PCBaseUnf$rotation[,1], Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
                              Mode = PC1SignMode, DefWei = DefaultWeight, Thr = PC1SignThr)
@@ -690,7 +703,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   ReorderIdxs <- order(ModuleOrder[UsedModules])
   
   return(list(ModuleMatrix = ModuleMatrix[ReorderIdxs,], ProjMatrix = ProjMatrix[ReorderIdxs,], ModuleSummary = ModuleSummary[ReorderIdxs],
-              WeigthList = WeigthList[ReorderIdxs], PVVectMat = PVVectMat[ReorderIdxs,], OutLiersList = OutLiersList[ReorderIdxs]))
+              WeigthList = WeigthList[ReorderIdxs], PVVectMat = PVVectMat[ReorderIdxs,], OutLiersList = OutLiersList[ReorderIdxs],
+              GeneCenters = GeneCenters, SampleCenters = SampleCenters))
   
 }
 
