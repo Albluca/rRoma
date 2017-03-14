@@ -204,7 +204,8 @@ FixPCSign <-
 #' @param MinGenes integer, the minimum number of genes reported by a module available in the expression matrix to process the module
 #' @param MaxGenes integer, the maximum number of genes reported by a module available in the expression matrix to process the module
 #' @param nSamples integer, the number of randomized gene sampled (per module)
-#' @param ApproxSamples integer, the approximation parameter to reuse samples
+#' @param ApproxSamples integer between 0 and 100 the approximation parameter to reuse samples. This is the minimal percentage variation to reuse samples.
+#' For example 5, means that samples re recalculated only if the number of genes in the geneset has increased by at least 5\%.
 #' @param OutGeneNumber scalar, number of median-absolute-deviations away from median required for the total number of genes expressed in a sample to be called an outlier
 #' @param Ncomp iteger, number of principal components used to filter samples in the gene expression space
 #' @param OutGeneSpace scalar, number of median-absolute-deviations away from median required for in a sample to be called an outlier in the gene expression space

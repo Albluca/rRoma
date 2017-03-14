@@ -30,7 +30,8 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
 
 \item{MaxGenes}{integer, the maximum number of genes reported by a module available in the expression matrix to process the module}
 
-\item{ApproxSamples}{integer, the approximation parameter to reuse samples}
+\item{ApproxSamples}{integer between 0 and 100 the approximation parameter to reuse samples. This is the minimal percentage variation to reuse samples.
+For example 5, means that samples re recalculated only if the number of genes in the geneset has increased by at least 5\%.}
 
 \item{nSamples}{integer, the number of randomized gene sampled (per module)}
 
