@@ -8,13 +8,21 @@ SelectGeneSets(RomaData, VarThr = 0.001, VarMode = "Wil",
   VarType = "Over", MedThr = NULL, MedMode = "Wil", MedType = "Over")
 }
 \arguments{
-\item{RomaData}{}
+\item{RomaData}{list, the analysis returned by rRoma}
 
-\item{GSThr}{}
+\item{VarThr}{numeric between 0 and 1, the threshold PV to select significantly over- or under-disperdes genesets}
 
-\item{Mode}{}
+\item{VarMode}{string, the test to use to select over- or under-underdisperdes genesets.
+Currently it can be either 'Wil' (Wilcoxon test) or 'PPV' (permutation base p-value)}
 
-\item{Type}{}
+\item{VarType}{string, the type of statistical difference to select. Currently it can be either 'Over' (overdispersed) or 'Under' (underdispersed)}
+
+\item{MedThr}{numeric between 0 and 1, the threshold PV to select significantly over- or under-expressed genesets}
+
+\item{MedMode}{string, the test to use to select over- or under-expressed genesets.
+Currently it can be either 'Wil' (Wilcoxon test) or 'PPV' (permutation base p-value)}
+
+\item{MedType}{string, the type of statistical difference to select. Currently it can be either 'Over' (overexpressed) or 'Under' (underexpressed)}
 }
 \description{
 Select genesets accoding to specific conditions

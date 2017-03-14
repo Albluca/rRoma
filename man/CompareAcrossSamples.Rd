@@ -17,9 +17,9 @@ CompareAcrossSamples(RomaData, Groups, Selected = NULL,
 
 \item{TestMode}{string, the type of statistical methodology to assess sample difference. Currentyl only ANOVA + Tukey is implemented ("Aov+Tuk")}
 
-\item{TestPV1}{numeric between 0 and 1, the threshold PV for Anova}
+\item{TestPV1}{numeric between 0 and 1, the threshold PV for the initial test (ANOVA)}
 
-\item{TestPV2}{numeric between 0 and 1, the threshold PV for Tukey}
+\item{TestPV2}{numeric between 0 and 1, the threshold PV for difference test (Tukey)}
 
 \item{PlotDiag}{boolean, should diagnostic plot be displyed?}
 

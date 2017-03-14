@@ -4,8 +4,8 @@
 #' @param Groups string vector, a vector of group identifier described by strings
 #' @param Selected The genesets used to perform the analysis 
 #' @param TestMode string, the type of statistical methodology to assess sample difference. Currentyl only ANOVA + Tukey is implemented ("Aov+Tuk")
-#' @param TestPV1 numeric between 0 and 1, the threshold PV for Anova
-#' @param TestPV2 numeric between 0 and 1, the threshold PV for Tukey
+#' @param TestPV1 numeric between 0 and 1, the threshold PV for the initial test (ANOVA)
+#' @param TestPV2 numeric between 0 and 1, the threshold PV for difference test (Tukey)
 #' @param PlotDiag boolean, should diagnostic plot be displyed?
 #' @param PlotXGSDiff boolean, should all the significant differences by considered?
 #'
@@ -250,10 +250,15 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
 
 #' Select genesets accoding to specific conditions
 #'
-#' @param RomaData 
-#' @param GSThr 
-#' @param Mode 
-#' @param Type 
+#' @param RomaData list, the analysis returned by rRoma 
+#' @param VarThr numeric between 0 and 1, the threshold PV to select significantly over- or under-disperdes genesets
+#' @param VarMode string, the test to use to select over- or under-underdisperdes genesets.
+#' Currently it can be either 'Wil' (Wilcoxon test) or 'PPV' (permutation base p-value)
+#' @param VarType string, the type of statistical difference to select. Currently it can be either 'Over' (overdispersed) or 'Under' (underdispersed)
+#' @param MedThr numeric between 0 and 1, the threshold PV to select significantly over- or under-expressed genesets
+#' @param MedMode string, the test to use to select over- or under-expressed genesets.
+#' Currently it can be either 'Wil' (Wilcoxon test) or 'PPV' (permutation base p-value)
+#' @param MedType string, the type of statistical difference to select. Currently it can be either 'Over' (overexpressed) or 'Under' (underexpressed)
 #'
 #' @return
 #' @export
