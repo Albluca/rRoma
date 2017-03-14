@@ -2,22 +2,22 @@
 % Please edit documentation in R/Plotting.R
 \name{PlotSampleProjections}
 \alias{PlotSampleProjections}
-\title{Title}
+\title{Plot gene weigth across selected samples}
 \usage{
 PlotSampleProjections(RomaData, PlotSamples = 40, ExpressionMatrix = NULL,
   LogExpression = TRUE, Selected = NULL)
 }
 \arguments{
-\item{RomaData}{}
+\item{RomaData}{list, the analysis returned by rRoma}
 
-\item{PlotSamples}{}
+\item{PlotSamples}{scalar, numeric. The number of samples to plot}
 
-\item{ExpressionMatrix}{}
+\item{ExpressionMatrix}{matrix, numeric. The expression matrix used to produce gene expression boxplot. If NULL (default), no gene expression information is reported}
 
-\item{LogExpression}{}
+\item{LogExpression}{boolean, should gene expression be logtransformed?}
 
-\item{Selected}{}
+\item{Selected}{vector, integer. The position of the genesets to plot}
 }
 \description{
-Title
+Plot gene weigth across selected samples
 }

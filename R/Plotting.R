@@ -1,11 +1,11 @@
-#' Plot genesets
+#' Plot genesets information
 #'
-#' @param RomaData 
-#' @param Selected 
-#' @param GenesetMargin 
-#' @param SampleMargin 
-#' @param ColorGradient 
-#' @param cluster_cols 
+#' @param RomaData list, the analysis returned by rRoma
+#' @param Selected vector, integer. The position of the genesets to plot
+#' @param GenesetMargin scalat, integer. The number of rows used to draw the geneset names.
+#' @param SampleMargin scalat, integer. The number of rows used to draw the sample names.
+#' @param ColorGradient vector, string. The colors used for the heatmap.
+#' @param cluster_cols boolean, should the samp^le be reordered according to the dendrogram?
 #'
 #' @return
 #' @export
@@ -61,14 +61,14 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
 
 
 
-#' Title
+#' Plot gene weigth across selected samples
 #'
-#' @param RomaData 
-#' @param PlotGenes 
-#' @param ExpressionMatrix 
-#' @param LogExpression 
-#' @param Selected 
-#' @param PlotWeigthSign 
+#' @param RomaData list, the analysis returned by rRoma
+#' @param Selected vector, integer. The position of the genesets to plot
+#' @param PlotGenes scalar, numeric. The number of genes to plot
+#' @param ExpressionMatrix matrix, numeric. The expression matrix used to produce gene expression boxplot. If NULL (default), no gene expression information is reported
+#' @param LogExpression boolean, should gene expression be logtransformed?
+#' @param PlotWeigthSign boolean, should the sign of the genes weigth be used to color the plots?
 #'
 #' @return
 #' @export
@@ -197,13 +197,13 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
 
 
 
-#' Title
+#' Plot gene weigth across selected samples
 #'
-#' @param RomaData 
-#' @param PlotSamples 
-#' @param ExpressionMatrix 
-#' @param LogExpression 
-#' @param Selected 
+#' @param RomaData list, the analysis returned by rRoma
+#' @param PlotSamples scalar, numeric. The number of samples to plot
+#' @param ExpressionMatrix matrix, numeric. The expression matrix used to produce gene expression boxplot. If NULL (default), no gene expression information is reported
+#' @param LogExpression boolean, should gene expression be logtransformed?
+#' @param Selected vector, integer. The position of the genesets to plot
 #'
 #' @return
 #' @export

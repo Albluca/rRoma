@@ -2,24 +2,24 @@
 % Please edit documentation in R/Plotting.R
 \name{PlotGeneWeight}
 \alias{PlotGeneWeight}
-\title{Title}
+\title{Plot gene weigth across selected samples}
 \usage{
 PlotGeneWeight(RomaData, PlotGenes = 40, ExpressionMatrix = NULL,
   LogExpression = TRUE, Selected = NULL, PlotWeigthSign = FALSE)
 }
 \arguments{
-\item{RomaData}{}
+\item{RomaData}{list, the analysis returned by rRoma}
 
-\item{PlotGenes}{}
+\item{PlotGenes}{scalar, numeric. The number of genes to plot}
 
-\item{ExpressionMatrix}{}
+\item{ExpressionMatrix}{matrix, numeric. The expression matrix used to produce gene expression boxplot. If NULL (default), no gene expression information is reported}
 
-\item{LogExpression}{}
+\item{LogExpression}{boolean, should gene expression be logtransformed?}
 
-\item{Selected}{}
+\item{Selected}{vector, integer. The position of the genesets to plot}
 
-\item{PlotWeigthSign}{}
+\item{PlotWeigthSign}{boolean, should the sign of the genes weigth be used to color the plots?}
 }
 \description{
-Title
+Plot gene weigth across selected samples
 }

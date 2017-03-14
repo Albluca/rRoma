@@ -2,25 +2,25 @@
 % Please edit documentation in R/Plotting.R
 \name{Plot.Genesets}
 \alias{Plot.Genesets}
-\title{Plot genesets}
+\title{Plot genesets information}
 \usage{
 Plot.Genesets(RomaData, Selected = NULL, GenesetMargin = 4,
   SampleMargin = 4, ColorGradient = colorRamps::blue2red(50),
   cluster_cols = FALSE)
 }
 \arguments{
-\item{RomaData}{}
+\item{RomaData}{list, the analysis returned by rRoma}
 
-\item{Selected}{}
+\item{Selected}{vector, integer. The position of the genesets to plot}
 
-\item{GenesetMargin}{}
+\item{GenesetMargin}{scalat, integer. The number of rows used to draw the geneset names.}
 
-\item{SampleMargin}{}
+\item{SampleMargin}{scalat, integer. The number of rows used to draw the sample names.}
 
-\item{ColorGradient}{}
+\item{ColorGradient}{vector, string. The colors used for the heatmap.}
 
-\item{cluster_cols}{}
+\item{cluster_cols}{boolean, should the samp^le be reordered according to the dendrogram?}
 }
 \description{
-Plot genesets
+Plot genesets information
 }
