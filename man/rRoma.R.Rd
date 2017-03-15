@@ -9,9 +9,9 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
   ApproxSamples = 2, nSamples = 100, OutGeneNumber = 5, Ncomp = 10,
   OutGeneSpace = 5, FixedCenter = TRUE, GeneOutDetection = "PC1IQR",
   GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
-  MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PC1SignMode = "none",
-  PC1SignThr = NULL, UseParallel = FALSE, nCores = NULL,
-  ClusType = "PSOCK")
+  MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PCSignMode = "none",
+  PCSignThr = NULL, UseParallel = FALSE, nCores = NULL,
+  ClusType = "PSOCK", SamplingGeneWeights = NULL)
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -61,12 +61,12 @@ minimal percentage variation (L1OutVarPerc).}
 \item{PCADims}{integer, the number of PCA dimensions to compute. Should be >= 2.
 Larger values decrease the error in the estimation of the explained variance but increase the computation time.}
 
-\item{PC1SignMode}{characrter scalar, the modality to use to determine the direction of the 1st principal component. The following options are currentlhy available:
+\item{PCSignMode}{characrter scalar, the modality to use to determine the direction of the principal components. The following options are currentlhy available:
 'none' (The direction is chosen at random), 'PreferActivation' (the direction is chosen in such a way that the sum of the projection is positive),
 'UseAllWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weith are set to DefaultWeight),
 'UseKnownWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weigth are set to 0)}
 
-\item{PC1SignThr}{numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
+\item{PCSignThr}{numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
 only the 10\% of genes with the largest projection in absolugte value will be considered.}
 
 \item{UseParallel}{boolean, shuold a parallel environment be used? Note that using a parallel environment will increase the memorey usage as a

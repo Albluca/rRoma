@@ -204,6 +204,8 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
 #' @param ExpressionMatrix matrix, numeric. The expression matrix used to produce gene expression boxplot. If NULL (default), no gene expression information is reported
 #' @param LogExpression boolean, should gene expression be logtransformed?
 #' @param Selected vector, integer. The position of the genesets to plot
+#' @param PlotPCProj vector, string. The plotting modality of projections. It can containing any combination of the following strings: 'Points', 'Density', or 'Bins'.
+#' Any other value will result in projections not being plotted
 #'
 #' @return
 #' @export
@@ -211,7 +213,7 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
 #' @examples
 PlotSampleProjections <- function(RomaData, PlotSamples = 40,
                                 ExpressionMatrix = NULL, LogExpression = TRUE,
-                                Selected = NULL){
+                                Selected = NULL, PlotPCProj = 'none'){
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$ProjMatrix)
@@ -300,42 +302,49 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
     YLims[1] <- min(YLims[1], min(PC2Data))
     YLims[2] <- max(YLims[2], max(PC2Data))
     
-    p <- ggplot2::ggplot(DF, ggplot2::aes(x = PC1, y = PC2, colour = Source, alpha=Source)) + ggplot2::geom_point() +
-      ggplot2::scale_alpha_manual(values=c(Data=1, Sampling=.2), guide=FALSE) +
-      ggplot2::scale_x_continuous(limits = XLims) +
-      ggplot2::scale_y_continuous(limits = YLims) +
-      ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
-                             "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
-                             "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
-      ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0)
-    
-    print(p)
-    
-    
-    p <- ggplot2::ggplot(DF[DF$Source=="Sampling",], ggplot2::aes(x = PC1, y = PC2)) +
-      ggplot2::stat_density_2d(ggplot2::aes(fill = ..density..), geom="raster", contour = FALSE, n = 250) +
-      ggplot2::scale_x_continuous(limits = XLims) +
-      ggplot2::scale_y_continuous(limits = YLims) +
-      ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
-                             "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
-                             "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
-      ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0) +
-      ggplot2::geom_point(data = DF[DF$Source=="Data",], mapping = ggplot2::aes(x = PC1, y = PC2), color="red")
-
-    print(p)
+    if(any(PlotPCProj == 'Points')){
+      p <- ggplot2::ggplot(DF, ggplot2::aes(x = PC1, y = PC2, colour = Source, alpha=Source)) + ggplot2::geom_point() +
+        ggplot2::scale_alpha_manual(values=c(Data=1, Sampling=.2), guide=FALSE) +
+        ggplot2::scale_x_continuous(limits = XLims) +
+        ggplot2::scale_y_continuous(limits = YLims) +
+        ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+                               "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
+                               "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
+        ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0)
+      
+      print(p)
+    }
     
     
-    p <- ggplot2::ggplot(DF[DF$Source=="Sampling",], ggplot2::aes(x = PC1, y = PC2)) +
-      ggplot2::geom_bin2d(bins=75) +
-      ggplot2::scale_x_continuous(limits = XLims) +
-      ggplot2::scale_y_continuous(limits = YLims) +
-      ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
-                             "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
-                             "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
-      ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0) +
-      ggplot2::geom_point(data = DF[DF$Source=="Data",], mapping = ggplot2::aes(x = PC1, y = PC2), color="red")
+    if(any(PlotPCProj == 'Density')){
+      p <- ggplot2::ggplot(DF[DF$Source=="Sampling",], ggplot2::aes(x = PC1, y = PC2)) +
+        ggplot2::stat_density_2d(ggplot2::aes(fill = ..density..), geom="raster", contour = FALSE, n = 250) +
+        ggplot2::scale_x_continuous(limits = XLims) +
+        ggplot2::scale_y_continuous(limits = YLims) +
+        ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+                               "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
+                               "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
+        ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0) +
+        ggplot2::geom_point(data = DF[DF$Source=="Data",], mapping = ggplot2::aes(x = PC1, y = PC2), color="red")
+      
+      print(p)
+    }
     
-    print(p)
+    
+    
+    if(any(PlotPCProj == 'Bins')){
+      p <- ggplot2::ggplot(DF[DF$Source=="Sampling",], ggplot2::aes(x = PC1, y = PC2)) +
+        ggplot2::geom_bin2d(bins=75) +
+        ggplot2::scale_x_continuous(limits = XLims) +
+        ggplot2::scale_y_continuous(limits = YLims) +
+        ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+                               "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
+                               "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
+        ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0) +
+        ggplot2::geom_point(data = DF[DF$Source=="Data",], mapping = ggplot2::aes(x = PC1, y = PC2), color="red")
+      
+      print(p)
+    }
     
   }
   
