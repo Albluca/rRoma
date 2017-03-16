@@ -267,12 +267,14 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
   }
   
+  ExpressionMatrix <- data.matrix(ExpressionMatrix)
+  
   SAMPLE_WARNING <- 3
   
   AllGenesModule <- unique(unlist(lapply(ModuleList, "[[", "Genes")))
   AllGenesMatrix <- rownames(ExpressionMatrix)
   
-  if(sum(AllGenesMatrix[duplicated(AllGenesMatrix)] %in% AllGenesModule) < 3){
+  if(sum(AllGenesMatrix %in% AllGenesModule) < 3){
     stop("Not enough module genes found in the matrix. Impossible to proceed")
   }
   

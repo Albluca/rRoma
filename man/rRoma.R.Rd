@@ -11,7 +11,7 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
   GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
   MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PCSignMode = "none",
   PCSignThr = NULL, UseParallel = FALSE, nCores = NULL,
-  ClusType = "PSOCK", SamplingGeneWeights = NULL)
+  ClusType = "PSOCK", SamplingGeneWeights = NULL, FillNAMethod = list())
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -76,6 +76,10 @@ copy of the gene expression matrix is needed for each core}
 
 \item{ClusType}{string, the cluster type to use. The default value ("PSOCK") should be available on most systems, unix-like environments also support the "PSOCK",
 which should be faster.}
+
+\item{SamplingGeneWeights}{named vector, numeric. Weigth so use when correcting the sign of the PC for sampled data.}
+
+\item{FillNAMethod}{names list, additional parameters to pass to the mice function}
 }
 \description{
 Perform ROMA on a datasets
