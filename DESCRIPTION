@@ -16,4 +16,5 @@ Imports:
       gridExtra,
       pheatmap,
       parallel,
-      reshape
+      reshape,
+      mice

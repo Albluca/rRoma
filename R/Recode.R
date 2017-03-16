@@ -234,6 +234,8 @@ FixPCSign <-
 #' @param nCores integer, the number of cores to use if UseParallel is TRUE. Set to NULL for auto-detection
 #' @param ClusType string, the cluster type to use. The default value ("PSOCK") should be available on most systems, unix-like environments also support the "PSOCK",
 #' which should be faster.
+#' @param SamplingGeneWeights named vector, numeric. Weigth so use when correcting the sign of the PC for sampled data.
+#' @param FillNAMethod names list, additional parameters to pass to the mice function
 #' 
 #' @return
 #' @export
@@ -244,23 +246,35 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                     nSamples = 100, OutGeneNumber = 5, Ncomp = 10, OutGeneSpace = 5, FixedCenter = TRUE,
                     GeneOutDetection = "PC1IQR", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
                     MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PCSignMode ='none', PCSignThr = NULL,
-                    UseParallel = FALSE, nCores = NULL, ClusType = "PSOCK", SamplingGeneWeights = NULL) {
+                    UseParallel = FALSE, nCores = NULL, ClusType = "PSOCK", SamplingGeneWeights = NULL,
+                    FillNAMethod = list()) {
   
   if(is.null(SamplingGeneWeights)){
     SamplingGeneWeights = rep(1, nrow(ExpressionMatrix))
     names(SamplingGeneWeights) <- rownames(ExpressionMatrix)
   }
   
-  SAMPLE_WARNING <- 10
-  
-  AllGenes <- NULL
-  for(i in 1:length(ModuleList)){
-    AllGenes <- c(AllGenes, ModuleList[[i]]$Genes)
+  if(any(is.na(ExpressionMatrix))){
+    
+    if(!require(mice)){
+      stop("Unable to load mice. Impossible to proceed")
+    } else {
+      print("Filling NA with mice")
+    }
+    
+    imp <- do.call(what = mice, args = append(list(data = ExpressionMatrix), FillNAMethod))
+    ExpressionMatrix <- complete(imp)
+    
   }
   
+  SAMPLE_WARNING <- 3
   
-  AllGenesModule <- unique(AllGenes)
+  AllGenesModule <- unique(unlist(lapply(ModuleList, "[[", "Genes")))
   AllGenesMatrix <- rownames(ExpressionMatrix)
+  
+  if(sum(AllGenesMatrix[duplicated(AllGenesMatrix)] %in% AllGenesModule) < 3){
+    stop("Not enough module genes found in the matrix. Impossible to proceed")
+  }
   
   if(ncol(ExpressionMatrix) <= SAMPLE_WARNING){
     print(paste("Only", ncol(ExpressionMatrix), "sample found"))
