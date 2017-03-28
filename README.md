@@ -115,7 +115,9 @@ table(Type)
 For convenience, we will modify the sample names to accoun for the tissue of origin
 
 ``` r
-colnames(MatData) <- paste(colnames(MatData), paste("(", substr(Type[colnames(MatData)], 1, 1), ")", sep=""))
+colnames(MatData) <- paste(colnames(MatData),
+                           paste("(", substr(Type[colnames(MatData)], 1, 1), ")",
+                                 sep=""))
 ```
 
 At this point we can create the metagene files. We will extract all the "HALLPARK" geneset from MSig.
@@ -148,7 +150,8 @@ To reduce potential problmes we will also rename genes with a duplicated name
 ``` r
 if(any(duplicated(rownames(MatData)))){
   for(i in rownames(MatData)[duplicated(rownames(MatData))]){
-    rownames(MatData)[rownames(MatData) %in% i] <- paste(rownames(MatData)[rownames(MatData) %in% i], 1:sum(rownames(MatData) %in% i))
+    rownames(MatData)[rownames(MatData) %in% i] <-
+      paste(rownames(MatData)[rownames(MatData) %in% i], 1:sum(rownames(MatData) %in% i))
   }
 }
 ```
@@ -157,13 +160,16 @@ And now we are ready to perform ROMA without fixed center
 
 ``` r
 tictoc::tic()
-DataWU.NFC <- rRoma.R(ExpressionMatrix = MatData, centerData = TRUE, ExpFilter = FALSE, ApproxSamples = 5,
-                     ModuleList = ModuleListWU, MinGenes = 5, MaxGenes = 1000, nSamples = 100, UseWeigths = FALSE, DefaultWeight = 1,
-                     FixedCenter = FALSE, GeneOutDetection = 'L1OutVarPerc', GeneOutThr = 1,
-                     GeneSelMode = "All", SampleFilter = TRUE, MoreInfo = FALSE, PlotData = FALSE,
-                     PCSignMode = "UseAllWeigths", OutGeneNumber = 5, Ncomp = 100, OutGeneSpace = 5,
-                     PCADims = 5, PCSignThr = NULL, UseParallel = TRUE, nCores = 3, ClusType = "FORK",
-                     SamplingGeneWeights = SamplingGeneWeights)
+DataWU.NFC <- rRoma.R(ExpressionMatrix = MatData, centerData = TRUE, ExpFilter = FALSE,
+                      ApproxSamples = 5, ModuleList = ModuleListWU, MinGenes = 5,
+                      MaxGenes = 1000, nSamples = 100, UseWeigths = FALSE,
+                      DefaultWeight = 1, FixedCenter = FALSE,
+                      GeneOutDetection = 'L1OutVarPerc', GeneOutThr = 1,
+                      GeneSelMode = "All", SampleFilter = TRUE, MoreInfo = FALSE,
+                      PlotData = FALSE, PCSignMode = "UseAllWeigths", OutGeneNumber = 5,
+                      Ncomp = 100, OutGeneSpace = 5, PCADims = 5, PCSignThr = NULL,
+                      UseParallel = TRUE, nCores = 3, ClusType = "FORK",
+                      SamplingGeneWeights = SamplingGeneWeights)
 tictoc::toc()
 ```
 
@@ -171,13 +177,16 @@ and with fixed center
 
 ``` r
 tictoc::tic()
-DataWU.FC <- rRoma.R(ExpressionMatrix = MatData, centerData = TRUE, ExpFilter = FALSE, ApproxSamples = 5,
-                  ModuleList = ModuleListWU, MinGenes = 5, MaxGenes = 1000, nSamples = 100, UseWeigths = FALSE, DefaultWeight = 1,
-                  FixedCenter = TRUE, GeneOutDetection = 'L1OutVarPerc', GeneOutThr = 1,
-                  GeneSelMode = "All", SampleFilter = TRUE, MoreInfo = FALSE, PlotData = FALSE,
-                  PCSignMode = "UseAllWeigths", OutGeneNumber = 5, Ncomp = 100, OutGeneSpace = 5,
-                  PCADims = 5, PCSignThr = NULL, UseParallel = TRUE, nCores = 3, ClusType = "FORK",
-                  SamplingGeneWeights = SamplingGeneWeights)
+DataWU.FC <- rRoma.R(ExpressionMatrix = MatData, centerData = TRUE, ExpFilter = FALSE,
+                     ApproxSamples = 5, ModuleList = ModuleListWU, MinGenes = 5,
+                     MaxGenes = 1000, nSamples = 100, UseWeigths = FALSE,
+                     DefaultWeight = 1, FixedCenter = TRUE,
+                     GeneOutDetection = 'L1OutVarPerc', GeneOutThr = 1,
+                     GeneSelMode = "All", SampleFilter = TRUE, MoreInfo = FALSE,
+                     PlotData = FALSE, PCSignMode = "UseAllWeigths", OutGeneNumber = 5,
+                     Ncomp = 100, OutGeneSpace = 5, PCADims = 5, PCSignThr = NULL,
+                     UseParallel = TRUE, nCores = 3, ClusType = "FORK",
+                     SamplingGeneWeights = SamplingGeneWeights)
 tictoc::toc()
 ```
 
