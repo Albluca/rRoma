@@ -115,7 +115,9 @@ table(Type)
 For convenience, we will modify the sample names to accoun for the tissue of origin
 
 ``` r
-colnames(MatData) <- paste(colnames(MatData), paste("(", substr(Type[colnames(MatData)], 1, 1), ")", sep=""))
+colnames(MatData) <- paste(colnames(MatData),
+                           paste("(", substr(Type[colnames(MatData)], 1, 1), ")",
+                                 sep=""))
 ```
 
 At this point we can create the metagene files. We will extract all the "HALLPARK" geneset from MSig.
@@ -148,7 +150,8 @@ To reduce potential problmes we will also rename genes with a duplicated name
 ``` r
 if(any(duplicated(rownames(MatData)))){
   for(i in rownames(MatData)[duplicated(rownames(MatData))]){
-    rownames(MatData)[rownames(MatData) %in% i] <- paste(rownames(MatData)[rownames(MatData) %in% i], 1:sum(rownames(MatData) %in% i))
+    rownames(MatData)[rownames(MatData) %in% i] <-
+      paste(rownames(MatData)[rownames(MatData) %in% i], 1:sum(rownames(MatData) %in% i))
   }
 }
 ```
@@ -157,13 +160,16 @@ And now we are ready to perform ROMA without fixed center
 
 ``` r
 tictoc::tic()
-DataWU.NFC <- rRoma.R(ExpressionMatrix = MatData, centerData = TRUE, ExpFilter = FALSE, ApproxSamples = 5,
-                     ModuleList = ModuleListWU, MinGenes = 5, MaxGenes = 1000, nSamples = 100, UseWeigths = FALSE, DefaultWeight = 1,
-                     FixedCenter = FALSE, GeneOutDetection = 'L1OutVarPerc', GeneOutThr = 1,
-                     GeneSelMode = "All", SampleFilter = TRUE, MoreInfo = FALSE, PlotData = FALSE,
-                     PCSignMode = "UseAllWeigths", OutGeneNumber = 5, Ncomp = 100, OutGeneSpace = 5,
-                     PCADims = 5, PCSignThr = NULL, UseParallel = TRUE, nCores = 3, ClusType = "FORK",
-                     SamplingGeneWeights = SamplingGeneWeights)
+DataWU.NFC <- rRoma.R(ExpressionMatrix = MatData, centerData = TRUE, ExpFilter = FALSE,
+                      ApproxSamples = 5, ModuleList = ModuleListWU, MinGenes = 5,
+                      MaxGenes = 1000, nSamples = 100, UseWeigths = FALSE,
+                      DefaultWeight = 1, FixedCenter = FALSE,
+                      GeneOutDetection = 'L1OutVarPerc', GeneOutThr = 1,
+                      GeneSelMode = "All", SampleFilter = TRUE, MoreInfo = FALSE,
+                      PlotData = FALSE, PCSignMode = "UseAllWeigths", OutGeneNumber = 5,
+                      Ncomp = 100, OutGeneSpace = 5, PCADims = 5, PCSignThr = NULL,
+                      UseParallel = TRUE, nCores = 3, ClusType = "FORK",
+                      SamplingGeneWeights = SamplingGeneWeights)
 tictoc::toc()
 ```
 
@@ -171,87 +177,110 @@ and with fixed center
 
 ``` r
 tictoc::tic()
-DataWU.FC <- rRoma.R(ExpressionMatrix = MatData, centerData = TRUE, ExpFilter = FALSE, ApproxSamples = 5,
-                  ModuleList = ModuleListWU, MinGenes = 5, MaxGenes = 1000, nSamples = 100, UseWeigths = FALSE, DefaultWeight = 1,
-                  FixedCenter = TRUE, GeneOutDetection = 'L1OutVarPerc', GeneOutThr = 1,
-                  GeneSelMode = "All", SampleFilter = TRUE, MoreInfo = FALSE, PlotData = FALSE,
-                  PCSignMode = "UseAllWeigths", OutGeneNumber = 5, Ncomp = 100, OutGeneSpace = 5,
-                  PCADims = 5, PCSignThr = NULL, UseParallel = TRUE, nCores = 3, ClusType = "FORK",
-                  SamplingGeneWeights = SamplingGeneWeights)
+DataWU.FC <- rRoma.R(ExpressionMatrix = MatData, centerData = TRUE, ExpFilter = FALSE,
+                     ApproxSamples = 5, ModuleList = ModuleListWU, MinGenes = 5,
+                     MaxGenes = 1000, nSamples = 100, UseWeigths = FALSE,
+                     DefaultWeight = 1, FixedCenter = TRUE,
+                     GeneOutDetection = 'L1OutVarPerc', GeneOutThr = 1,
+                     GeneSelMode = "All", SampleFilter = TRUE, MoreInfo = FALSE,
+                     PlotData = FALSE, PCSignMode = "UseAllWeigths", OutGeneNumber = 5,
+                     Ncomp = 100, OutGeneSpace = 5, PCADims = 5, PCSignThr = NULL,
+                     UseParallel = TRUE, nCores = 3, ClusType = "FORK",
+                     SamplingGeneWeights = SamplingGeneWeights)
 tictoc::toc()
 ```
 
 Let us have a look at the overexpressed genesets for using the fixed center
 
 ``` r
-Plot.Genesets(RomaData = DataWU.FC, Selected = SelectGeneSets(RomaData = DataWU.FC, VarThr = 1e-3, VarMode = "Wil", VarType = "Over"),
+Plot.Genesets(RomaData = DataWU.FC,
+              Selected = SelectGeneSets(RomaData = DataWU.FC, VarThr = 1e-3,
+                                        VarMode = "Wil", VarType = "Over"),
               GenesetMargin = 20, SampleMargin = 14, cluster_cols = TRUE)
 ```
 
 and without the fixed center
 
 ``` r
-Plot.Genesets(RomaData = DataWU.NFC, Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3, VarMode = "Wil", VarType = "Over"),
+Plot.Genesets(RomaData = DataWU.NFC,
+              Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3,
+                                        VarMode = "Wil", VarType = "Over"),
               GenesetMargin = 20, SampleMargin = 14, cluster_cols = TRUE)
 ```
 
 Now we can look at the underexpressed geneset with fixed center
 
 ``` r
-Plot.Genesets(RomaData = DataWU.FC, Selected = SelectGeneSets(RomaData = DataWU.FC, VarThr = 1e-3, VarMode = "Wil", VarType = "Under",
-                                                           MedThr = 1e-3, MedMode = "Wil", MedType = "Over"),
+Plot.Genesets(RomaData = DataWU.FC,
+              Selected = SelectGeneSets(RomaData = DataWU.FC, VarThr = 1e-3,
+                                        VarMode = "Wil", VarType = "Under",
+                                        MedThr = 1e-3, MedMode = "Wil", MedType = "Over"),
               GenesetMargin = 20, SampleMargin = 14, cluster_cols = TRUE)
 ```
 
 and without the fixed center
 
 ``` r
-Plot.Genesets(RomaData = DataWU.NFC, Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3, VarMode = "Wil", VarType = "Under",
-                                                              MedThr = 1e-3, MedMode = "Wil", MedType = "Over"),
+Plot.Genesets(RomaData = DataWU.NFC,
+              Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3,
+                                        VarMode = "Wil", VarType = "Under",
+                                        MedThr = 1e-3, MedMode = "Wil", MedType = "Over"),
               GenesetMargin = 20, SampleMargin = 14, cluster_cols = TRUE)
 ```
 
 We can also explore the gene weigths with the fixed center
 
 ``` r
-PlotGeneWeight(RomaData = DataWU.FC, PlotGenes = 30, ExpressionMatrix = MatData, LogExpression = FALSE,
-               Selected = SelectGeneSets(RomaData = DataWU.FC, VarThr = 1e-3, VarMode = "Wil", VarType = "Over"),
+PlotGeneWeight(RomaData = DataWU.FC, PlotGenes = 30,
+               ExpressionMatrix = MatData, LogExpression = FALSE,
+               Selected = SelectGeneSets(RomaData = DataWU.FC, VarThr = 1e-3,
+                                         VarMode = "Wil", VarType = "Over"),
                PlotWeigthSign = TRUE)
 ```
 
 and without the fixed center
 
 ``` r
-PlotGeneWeight(RomaData = DataWU.NFC, PlotGenes = 30, ExpressionMatrix = MatData, LogExpression = FALSE,
-               Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3, VarMode = "Wil", VarType = "Over"),
+PlotGeneWeight(RomaData = DataWU.NFC, PlotGenes = 30,
+               ExpressionMatrix = MatData, LogExpression = FALSE,
+               Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3,
+                                         VarMode = "Wil", VarType = "Over"),
                PlotWeigthSign = TRUE)
 ```
 
 Moreover, we can look at the projections of the samples with the fixed center
 
 ``` r
-PlotSampleProjections(RomaData = DataWU.FC, PlotSamples = 30, ExpressionMatrix = MatData, LogExpression = FALSE,
-                      Selected = SelectGeneSets(RomaData = DataWU.FC, VarThr = 1e-6, VarMode = "Wil", VarType = "Over"),
+PlotSampleProjections(RomaData = DataWU.FC, PlotSamples = 30,
+                      ExpressionMatrix = MatData, LogExpression = FALSE,
+                      Selected = SelectGeneSets(RomaData = DataWU.FC, VarThr = 1e-6,
+                                                VarMode = "Wil", VarType = "Over"),
                       PlotPCProj = "Density")
 ```
 
 and without the fixed center
 
 ``` r
-PlotSampleProjections(RomaData = DataWU.NFC, PlotSamples = 30, ExpressionMatrix = MatData, LogExpression = FALSE,
-                      Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-6, VarMode = "Wil", VarType = "Over"),
+PlotSampleProjections(RomaData = DataWU.NFC, PlotSamples = 30,
+                      ExpressionMatrix = MatData, LogExpression = FALSE,
+                      Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-6,
+                                                VarMode = "Wil", VarType = "Over"),
                       PlotPCProj = "Density")
 ```
 
 Additionaly, we can compare across samples
 
 ``` r
-CompareAcrossSamples(RomaData = DataWU.FC, Selected = SelectGeneSets(RomaData = DataWU.FC, VarThr = 1e-3, VarMode = "Wil", VarType = "Over"),
+CompareAcrossSamples(RomaData = DataWU.FC,
+                     Selected = SelectGeneSets(RomaData = DataWU.FC, VarThr = 1e-3,
+                                               VarMode = "Wil", VarType = "Over"),
                      Groups = Type)
 ```
 
 Finally, we can look at genes which appear across different genesests and explore thier weithgs
 
 ``` r
-PlotRecurringGenes(RomaData = DataWU.NFC, Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3, VarMode = "Wil", VarType = "Over"), GenesByGroup = 25, MinMult = 3)
+PlotRecurringGenes(RomaData = DataWU.NFC,
+                   Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3,
+                                             VarMode = "Wil", VarType = "Over"), GenesByGroup = 25, MinMult = 3)
 ```
