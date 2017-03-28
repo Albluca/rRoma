@@ -282,5 +282,6 @@ Finally, we can look at genes which appear across different genesests and explor
 ``` r
 PlotRecurringGenes(RomaData = DataWU.NFC,
                    Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3,
-                                             VarMode = "Wil", VarType = "Over"), GenesByGroup = 25, MinMult = 3)
+                                             VarMode = "Wil", VarType = "Over"),
+                   GenesByGroup = 25, MinMult = 3)
 ```
