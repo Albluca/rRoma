@@ -1,10 +1,10 @@
 Package: rRoma
 Title: An r implementation of ROMA
-Version: 0.0.2.0000
+Version: 0.0.3.0000
 Authors@R: person("Luca", "Albergante", email = "luca.albergante@gmail.com", role = c("aut", "cre"))
 Description: An R implementation of ROMA
 Depends:
-    R (>= 3.3.1)
+    R (>= 3.1.1)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
