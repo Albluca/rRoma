@@ -354,3 +354,108 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
 
 
 
+
+#' Plot the weigth of genes appearing across multiple genesets
+#'
+#' @param RomaData list, the analysis returned by rRoma
+#' @param Selected vector, integer. The position of the genesets to plot 
+#' @param GenesByGroup scalar, integer. The number of genes per plot
+#' @param MinMult scalar, integer. The minimal multiplicity to plot 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+PlotRecurringGenes  <- function(RomaData, Selected = NULL,
+                                GenesByGroup = 20, MinMult = 2){
+  
+  if(is.null(Selected)){
+    Selected <- 1:nrow(RomaData$ProjMatrix)
+  }
+  
+  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+    print("No Genset selected")
+    return(NULL)
+  } else {
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
+  }
+  
+  AllGenes <- lapply(RomaData$ModuleSummary, "[[", "UsedGenes")
+  GeneMult <- table(unlist(AllGenes))
+  GeneMult <- sort(GeneMult[GeneMult >= MinMult])
+
+  if(length(GeneMult) == 0){
+    return(NULL)
+  }
+  
+  AllGenesWei <- lapply(RomaData$ModuleSummary, "[[", "PC1Weight.SignFixed")
+  
+  GenesModuleMat <- sapply(AllGenesWei, function(x){x[names(GeneMult)]})
+
+  rownames(GenesModuleMat) <- names(GeneMult)
+  colnames(GenesModuleMat) <- unlist(lapply(RomaData$ModuleSummary, "[[", "ModuleName"))
+
+  GenesByMult <- split(data.frame(GenesModuleMat), GeneMult)
+  
+  for(i in 1:length(GenesByMult)){
+    ToPlotData <- t(data.matrix(GenesByMult[[i]]))
+    # hist(apply(ToPlotData, 2, var, na.rm=TRUE),
+    #      main = paste("Genes with multiplicity", names(GenesByMult)[i]))
+    
+    if(nrow(GenesByMult[[i]]) > 1){
+      ToPlotData <- ToPlotData[,order(apply(ToPlotData, 2, var, na.rm=TRUE))]
+    }
+    
+    
+    
+    par(mfcol=c(1,2))
+    
+    
+    
+    boxplot(apply(ToPlotData, 2, var, na.rm=TRUE), log='y', las=2,
+            main = paste("Genes with multiplicity", names(GenesByMult)[i]),
+            ylab = "Variance")
+    
+    boxplot(apply(ToPlotData, 2, var, na.rm=TRUE)/
+              abs(apply(ToPlotData, 2, mean, na.rm=TRUE)), las=2, log='y',
+            main = paste("Genes with multiplicity", names(GenesByMult)[i]),
+            ylab = "Coefficient of variance")
+    
+    par(mfcol=c(1,1))
+    
+    Seps <- seq(from=0, to=ncol(ToPlotData), by=GenesByGroup)
+    if(max(Seps) != ncol(ToPlotData)){
+      Seps <- c(Seps, ncol(ToPlotData))
+    }
+    
+    for(j in 2:length(Seps)){
+      if(Seps[j-1]+1 != Seps[j]){
+        BoxPlotData <- ToPlotData[,(Seps[j-1]+1):Seps[j]]
+        YLim <- range(BoxPlotData, na.rm = TRUE)
+        YLim <- YLim + c(-diff(YLim)*.05, diff(YLim)*.05)
+        
+        # CVData <- apply(ToPlotData[,(Seps[j-1]+1):Seps[j]], 2, var, na.rm=TRUE)/
+        #   abs(apply(ToPlotData[,(Seps[j-1]+1):Seps[j]], 2, mean, na.rm=TRUE))
+        # YLim2 <- range(CVData)
+        
+        boxplot(BoxPlotData, horizontal=FALSE, las = 2,
+                main = paste("Genes with multiplicity", names(GenesByMult)[i]),
+                ylab = "Weight (across genesets)", ylim = YLim)
+        # points( ((CVData-min(CVData))/max(CVData-min(CVData)))*(YLim[2]-YLim[1])+YLim[1],
+        #         pch = 18, col="blue", cex = 2)
+        
+      } else {
+        boxplot(ToPlotData[,Seps[j]], horizontal=FALSE, las = 2,
+                main = paste("Genes with multiplicity", names(GenesByMult)[i]),
+                ylab = "Weight", xlab=colnames(ToPlotData)[Seps[j]])
+        # barplot(var(ToPlotData[,Seps[j]], na.rm=TRUE)/
+        #           abs(mean(ToPlotData[,Seps[j]], na.rm=TRUE)),
+        #         las= 2, log = 'y', xlab=colnames(ToPlotData)[Seps[j]])
+      }
+    }
+  }
+}
+
+
+
+
