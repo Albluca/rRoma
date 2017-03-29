@@ -201,7 +201,7 @@ tictoc::toc()
 
 ```
 
-Let us have a look at the overexpressed genesets for using the fixed center
+Let us have a look at the overdispersed genesets for using the fixed center
 
 ```{r, fig.height=5, fig.width=6, eval=FALSE}
 Plot.Genesets(RomaData = DataWU.FC,
@@ -220,7 +220,7 @@ Plot.Genesets(RomaData = DataWU.NFC,
 
 ```
 
-Now we can look at the underexpressed geneset with fixed center
+Now we can look at the underdispersed geneset with fixed center
 
 ```{r, fig.height=5, fig.width=6, eval=FALSE}
 Plot.Genesets(RomaData = DataWU.FC,

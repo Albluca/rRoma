@@ -190,7 +190,7 @@ DataWU.FC <- rRoma.R(ExpressionMatrix = MatData, centerData = TRUE, ExpFilter = 
 tictoc::toc()
 ```
 
-Let us have a look at the overexpressed genesets for using the fixed center
+Let us have a look at the overdispersed genesets for using the fixed center
 
 ``` r
 Plot.Genesets(RomaData = DataWU.FC,
@@ -208,7 +208,7 @@ Plot.Genesets(RomaData = DataWU.NFC,
               GenesetMargin = 20, SampleMargin = 14, cluster_cols = TRUE)
 ```
 
-Now we can look at the underexpressed geneset with fixed center
+Now we can look at the underdispersed geneset with fixed center
 
 ``` r
 Plot.Genesets(RomaData = DataWU.FC,
