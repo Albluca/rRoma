@@ -104,6 +104,48 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     
   }
   
+  if(GeneOutDetection == "L1OutExpOut"){
+    
+    if(PrintInfo){
+      print("Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)")
+    }
+    
+    # Computing all the PC1
+    AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
+      tData <- t(ExpressionData[-i, ])
+      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
+      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
+    })
+    
+    
+    # Getting the distance from the median PC1
+    GenesOut <- scater::isOutlier(AllPCA1, metric = GeneOutThr)
+    
+    if(PlotData){
+      # Plotting the distances from the median PC1
+      B <- boxplot(x = AllPCA1, at = 1, horizontal = FALSE, ylab = "Variance explained by PC1", main = ModuleName)
+    }
+    
+    if(PrintInfo){
+      print(paste(sum(GenesOut), "genes will be filtered:"))
+      if(sum(GenesOut)>0){
+        print(CompatibleGenes[GenesOut])
+      }
+    }
+    
+    
+    if(PlotData){
+      # Highliting outliers
+      points(y= AllPCA1[GenesOut], x=rep(1, sum(GenesOut)), col='red', pch=20)
+      legend("left", pch = 20, col='red', legend = "Outlier(s)")
+    }
+    
+    # Updating gene list
+    SelGenes <- CompatibleGenes[!GenesOut]
+    
+  }
+  
+  
   return(SelGenes)
   
 }
@@ -211,10 +253,11 @@ FixPCSign <-
 #' @param OutGeneSpace scalar, number of median-absolute-deviations away from median required for in a sample to be called an outlier in the gene expression space
 #' @param FixedCenter logical, should PCA with fixed center be used?
 #' @param GeneOutDetection character scalar, the algorithm used to filter genes in a module. Possible values are
-#' "L1OutVarPerc" (Percentage variation relative to the median variance explained supporgted by a leave one out approach), and
-#' "L1OutVarDC" (Dendrogram clustering statistics on variance explained supported by a leave one out approach)
-#' @param GeneOutThr scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC") or
-#' minimal percentage variation (L1OutVarPerc).
+#' "L1OutVarPerc" (Percentage variation relative to the median variance explained supporgted by a leave one out approach),
+#' "L1OutVarDC" (Dendrogram clustering statistics on variance explained supported by a leave one out approach), and
+#' "L1OutExpOut" (Number of median-absolute-deviations away from median explined variance). the option "L1OutExpOut" requires the scater package to be installed.
+#' @param GeneOutThr scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC"), 
+#' minimal percentage variation (L1OutVarPerc) or the number of median-absolute-deviations away from median ("L1OutExpOut")
 #' @param GeneSelMode character scalar, mode used to sample genes: all available genes ("All") or genes not present in the module ("Others")
 #' @param centerData logical, should the gene expression values be centered over the samples?
 #' @param MoreInfo logical, shuold detailed information on the computation by printed?
