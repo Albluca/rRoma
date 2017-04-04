@@ -44,11 +44,12 @@ For example 5, means that samples re recalculated only if the number of genes in
 \item{FixedCenter}{logical, should PCA with fixed center be used?}
 
 \item{GeneOutDetection}{character scalar, the algorithm used to filter genes in a module. Possible values are
-"L1OutVarPerc" (Percentage variation relative to the median variance explained supporgted by a leave one out approach), and
-"L1OutVarDC" (Dendrogram clustering statistics on variance explained supported by a leave one out approach)}
+"L1OutVarPerc" (Percentage variation relative to the median variance explained supporgted by a leave one out approach),
+"L1OutVarDC" (Dendrogram clustering statistics on variance explained supported by a leave one out approach), and
+"L1OutExpOut" (Number of median-absolute-deviations away from median explined variance). the option "L1OutExpOut" requires the scater package to be installed.}
 
-\item{GeneOutThr}{scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC") or
-minimal percentage variation (L1OutVarPerc).}
+\item{GeneOutThr}{scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC"), 
+minimal percentage variation (L1OutVarPerc) or the number of median-absolute-deviations away from median ("L1OutExpOut")}
 
 \item{GeneSelMode}{character scalar, mode used to sample genes: all available genes ("All") or genes not present in the module ("Others")}
 
