@@ -932,14 +932,16 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         ggplot2::labs(title = ModuleList[[i]]$Name)
       print(p)
       
-      if(any(!is.na(ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes]))){
-        
-        WeiVect <- ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes]
-        names(WeiVect) <- SelGenes
-        
-        if(PCSignMode %in% c('UseAllWeights', 'CorrelateAllWeights')){
-          WeiVect[is.na(WeiVect)] <- DefaultWeight
-        }
+      WeiVect <- ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes]
+      names(WeiVect) <- SelGenes
+      
+      if(PCSignMode %in% c('UseAllWeights', 'CorrelateAllWeights')){
+        WeiVect[is.na(WeiVect)] <- DefaultWeight
+      }
+      
+      # print(WeiVect)
+      
+      if(any(!is.na(WeiVect))){
         
         LocMat <- OrgExpMatrix[SelGenes[!is.na(WeiVect)], ]
         
@@ -965,20 +967,23 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         
         names(SplitGroups) <- unique(MeltData$Gene)
         
+        print("Plotting expression VS projections")
+        
         for(GeneGroup in levels(SplitGroups)){
           
           GenesToUse <- names(SplitGroups[as.character(SplitGroups) == GeneGroup])
           
-          if(length(GenesToUse)>1){
-            next
+          if(length(GenesToUse)>0){
+            p <- ggplot2::ggplot(MeltData[as.character(MeltData$Gene) %in% GenesToUse,], ggplot2::aes(y=Exp, x=Proj, shape = Wei, color = Group)) + ggplot2::geom_point() +
+              ggplot2::facet_wrap( ~ Gene) + ggplot2::labs(title = ModuleList[[i]]$Name, x = "PC1 projections", y = "Expression") +
+              ggplot2::scale_shape_discrete(name = "Weight") + ggplot2::scale_color_discrete(name = "Group")
+            print(p)
           }
-          
-          p <- ggplot2::ggplot(MeltData[as.character(MeltData$Gene) %in% GenesToUse,], ggplot2::aes(y=Exp, x=Proj, shape = Wei, color = Group)) + ggplot2::geom_point() +
-            ggplot2::facet_wrap( ~ Gene) + ggplot2::labs(title = ModuleList[[i]]$Name, x = "PC1 projections", y = "Expression") +
-            ggplot2::scale_shape_discrete(name = "Weight") + ggplot2::scale_color_discrete(name = "Group")
-          print(p)
+ 
           
         }
+        
+        print("Plotting correlations")
         
         CorData <- apply(LocMat, 1, function(x){
           CT <- cor.test(x, CorrProj)
@@ -1001,21 +1006,23 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         # 
         # names(SplitGroups) <- unique(MeltData$Gene)
         
+        # print(CorData)
+        
         for(GeneGroup in levels(SplitGroups)){
           
           GenesToUse <- names(SplitGroups[as.character(SplitGroups) == GeneGroup])
           
-          if(length(GenesToUse)>1){
-            next
+          # print(GenesToUse)
+          
+          if(length(GenesToUse)>0){
+            p <- ggplot2::ggplot(CorData[as.character(CorData$Gene) %in% GenesToUse,], ggplot2::aes(x =  Gene, y = Est, ymin = Low, ymax = High, color = Conc)) +
+              ggplot2::geom_hline(yintercept = 0, linetype = 2) + ggplot2::geom_errorbar() +
+              ggplot2::geom_point() + ggplot2::coord_flip() + 
+              ggplot2::labs(title = ModuleList[[i]]$Name, y = "Estimated correlation (95% CI)", x = "")
+            
+            print(p)
           }
-          
-          p <- ggplot2::ggplot(CorData[as.character(CorData$Gene) %in% GenesToUse,], ggplot2::aes(x =  Gene, y = Est, ymin = Low, ymax = High, color = Conc)) +
-            ggplot2::geom_hline(yintercept = 0, linetype = 2) + ggplot2::geom_errorbar() +
-            ggplot2::geom_point() + ggplot2::coord_flip() + 
-            ggplot2::labs(title = ModuleList[[i]]$Name, y = "Estimated correlation (95% CI)", x = "")
-          
-          print(p)
-          
+
         }
         
       }
