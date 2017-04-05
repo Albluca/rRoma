@@ -483,7 +483,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   }
   
   if(FullSampleInfo){
-    print("PC projections and weigths will be computed and reoriented for sampled genesets. This is potentially very time consuming")
+    print("PC projections and weigths will be computed and reoriented for sampled genesets. This is potentially very time consuming.")
     Ans <- readline("Are you sure you want to do that? (y/n)")
     if(Ans != "y" & Ans != "Y"){
       FullSampleInfo <- FALSE
@@ -492,6 +492,21 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       print("PC projections and weigths will be computed and reoriented for sampled genesets.")
     }
   }
+  
+  
+  
+  if(PlotData){
+    print("Diagnostic plots will be produced. This is time consuming and can produce errors expecially if done interactivelly.")
+    print("It is advisable to only use this option if a relatively small number of genesets is analyzed and/or to redirect the graphic out (e.g. with pdf())")
+    Ans <- readline("Are you sure you want to do that? (y/n)")
+    if(Ans != "y" & Ans != "Y"){
+      FullSampleInfo <- FALSE
+      print("Diagnostic plots will NOT be produced.")
+    } else {
+      print("Diagnostic plots will be produced.")
+    }
+  }
+  
   
   # Cleanup data
   
