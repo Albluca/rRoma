@@ -860,7 +860,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       
       boxplot(SampleMedianExp, at = 1, ylab = "Median expression",
               main = ModuleList[[i]]$Name, ylim=range(c(SampleMedianExp, median(BaseMatrix))))
-      points(x=1, y=MedianExp, pch = 20, col="red", cex= 2)
+      points(x=1, y=median(BaseMatrix), pch = 20, col="red", cex= 2)
       
     }
     
@@ -969,6 +969,10 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           
           GenesToUse <- names(SplitGroups[as.character(SplitGroups) == GeneGroup])
           
+          if(length(GenesToUse)>1){
+            next
+          }
+          
           p <- ggplot2::ggplot(MeltData[as.character(MeltData$Gene) %in% GenesToUse,], ggplot2::aes(y=Exp, x=Proj, shape = Wei, color = Group)) + ggplot2::geom_point() +
             ggplot2::facet_wrap( ~ Gene) + ggplot2::labs(title = ModuleList[[i]]$Name, x = "PC1 projections", y = "Expression") +
             ggplot2::scale_shape_discrete(name = "Weight") + ggplot2::scale_color_discrete(name = "Group")
@@ -1000,6 +1004,10 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         for(GeneGroup in levels(SplitGroups)){
           
           GenesToUse <- names(SplitGroups[as.character(SplitGroups) == GeneGroup])
+          
+          if(length(GenesToUse)>1){
+            next
+          }
           
           p <- ggplot2::ggplot(CorData[as.character(CorData$Gene) %in% GenesToUse,], ggplot2::aes(x =  Gene, y = Est, ymin = Low, ymax = High, color = Conc)) +
             ggplot2::geom_hline(yintercept = 0, linetype = 2) + ggplot2::geom_errorbar() +
