@@ -7,11 +7,12 @@
 rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
   UseWeigths = FALSE, DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000,
   ApproxSamples = 2, nSamples = 100, OutGeneNumber = 5, Ncomp = 10,
-  OutGeneSpace = 5, FixedCenter = TRUE, GeneOutDetection = "PC1IQR",
+  OutGeneSpace = 5, FixedCenter = TRUE, GeneOutDetection = "L1OutExpOut",
   GeneOutThr = 5, GeneSelMode = "All", SampleFilter = FALSE,
   MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PCSignMode = "none",
   PCSignThr = NULL, UseParallel = FALSE, nCores = NULL,
-  ClusType = "PSOCK", SamplingGeneWeights = NULL, FillNAMethod = list())
+  ClusType = "PSOCK", SamplingGeneWeights = NULL, FillNAMethod = list(),
+  Grouping = NULL, FullSampleInfo = FALSE, GroupPCSign = FALSE)
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -44,9 +45,13 @@ For example 5, means that samples re recalculated only if the number of genes in
 \item{FixedCenter}{logical, should PCA with fixed center be used?}
 
 \item{GeneOutDetection}{character scalar, the algorithm used to filter genes in a module. Possible values are
-"L1OutVarPerc" (Percentage variation relative to the median variance explained supporgted by a leave one out approach),
-"L1OutVarDC" (Dendrogram clustering statistics on variance explained supported by a leave one out approach), and
-"L1OutExpOut" (Number of median-absolute-deviations away from median explined variance). the option "L1OutExpOut" requires the scater package to be installed.}
+\itemize{
+\item 'L1OutVarPerc': percentage variation relative to the median variance explained supporgted by a leave one out approach 
+\item 'L1OutVarDC': dendrogram clustering statistics on variance explained supported by a leave one out approach
+\item 'L1OutExpOut': number of median-absolute-deviations away from median explined variance
+\item 'L1OutSdMean': Number of standard deviations away from the mean
+}
+The option "L1OutExpOut" requires the scater package to be installed.}
 
 \item{GeneOutThr}{scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC"), 
 minimal percentage variation (L1OutVarPerc) or the number of median-absolute-deviations away from median ("L1OutExpOut")}
@@ -63,9 +68,16 @@ minimal percentage variation (L1OutVarPerc) or the number of median-absolute-dev
 Larger values decrease the error in the estimation of the explained variance but increase the computation time.}
 
 \item{PCSignMode}{characrter scalar, the modality to use to determine the direction of the principal components. The following options are currentlhy available:
-'none' (The direction is chosen at random), 'PreferActivation' (the direction is chosen in such a way that the sum of the projection is positive),
-'UseAllWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weith are set to DefaultWeight),
-'UseKnownWeigths' (as 'PreferActivation', but the projections ae multiplied by the weigths, missing weigth are set to 0)}
+\itemize{
+\item 'none' (The direction is chosen at random)
+\item 'PreferActivation': the direction is chosen in such a way that the sum of the projection is positive
+\item 'UseAllWeights': as 'PreferActivation', but the projections are multiplied by the weigths, missing weights are set to DefaultWeight
+\item 'UseKnownWeights': as 'UseAllWeights', but missing weigth are set to 0
+\item 'CorrelateAllWeights': the direction is chosen in such a way to maximise the positive correlation between genes with a positive (negative) weights
+and the (reversed) PC projections, missing weights are set to DefaultWeight
+\item 'CorrelateKnownWeights': as 'CorrelateAllWeights', but missing weights are set to 0
+}
+If 'CorrelateAllWeights' or 'CorrelateKnownWeights' are used and GroupPCSign is TRUE, the correltions will be computed on the groups defined by Grouping}
 
 \item{PCSignThr}{numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
 only the 10\% of genes with the largest projection in absolugte value will be considered.}
@@ -81,6 +93,12 @@ which should be faster.}
 \item{SamplingGeneWeights}{named vector, numeric. Weigth so use when correcting the sign of the PC for sampled data.}
 
 \item{FillNAMethod}{names list, additional parameters to pass to the mice function}
+
+\item{Grouping}{named vector, the groups associated with the sample}
+
+\item{FullSampleInfo}{boolean, should full PC information be computed and saved for all the randomised genesets?}
+
+\item{GroupPCSign}{boolean, should grouping information to be used to orient PCs?}
 }
 \description{
 Perform ROMA on a datasets
