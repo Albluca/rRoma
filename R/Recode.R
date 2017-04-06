@@ -493,8 +493,8 @@ FixPCSign <-
 #' }
 #' If 'CorrelateAllWeights', 'CorrelateKnownWeights', 'CorrelateAllWeightsBySample' or 'CorrelateKnownWeightsBySample' are used
 #' and GroupPCSign is TRUE, the correltions will be computed on the groups defined by Grouping.
-#' @param PCSignThr numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
-#' only the 10\% of genes with the largest projection in absolugte value will be considered.
+#' @param PCSignThr numeric scalar, a quantile threshold to limit the projections (or weights) to use, e.g., if equal to .9
+#' only the 10\% of genes with the largest projection (or weights) in absolute value will be considered.
 #' @param UseParallel boolean, shuold a parallel environment be used? Note that using a parallel environment will increase the memorey usage as a
 #' copy of the gene expression matrix is needed for each core
 #' @param nCores integer, the number of cores to use if UseParallel is TRUE. Set to NULL for auto-detection
