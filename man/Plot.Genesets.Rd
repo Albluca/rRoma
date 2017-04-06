@@ -6,7 +6,7 @@
 \usage{
 Plot.Genesets(RomaData, Selected = NULL, GenesetMargin = 4,
   SampleMargin = 4, ColorGradient = colorRamps::blue2red(50),
-  cluster_cols = FALSE)
+  cluster_cols = FALSE, GroupInfo = NULL)
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
@@ -20,6 +20,8 @@ Plot.Genesets(RomaData, Selected = NULL, GenesetMargin = 4,
 \item{ColorGradient}{vector, string. The colors used for the heatmap.}
 
 \item{cluster_cols}{boolean, should the samp^le be reordered according to the dendrogram?}
+
+\item{GroupInfo}{vector, character. A vector describing the group association of each sample}
 }
 \description{
 Plot genesets information

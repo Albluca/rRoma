@@ -6,6 +6,7 @@
 #' @param SampleMargin scalat, integer. The number of rows used to draw the sample names.
 #' @param ColorGradient vector, string. The colors used for the heatmap.
 #' @param cluster_cols boolean, should the samp^le be reordered according to the dendrogram?
+#' @param GroupInfo vector, character. A vector describing the group association of each sample
 #'
 #' @return
 #' @export
@@ -14,7 +15,7 @@
 Plot.Genesets <- function(RomaData, Selected = NULL,
                                GenesetMargin = 4, SampleMargin = 4,
                                ColorGradient = colorRamps::blue2red(50),
-                               cluster_cols = FALSE){
+                               cluster_cols = FALSE, GroupInfo = NULL){
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$ProjMatrix)
@@ -47,9 +48,15 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
   
   par(op)
   
+  if(!is.null(GroupInfo)){
+    AddInfo <- data.frame(Groups = GroupInfo)
+  } else {
+    AddInfo = NULL
+  }
+  
   pheatmap::pheatmap(RomaData$ProjMatrix[Selected,], color = ColorGradient,
-                     main = "Selected genesets", cluster_cols = cluster_cols)
-
+                     main = "Selected genesets", cluster_cols = cluster_cols,
+                     annotation_col = AddInfo)
 }
 
 
