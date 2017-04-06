@@ -267,15 +267,15 @@ FixPCSign <-
       }
     }
     
-    if (Mode == 'CorrelateAllWeights') {
+    if (Mode == 'CorrelateAllWeightsByGene') {
       
       print(paste("Missing gene weights will be replaced by", DefWei))
       Wei[is.na(Wei)] <- DefWei
-      Mode <-  'CorrelateKnownWeights'
+      Mode <-  'CorrelateKnownWeightsByGene'
     
     }
     
-    if (Mode == 'CorrelateKnownWeights') {
+    if (Mode == 'CorrelateKnownWeightsByGene') {
       
       print("Orienting PC by correlating gene expression and PC projections")
       
@@ -314,7 +314,7 @@ FixPCSign <-
           ToUse <- Cor.Test.Vect[1,] < Thr
         }
         
-        if(sum(Cor.Test.Vect[2,ToUse]*SelGenesWei[ToUse])>1){
+        if(sum(Cor.Test.Vect[2,ToUse]*SelGenesWei[ToUse])>0){
           return(1)
         } else {
           return(-1)
@@ -345,6 +345,85 @@ FixPCSign <-
         
       }
 
+    }
+    
+    if (Mode == 'CorrelateAllWeightsBySample') {
+      
+      print(paste("Missing gene weights will be replaced by", DefWei))
+      Wei[is.na(Wei)] <- DefWei
+      Mode <-  'CorrelateKnownWeightsBySample'
+      
+    }
+    
+    if (Mode == 'CorrelateKnownWeightsBySample') {
+      
+      print("Orienting PC by correlating gene expression and PC weights")
+      
+      if(sum(!is.na(Wei))<1){
+        print("Not enough weights, PC will be oriented randomly")
+        return(1)
+      }
+      
+      if(!is.null(Grouping)){
+        print("Using groups")
+        
+        AssocitedGroups <- Grouping[colnames(ExpMat)]
+        TB <- table(AssocitedGroups, useNA = "no")
+        
+        if(sum(TB>0)<2){
+          print("Not enough groups, PC will be oriented randomly")
+          return(1)
+        }
+        
+        GroupMedians <- apply(ExpMat, 1, function(x) {
+          aggregate(x = x, by=list(AssocitedGroups), FUN = median, na.rm=TRUE)
+        })
+        
+        
+        MediansByGroups <- sapply(GroupMedians, function(x) {
+          x[,2]
+        })
+        
+        Cor.Test.Vect <- apply(MediansByGroups, 1, function(x){
+          CT <- cor.test(x, PCWeigth*Wei)
+          c(CT$p.value, CT$estimate)
+        })
+        
+        ToUse <- rep(TRUE, length(PCWeigth))
+        if (!is.null(Thr)) {
+          ToUse <- Cor.Test.Vect[1,] < Thr
+        }
+        
+        if(sum(Cor.Test.Vect[2,ToUse])>0){
+          return(1)
+        } else {
+          return(-1)
+        }
+        
+      } else {
+        print("Not using groups")
+        
+        names(PCWeigth) <- rownames(ExpMat)
+        PCWeigth <- PCWeigth*Wei
+        
+        Cor.Test.Vect <- apply(ExpMat, 2, function(x){
+          CT <- cor.test(x, PCWeigth)
+          c(CT$p.value, CT$estimate)
+        })
+        
+        ToUse <- rep(TRUE, ncol(Cor.Test.Vect))
+        if (!is.null(Thr)) {
+          ToUse <- Cor.Test.Vect[1,] < Thr
+        }
+        
+        if(sum(Cor.Test.Vect[2,ToUse])>0){
+          return(1)
+        } else {
+          return(-1)
+        }
+        
+      }
+      
     }
     
   }
@@ -405,11 +484,15 @@ FixPCSign <-
 #' \item 'PreferActivation': the direction is chosen in such a way that the sum of the projection is positive
 #' \item 'UseAllWeights': as 'PreferActivation', but the projections are multiplied by the weigths, missing weights are set to DefaultWeight
 #' \item 'UseKnownWeights': as 'UseAllWeights', but missing weigth are set to 0
-#' \item 'CorrelateAllWeights': the direction is chosen in such a way to maximise the positive correlation between genes with a positive (negative) weights
+#' \item 'CorrelateAllWeightsByGene': the direction is chosen in such a way to maximise the positive correlation between the expression of genes with a positive (negative) weights
 #' and the (reversed) PC projections, missing weights are set to DefaultWeight
-#' \item 'CorrelateKnownWeights': as 'CorrelateAllWeights', but missing weights are set to 0
+#' \item 'CorrelateKnownWeightsByGene': as 'CorrelateAllWeights', but missing weights are set to 0
+#' \item 'CorrelateAllWeightsBySample': the direction is chosen in such a way to maximise the positive correlation between the expression of genes and the PC corrected weigth
+#' (i.e., PC weigths are multiplied by gene weigths), missing weights are set to DefaultWeight
+#' \item 'CorrelateKnownWeightsBySample': as 'CorrelateAllWeightsBySample', but missing weights are set to 0
 #' }
-#' If 'CorrelateAllWeights' or 'CorrelateKnownWeights' are used and GroupPCSign is TRUE, the correltions will be computed on the groups defined by Grouping
+#' If 'CorrelateAllWeights', 'CorrelateKnownWeights', 'CorrelateAllWeightsBySample' or 'CorrelateKnownWeightsBySample' are used
+#' and GroupPCSign is TRUE, the correltions will be computed on the groups defined by Grouping.
 #' @param PCSignThr numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
 #' only the 10\% of genes with the largest projection in absolugte value will be considered.
 #' @param UseParallel boolean, shuold a parallel environment be used? Note that using a parallel environment will increase the memorey usage as a
@@ -478,7 +561,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   }
   
   if(any(duplicated(AllGenesMatrix))){
-    warning("Duplicated gene names detected. This may create inconsistencies in the analysis. Consider fixing this problem.")
+    print("Duplicated gene names detected. This may create inconsistencies in the analysis. Consider fixing this problem.")
     readline("Press any key")
   }
   
@@ -548,9 +631,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     NotFoundSampNames <- which(!(colnames(ExpressionMatrix) %in% names(Grouping)))
     FoundSampNames <- which((colnames(ExpressionMatrix) %in% names(Grouping)))
-    print(paste("The following samples don't have an associated group:"))
-    print(colnames(ExpressionMatrix)[NotFoundSampNames])
-    print("They will not be considered for group associated analysis")
+    
+    if(length(NotFoundSampNames)>1){
+      print(paste("The following samples don't have an associated group:"))
+      print(colnames(ExpressionMatrix)[NotFoundSampNames])
+      print("They will not be considered for group associated analysis")
+    }
+
   }
   
   OrgExpMatrix = ExpressionMatrix
@@ -776,7 +863,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             }
             
             ExpMat <- NULL
-            if(PCSignMode %in% c("UseExpressionCorrelation")){
+            if(PCSignMode %in% c("CorrelateAllWeightsByGene", "CorrelateKnownWeightsByGene",
+                                 "CorrelateAllWeightsBySample", "CorrelateKnownWeightsBySample")){
               ExpMat <- OrgExpMatrix[SampleSelGenes, ]
             }
             
@@ -915,7 +1003,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     # Compute the sign correction
     
     ExpMat <- NULL
-    if(PCSignMode %in% c('CorrelateKnownWeights', 'CorrelateAllWeights')){
+    if(PCSignMode %in% c("CorrelateAllWeightsByGene", "CorrelateKnownWeightsByGene",
+                         "CorrelateAllWeightsBySample", "CorrelateKnownWeightsBySample")){
       ExpMat <- OrgExpMatrix[SelGenes, ]
     }
     
@@ -950,7 +1039,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       WeiVect <- ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes]
       names(WeiVect) <- SelGenes
       
-      if(PCSignMode %in% c('UseAllWeights', 'CorrelateAllWeights')){
+      if(PCSignMode %in% c('UseAllWeights', 'CorrelateAllWeightsBySample', 'CorrelateAllWeightsByGene')){
         WeiVect[is.na(WeiVect)] <- DefaultWeight
       }
       
@@ -974,6 +1063,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         
         MeltData <- cbind(MeltData, CorrProj[as.character(MeltData$Sample)])
         colnames(MeltData)[6] <- c("Proj")
+        
+        CorrLoading <- CorrectSign1*PCBase$rotation[,1]*WeiVect
+        names(CorrLoading) <- rownames(OrgExpMatrix[SelGenes,])
+        
+        MeltData <- cbind(MeltData, CorrLoading[as.character(MeltData$Gene)])
+        colnames(MeltData)[7] <- c("Load")
         
         MeltData$Wei <- factor(MeltData$Wei)
         
@@ -1039,7 +1134,75 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           }
 
         }
+       
         
+        
+        print("Plotting expression VS PC weigths")
+        
+        for(GroupID in levels(MeltData$Group)){
+          
+          if(sum(as.character(MeltData$Group) == GroupID, na.rm = TRUE)>0){
+            p <- ggplot2::ggplot(MeltData[as.character(MeltData$Group) == GroupID & !is.na(MeltData$Group),], ggplot2::aes(y=Exp, x=Load, shape = Wei, color = Group)) + ggplot2::geom_point() +
+              ggplot2::facet_wrap( ~ Sample) + ggplot2::labs(title = ModuleList[[i]]$Name, x = "PC1 projections", y = "Expression") +
+              ggplot2::scale_shape_discrete(name = "Weight") + ggplot2::scale_color_discrete(name = "Group")
+            print(p)
+          }
+          
+        }
+        
+        if(any(is.na(MeltData$Group))){
+          tData <- MeltData[is.na(MeltData$Group),]
+          tData$Group <- 'Unassigned'
+          p <- ggplot2::ggplot(tData, ggplot2::aes(y=Exp, x=Load, shape = Wei, color = Group)) + ggplot2::geom_point() +
+            ggplot2::facet_wrap( ~ Sample) + ggplot2::labs(title = ModuleList[[i]]$Name, x = "PC1 projections", y = "Expression") +
+            ggplot2::scale_shape_discrete(name = "Weight") + ggplot2::scale_color_discrete(name = "Group")
+          print(p)
+        }
+        
+        
+        CorData <- apply(LocMat, 2, function(x){
+          CT <- cor.test(x[!is.na(CorrLoading)], CorrLoading[!is.na(CorrLoading)])
+          return(c(CT$estimate, CT$conf.int))
+        })
+        
+        CorData <- t(rbind(CorData, Grouping[colnames(CorData)]))
+        
+        CorData <- cbind(rownames(CorData), CorData)
+        colnames(CorData) <- c("Gene",  "Est", "Low", "High", "Group")
+        
+        CorData <- data.frame(CorData)
+        
+        CorData$Est <- as.numeric(as.character(CorData$Est))
+        CorData$Low <- as.numeric(as.character(CorData$Low))
+        CorData$High <- as.numeric(as.character(CorData$High))
+     
+        
+        # print(CorData)
+        
+        for(GroupID in levels(CorData$Group)){
+          
+          if(sum(as.character(CorData$Group) == GroupID, na.rm = TRUE)>0){
+            p <- ggplot2::ggplot(CorData[as.character(CorData$Group) == GroupID & !is.na(CorData$Group),], ggplot2::aes(x =  Gene, y = Est, ymin = Low, ymax = High, color = Group)) +
+              ggplot2::geom_hline(yintercept = 0, linetype = 2) + ggplot2::geom_errorbar() +
+              ggplot2::geom_point() + ggplot2::coord_flip() + 
+              ggplot2::labs(title = ModuleList[[i]]$Name, y = "Estimated correlation (95% CI)", x = "")
+            
+            print(p)
+          }
+          
+        }
+        
+        if(any(is.na(CorData$Group))){
+          tData <- CorData[is.na(CorData$Group),]
+          tData$Group <- 'Unassigned'
+          p <- ggplot2::ggplot(tData, ggplot2::aes(x =  Gene, y = Est, ymin = Low, ymax = High, color = Group)) +
+            ggplot2::geom_hline(yintercept = 0, linetype = 2) + ggplot2::geom_errorbar() +
+            ggplot2::geom_point() + ggplot2::coord_flip() + 
+            ggplot2::labs(title = ModuleList[[i]]$Name, y = "Estimated correlation (95% CI)", x = "")
+          
+          print(p)
+        }
+         
       }
       
      }

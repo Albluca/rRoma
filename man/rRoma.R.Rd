@@ -73,11 +73,15 @@ Larger values decrease the error in the estimation of the explained variance but
 \item 'PreferActivation': the direction is chosen in such a way that the sum of the projection is positive
 \item 'UseAllWeights': as 'PreferActivation', but the projections are multiplied by the weigths, missing weights are set to DefaultWeight
 \item 'UseKnownWeights': as 'UseAllWeights', but missing weigth are set to 0
-\item 'CorrelateAllWeights': the direction is chosen in such a way to maximise the positive correlation between genes with a positive (negative) weights
+\item 'CorrelateAllWeightsByGene': the direction is chosen in such a way to maximise the positive correlation between the expression of genes with a positive (negative) weights
 and the (reversed) PC projections, missing weights are set to DefaultWeight
-\item 'CorrelateKnownWeights': as 'CorrelateAllWeights', but missing weights are set to 0
+\item 'CorrelateKnownWeightsByGene': as 'CorrelateAllWeights', but missing weights are set to 0
+\item 'CorrelateAllWeightsBySample': the direction is chosen in such a way to maximise the positive correlation between the expression of genes and the PC corrected weigth
+(i.e., PC weigths are multiplied by gene weigths), missing weights are set to DefaultWeight
+\item 'CorrelateKnownWeightsBySample': as 'CorrelateAllWeightsBySample', but missing weights are set to 0
 }
-If 'CorrelateAllWeights' or 'CorrelateKnownWeights' are used and GroupPCSign is TRUE, the correltions will be computed on the groups defined by Grouping}
+If 'CorrelateAllWeights', 'CorrelateKnownWeights', 'CorrelateAllWeightsBySample' or 'CorrelateKnownWeightsBySample' are used
+and GroupPCSign is TRUE, the correltions will be computed on the groups defined by Grouping.}
 
 \item{PCSignThr}{numeric scalar, a quantile threshold to limit the projections to use, e.g., if equal to .9
 only the 10\% of genes with the largest projection in absolugte value will be considered.}
