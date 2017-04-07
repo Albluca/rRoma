@@ -684,6 +684,18 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
   }
   
+  # Filter genesets depending on the number of genes
+  
+  nGenes <- unlist(lapply(lapply(ModuleList, "[[", "Genes"), length))
+  ToFilter <- (nGenes > MaxGenes | nGenes < MinGenes)
+  ToUse <- !ToFilter
+  
+  print("The following genesets will be ignored due to the number of genes")
+  
+  print(unlist(lapply(ModuleList[ToFilter], "[[", "Name")))
+  
+  ModuleList <- ModuleList[ToUse]
+  
   if(UseParallel){
     
     no_cores <- parallel::detectCores()
@@ -722,12 +734,6 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     if(MoreInfo){
       print("The following genes will be used:")
       print(CompatibleGenes)
-    }
-    
-    if(length(CompatibleGenes) > MaxGenes | length(CompatibleGenes) < MinGenes){
-      print("Number of specified genes outside the given range")
-      print("Skipping module")
-      next()
     }
     
     # Filtering genes
