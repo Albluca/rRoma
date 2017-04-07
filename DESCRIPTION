@@ -18,6 +18,6 @@ Imports:
       gridExtra,
       pheatmap,
       parallel,
-      reshape,
+      reshape
 Suggests:
       mice
