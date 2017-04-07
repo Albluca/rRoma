@@ -7,7 +7,7 @@
 Plot.Genesets(RomaData, Selected = NULL, GenesetMargin = 4,
   SampleMargin = 4, ColorGradient = colorRamps::blue2red(50),
   cluster_cols = FALSE, GroupInfo = NULL, HMTite = "Selected Genesets",
-  AggByGroupsFL = list())
+  AggByGroupsFL = list(), Normalize = FALSE)
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
@@ -27,7 +27,9 @@ Plot.Genesets(RomaData, Selected = NULL, GenesetMargin = 4,
 \item{HMTite}{scalar, string. The title of the heatmap}
 
 \item{AggByGroupsFL}{list, string. A list of function names that will be used to aggregate the
-geneset weigths and produce additional heatmaps}
+geneset weigths and produce additional heatmaps.}
+
+\item{Normalize}{boolean, shuold weights be normalized to c(-1, 1) for each geneset}
 }
 \description{
 Plot genesets information

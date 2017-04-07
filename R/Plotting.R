@@ -10,6 +10,7 @@
 #' @param HMTite scalar, string. The title of the heatmap
 #' @param AggByGroupsFL list, string. A list of function names that will be used to aggregate the
 #' geneset weigths and produce additional heatmaps.
+#' @param Normalize boolean, shuold weights be normalized to c(-1, 1) for each geneset
 #'
 #' @return
 #' @export
@@ -19,7 +20,8 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
                           GenesetMargin = 4, SampleMargin = 4,
                           ColorGradient = colorRamps::blue2red(50),
                           cluster_cols = FALSE, GroupInfo = NULL,
-                          HMTite = "Selected Genesets", AggByGroupsFL = list()){
+                          HMTite = "Selected Genesets", AggByGroupsFL = list(),
+                          Normalize = FALSE){
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$ProjMatrix)
@@ -58,13 +60,25 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
     AddInfo = NULL
   }
   
-  pheatmap::pheatmap(RomaData$ProjMatrix[Selected,], color = ColorGradient,
+  PlotMat <- RomaData$ProjMatrix[Selected,]
+  
+  if(Normalize){
+    
+    PlotMat <- t(apply(PlotMat, 1, function(x){
+      x[x>0] <- x[x>0]/max(x[x>0])
+      x[x<0] <- -x[x<0]/min(x[x<0])
+      x
+    }))
+    
+  }
+  
+  pheatmap::pheatmap(PlotMat, color = ColorGradient,
                      main = HMTite, cluster_cols = cluster_cols,
                      annotation_col = AddInfo)
   
   if(length(AggByGroupsFL)>0 & !is.null(GroupInfo)){
     
-    SplitData <- split(data.frame(t(RomaData$ProjMatrix[Selected,])), f=GroupInfo)
+    SplitData <- split(data.frame(t(PlotMat)), f=GroupInfo)
     
     for(i in 1:length(AggByGroupsFL)){
       
