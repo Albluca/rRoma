@@ -6,16 +6,20 @@
 #' @param SampleMargin scalat, integer. The number of rows used to draw the sample names.
 #' @param ColorGradient vector, string. The colors used for the heatmap.
 #' @param cluster_cols boolean, should the samp^le be reordered according to the dendrogram?
-#' @param GroupInfo vector, character. A vector describing the group association of each sample
+#' @param GroupInfo vector, character. A vector describing the group association of each sample.
+#' @param HMTite scalar, string. The title of the heatmap
+#' @param AggByGroupsFL list, string. A list of function names that will be used to aggregate the
+#' geneset weigths and produce additional heatmaps.
 #'
 #' @return
 #' @export
 #'
 #' @examples
 Plot.Genesets <- function(RomaData, Selected = NULL,
-                               GenesetMargin = 4, SampleMargin = 4,
-                               ColorGradient = colorRamps::blue2red(50),
-                               cluster_cols = FALSE, GroupInfo = NULL){
+                          GenesetMargin = 4, SampleMargin = 4,
+                          ColorGradient = colorRamps::blue2red(50),
+                          cluster_cols = FALSE, GroupInfo = NULL,
+                          HMTite = "Selected Genesets", AggByGroupsFL = list()){
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$ProjMatrix)
@@ -55,8 +59,27 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
   }
   
   pheatmap::pheatmap(RomaData$ProjMatrix[Selected,], color = ColorGradient,
-                     main = "Selected genesets", cluster_cols = cluster_cols,
+                     main = HMTite, cluster_cols = cluster_cols,
                      annotation_col = AddInfo)
+  
+  if(length(AggByGroupsFL)>0 & !is.null(GroupInfo)){
+    
+    SplitData <- split(data.frame(t(RomaData$ProjMatrix[Selected,])), f=GroupInfo)
+    
+    for(i in 1:length(AggByGroupsFL)){
+      
+      Aggmat <- sapply(SplitData, function(x) {
+        apply(x, 2, get(AggByGroupsFL[[i]]))
+        })
+      
+      pheatmap::pheatmap(Aggmat, color = ColorGradient,
+                         main = paste(HMTite, AggByGroupsFL[[i]]),
+                         cluster_cols = cluster_cols)
+      
+    }
+
+  }
+  
 }
 
 
