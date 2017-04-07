@@ -502,7 +502,7 @@ FixPCSign <-
 #' which should be faster.
 #' @param SamplingGeneWeights named vector, numeric. Weigth so use when correcting the sign of the PC for sampled data.
 #' @param FillNAMethod names list, additional parameters to pass to the mice function
-#' @param Grouping named vector, the groups associated with the sample
+#' @param Grouping named vector, the groups associated with the sample.
 #' @param FullSampleInfo boolean, should full PC information be computed and saved for all the randomised genesets?
 #' @param GroupPCSign boolean, should grouping information to be used to orient PCs?
 #' 
@@ -590,7 +590,6 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     }
   }
   
-  
   # Cleanup data
   
   if(ExpFilter){
@@ -638,6 +637,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       print("They will not be considered for group associated analysis")
     }
 
+  } else {
+    FoundSampNames <- NULL
   }
   
   OrgExpMatrix = ExpressionMatrix
@@ -712,7 +713,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   
   for(i in 1:length(ModuleList)){
     
-    print(paste("Working on", ModuleList[[i]]$Name, "-", ModuleList[[i]]$Desc))
+    print(paste("[", i, "/", length(ModuleList), "] Working on ", ModuleList[[i]]$Name, " - ", ModuleList[[i]]$Desc, sep = ""))
     
     CompatibleGenes <- ModuleList[[i]]$Genes
     
@@ -929,15 +930,15 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           stop("Incorrect sampling mode")
         }
         
+        
+        
         if(!UseParallel){
-          
-          SampledExp <- lapply(SampledsGeneList, TestGenes)
-          
+          Time <- system.time(SampledExp <- lapply(SampledsGeneList, TestGenes), gcFirst = FALSE)
         } else {
-          
-          SampledExp <- parallel::parLapply(cl, SampledsGeneList, TestGenes)
-
+          Time <- system.time(SampledExp <- parallel::parLapply(cl, SampledsGeneList, TestGenes), gcFirst = FALSE)
         }
+        
+        print(Time)
         
         SampleExpVar <- sapply(SampledExp, "[[", "ExpVar")
         SampleMedianExp <- sapply(SampledExp, "[[", "MedianExp")
