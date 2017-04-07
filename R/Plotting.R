@@ -21,7 +21,7 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
                           ColorGradient = colorRamps::blue2red(50),
                           cluster_cols = FALSE, GroupInfo = NULL,
                           HMTite = "Selected Genesets", AggByGroupsFL = list(),
-                          Normalize = FALSE){
+                          Normalize = FALSE, Transpose = FALSE){
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$ProjMatrix)
@@ -37,7 +37,12 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
   op <- par(mar=c(GenesetMargin, 5, 4, 2))
   
   B <- boxplot(lapply(RomaData$ModuleSummary[Selected], function(x){
-    sapply(x$SampledExp, "[[", "ExpVar")[1,]
+    tSampleExp <- sapply(x$SampledExp, "[[", "ExpVar")
+    if(!is.null(ncol(tSampleExp))){
+      tSampleExp[1,]
+    } else {
+      tSampleExp
+    }
   }), at = 1:length(Selected), las = 2, ylab = "Explained variance", main = "Selected genesets",
   names = unlist(lapply(RomaData$ModuleSummary[Selected], "[[", "ModuleName")),
   ylim = c(0,1))
@@ -72,9 +77,17 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
     
   }
   
-  pheatmap::pheatmap(PlotMat, color = ColorGradient,
-                     main = HMTite, cluster_cols = cluster_cols,
-                     annotation_col = AddInfo)
+  if(Transpose){
+    pheatmap::pheatmap(t(PlotMat), color = ColorGradient,
+                       main = HMTite, cluster_rows = cluster_cols,
+                       annotation_row = AddInfo)
+  } else {
+    pheatmap::pheatmap(PlotMat, color = ColorGradient,
+                       main = HMTite, cluster_cols = cluster_cols,
+                       annotation_col = AddInfo)
+  }
+  
+  
   
   if(length(AggByGroupsFL)>0 & !is.null(GroupInfo)){
     
@@ -86,10 +99,16 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
         apply(x, 2, get(AggByGroupsFL[[i]]))
         })
       
-      pheatmap::pheatmap(Aggmat, color = ColorGradient,
-                         main = paste(HMTite, AggByGroupsFL[[i]]),
-                         cluster_cols = cluster_cols)
-      
+      if(Transpose){
+        pheatmap::pheatmap(t(Aggmat), color = ColorGradient,
+                           main = paste(HMTite, AggByGroupsFL[[i]]),
+                           cluster_rows = cluster_cols)
+      } else {
+        pheatmap::pheatmap(Aggmat, color = ColorGradient,
+                           main = paste(HMTite, AggByGroupsFL[[i]]),
+                           cluster_cols = cluster_cols)
+      }
+
     }
 
   }

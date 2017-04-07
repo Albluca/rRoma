@@ -23,7 +23,7 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
 
 \item{ModuleList}{list, gene module list}
 
-\item{UseWeigths}{logical, should the weigths be used}
+\item{UseWeigths}{logical, should the weigths be used for PCA calculation?}
 
 \item{DefaultWeight}{integer scalar, the default weigth to us if no weith is specified by the modile file and an algorithm requiring weigths is used}
 
@@ -58,13 +58,14 @@ minimal percentage variation (L1OutVarPerc) or the number of median-absolute-dev
 
 \item{GeneSelMode}{character scalar, mode used to sample genes: all available genes ("All") or genes not present in the module ("Others")}
 
-\item{SampleFilter}{logical, should outlier detection be applied to sampled to sample data as well?}
+\item{SampleFilter}{logical, should outlier detection be applied to sampled data as well?}
 
 \item{MoreInfo}{logical, shuold detailed information on the computation by printed?}
 
 \item{PlotData}{logical, shuold debugging plots by produced ?}
 
-\item{PCADims}{integer, the number of PCA dimensions to compute. Should be >= 2.
+\item{PCADims}{integer, the number of PCA dimensions to compute. Should be >= 2. Note that, the value 1 is allowed,
+but is not advisable under normal circumstances.
 Larger values decrease the error in the estimation of the explained variance but increase the computation time.}
 
 \item{PCSignMode}{characrter scalar, the modality to use to determine the direction of the principal components. The following options are currentlhy available:
@@ -91,14 +92,14 @@ copy of the gene expression matrix is needed for each core}
 
 \item{nCores}{integer, the number of cores to use if UseParallel is TRUE. Set to NULL for auto-detection}
 
-\item{ClusType}{string, the cluster type to use. The default value ("PSOCK") should be available on most systems, unix-like environments also support the "PSOCK",
+\item{ClusType}{string, the cluster type to use. The default value ("PSOCK") should be available on most systems, unix-like environments also support the "FORK",
 which should be faster.}
 
 \item{SamplingGeneWeights}{named vector, numeric. Weigth so use when correcting the sign of the PC for sampled data.}
 
 \item{FillNAMethod}{names list, additional parameters to pass to the mice function}
 
-\item{Grouping}{named vector, the groups associated with the sample}
+\item{Grouping}{named vector, the groups associated with the sample.}
 
 \item{FullSampleInfo}{boolean, should full PC information be computed and saved for all the randomised genesets?}
 

@@ -7,7 +7,7 @@
 Plot.Genesets(RomaData, Selected = NULL, GenesetMargin = 4,
   SampleMargin = 4, ColorGradient = colorRamps::blue2red(50),
   cluster_cols = FALSE, GroupInfo = NULL, HMTite = "Selected Genesets",
-  AggByGroupsFL = list(), Normalize = FALSE)
+  AggByGroupsFL = list(), Normalize = FALSE, Transpose = FALSE)
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
