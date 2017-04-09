@@ -644,7 +644,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     if(length(NotFoundSampNames)>1){
       print(paste("The following samples don't have an associated group:"))
       print(colnames(ExpressionMatrix)[NotFoundSampNames])
-      print("They will not be considered for group associated analysis")
+      print("They will NOT be considered for group associated analysis")
     }
 
   } else {
@@ -702,7 +702,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   ToFilter <- (nGenes > MaxGenes | nGenes < MinGenes)
   ToUse <- !ToFilter
   
-  print("The following genesets will be ignored due to the number of genes")
+  print("The following genesets will be ignored due to the number of genes being outside the specified range")
   
   print(unlist(lapply(ModuleList[ToFilter], "[[", "Name")))
   
