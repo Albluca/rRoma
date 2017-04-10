@@ -8,9 +8,10 @@
 #' @param cluster_cols boolean, should the samp^le be reordered according to the dendrogram?
 #' @param GroupInfo vector, character. A vector describing the group association of each sample.
 #' @param HMTite scalar, string. The title of the heatmap
-#' @param AggByGroupsFL list, string. A list of function names that will be used to aggregate the
+#' @param AggByGroupsFL list, string. A list of function names (as strings) that will be used to aggregate the
 #' geneset weigths and produce additional heatmaps.
 #' @param Normalize boolean, shuold weights be normalized to c(-1, 1) for each geneset
+#' @param Transpose boolean, should the samples by plotted on the rows instead of the columns?
 #'
 #' @return
 #' @export
