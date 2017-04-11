@@ -54,7 +54,7 @@ ReadGMTFile <- function(FileLocation) {
 
 # Load data
 # Msigdb.v6.0.symbols.all <- rRoma::ReadGMTFile("~/Downloads/msigdb.v6.0.symbols.gmt.txt")
-devtools::use_data(Msigdb.v6.0.symbols.all)
+# devtools::use_data(Msigdb.v6.0.symbols.all)
 
 
 
@@ -72,7 +72,7 @@ SelectFromMSIGdb <- function(SearchString, Version = "6.0") {
     print("Searching in MsigDB v6.0")
     
     return(rRoma::Msigdb.v6.0.symbols.all[grep(pattern = tolower(SearchString),
-                                               x = tolower(unlist(lapply(Msigdb.v6.0.symbols.all, "[[", "Name"))),
+                                               x = tolower(unlist(lapply(rRoma::Msigdb.v6.0.symbols.all, "[[", "Name"))),
                                                fixed = TRUE)])
   }
   
@@ -80,7 +80,7 @@ SelectFromMSIGdb <- function(SearchString, Version = "6.0") {
     print("Searching in MsigDB v5.2")
     
     return(rRoma::Msigdb.v5.2.symbols.all[grep(pattern = tolower(SearchString),
-                                               x = tolower(unlist(lapply(Msigdb.v5.2.symbols.all, "[[", "Name"))),
+                                               x = tolower(unlist(lapply(rRoma::Msigdb.v5.2.symbols.all, "[[", "Name"))),
                                                fixed = TRUE)])
   }
 
