@@ -737,6 +737,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   
   for(i in 1:length(ModuleList)){
     
+    print(Sys.time())
+    
     print(paste("[", i, "/", length(ModuleList), "] Working on ", ModuleList[[i]]$Name, " - ", ModuleList[[i]]$Desc, sep = ""))
     
     CompatibleGenes <- ModuleList[[i]]$Genes
