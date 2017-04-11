@@ -722,7 +722,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     }
     
     # Initiate cluster
-    cl <- parallel::makeCluster(no_cores, type = ClusType)
+    cl <- parallel::makeCluster(nCores, type = ClusType)
     
     parallel::clusterExport(cl=cl, varlist=c("SampleFilter", "GeneOutDetection", "GeneOutThr",
                                    "ModulePCACenter", "ExpressionMatrix", "DetectOutliers",
@@ -752,8 +752,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     # Filtering genes
     SelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
-                               CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ], PlotData = PlotData,
-                               ModuleName = ModuleList[[i]]$Name)
+                               CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ],
+                               PlotData = PlotData, ModuleName = ModuleList[[i]]$Name)
     
     if(length(SelGenes) > MaxGenes | length(SelGenes) < MinGenes){
       print("Number of selected genes outside the specified range")
