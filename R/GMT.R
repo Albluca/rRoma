@@ -52,6 +52,11 @@ ReadGMTFile <- function(FileLocation) {
 
 
 
+# Load data
+# Msigdb.v6.0.symbols.all <- rRoma::ReadGMTFile("~/Downloads/msigdb.v6.0.symbols.gmt.txt")
+devtools::use_data(Msigdb.v6.0.symbols.all)
+
+
 
 #' Return a subset of Msigdb containing the provided search string
 #'
@@ -61,13 +66,28 @@ ReadGMTFile <- function(FileLocation) {
 #' @export
 #'
 #' @examples
-SelectFromMSIGdb <- function(SearchString) {
+SelectFromMSIGdb <- function(SearchString, Version = "6.0") {
   
-  print("Searching in MsigDB v5.2")
+  if(Version == "6"){
+    print("Searching in MsigDB v6.0")
+    
+    return(rRoma::Msigdb.v6.0.symbols.all[grep(pattern = tolower(SearchString),
+                                               x = tolower(unlist(lapply(Msigdb.v6.0.symbols.all, "[[", "Name"))),
+                                               fixed = TRUE)])
+  }
   
-  return(rRoma::Msigdb.v5.2.symbols.all[grep(pattern = tolower(SearchString),
-                                      x = tolower(unlist(lapply(Msigdb.v5.2.symbols.all, "[[", "Name"))),
-                                      fixed = TRUE)])
+  if(Version == "5.2"){
+    print("Searching in MsigDB v5.2")
+    
+    return(rRoma::Msigdb.v5.2.symbols.all[grep(pattern = tolower(SearchString),
+                                               x = tolower(unlist(lapply(Msigdb.v5.2.symbols.all, "[[", "Name"))),
+                                               fixed = TRUE)])
+  }
+
 }
+
+
+
+
 
 
