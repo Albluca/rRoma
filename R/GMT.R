@@ -68,7 +68,7 @@ ReadGMTFile <- function(FileLocation) {
 #' @examples
 SelectFromMSIGdb <- function(SearchString, Version = "6.0") {
   
-  if(Version == "6"){
+  if(Version == "6.0"){
     print("Searching in MsigDB v6.0")
     
     return(rRoma::Msigdb.v6.0.symbols.all[grep(pattern = tolower(SearchString),
@@ -84,6 +84,7 @@ SelectFromMSIGdb <- function(SearchString, Version = "6.0") {
                                                fixed = TRUE)])
   }
 
+  print("Versione unavailable")
 }
 
 
