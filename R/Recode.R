@@ -60,7 +60,10 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
   }
   
   if(GeneOutDetection == "L1OutVarDC"){
-    print("Detecting outliers using leave one out and percentage variation on variance explained by PC1")
+    
+    if(PrintInfo){
+      print("Detecting outliers using leave one out and percentage variation on variance explained by PC1")
+    }
     
     # Computing all the PC1
     AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
@@ -94,9 +97,13 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
       
     }
     
-    print(paste(sum(GenesOut), "genes will be filtered:"))
-    if(sum(GenesOut)>0){
-      print(CompatibleGenes[GenesOut])
+    if(PrintInfo){
+      if(sum(GenesOut)>0){
+        print(paste(sum(GenesOut), "gene(s) will be filtered:"))
+        print(CompatibleGenes[GenesOut])
+      } else {
+        print("No gene will be filtered")
+      }
     }
     
     # Updating gene list
@@ -127,9 +134,11 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     }
     
     if(PrintInfo){
-      print(paste(sum(GenesOut), "genes will be filtered:"))
       if(sum(GenesOut)>0){
+        print(paste(sum(GenesOut), "gene(s) will be filtered:"))
         print(CompatibleGenes[GenesOut])
+      } else {
+        print("No gene will be filtered")
       }
     }
     
@@ -169,9 +178,11 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     }
     
     if(PrintInfo){
-      print(paste(sum(GenesOut), "genes will be filtered:"))
       if(sum(GenesOut)>0){
+        print(paste(sum(GenesOut), "gene(s) will be filtered:"))
         print(CompatibleGenes[GenesOut])
+      } else {
+        print("No gene will be filtered")
       }
     }
     
@@ -632,7 +643,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     GeneDetectesOUT <- scater::isOutlier(colSums(ExpressionMatrix==0), nmads = OutGeneNumber)
     
-    print(paste(sum(GeneDetectesOUT), "samples will be filtered:"))
+    print(paste(sum(GeneDetectesOUT), "sample(s) will be filtered:"))
     if(sum(GeneDetectesOUT)>0){
       print(names(which(GeneDetectesOUT)))
     }
@@ -646,7 +657,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     GeneSpaceOUT <- scater::isOutlier(rowSums(prcomp(t(ExpressionMatrix), center = TRUE, retx = TRUE)$x[,1:Ncomp]^2),
                                       nmads = OutGeneSpace)
     
-    print(paste(sum(GeneSpaceOUT), "samples will be filtered:"))
+    print(paste(sum(GeneSpaceOUT), "sample(s) will be filtered:"))
     if(sum(GeneSpaceOUT)>0){
       print(names(which(GeneSpaceOUT)))
     }
@@ -727,7 +738,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   ToUse <- !ToFilter
   
   if(sum(ToFilter)>1){
-    print("The following genesets will be ignored due to the number of genes being outside the specified range")
+    print("The following geneset(s) will be ignored due to the number of genes being outside the specified range")
     print(unlist(lapply(ModuleList[ToFilter], "[[", "Name")))
     ModuleList <- ModuleList[ToUse]
   } else {
