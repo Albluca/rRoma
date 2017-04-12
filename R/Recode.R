@@ -301,15 +301,20 @@ FixPCSign <-
         
         MedianProj <- aggregate(PCProj, by=list(AssocitedGroups), FUN = median)
         
+        print("Computing correlations")
         Cor.Test.Vect <- sapply(GroupMedians, function(x){
-          CT <- cor.test(x[,2], MedianProj[,2])
-          c(CT$p.value, CT$estimate)
+          if(length(unique(x[,2])) > 2 & length(unique(MedianProj[,2])) > 2){
+            CT <- cor.test(x[,2], MedianProj[,2])
+            c(CT$p.value, CT$estimate)
+          } else {
+            c(NA, NA)
+          }
         })
         
         SelGenesWei <- Wei[!is.na(Wei)]
         names(SelGenesWei) <- names(GroupMedians)
         
-        ToUse <- which(!is.na(Cor.Test.Vect[2,]))
+        ToUse <- !is.na(Cor.Test.Vect[2,])
         if (!is.null(Thr)) {
           ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
         }
@@ -325,14 +330,22 @@ FixPCSign <-
         
         names(PCProj) <- colnames(ExpMat)
         
+        print("Computing correlations")
         Cor.Test.Vect <- apply(ExpMat, 1, function(x){
-          CT <- cor.test(x, PCProj)
-          c(CT$p.value, CT$estimate)
+          if(length(unique(x)) > 2 & length(unique(PCProj)) > 2){
+            CT <- cor.test(x, PCProj)
+            c(CT$p.value, CT$estimate)
+          } else {
+            c(NA, NA)
+          }
         })
         
-        Cor.Test.Vect[2,!is.na(Wei)] <- Cor.Test.Vect[2,!is.na(Wei)]*Wei[!is.na(Wei)]
+        print("Correcting using weights")
+        if(sum(!is.na(Wei))>1){
+          Cor.Test.Vect[2,!is.na(Wei)] <- Cor.Test.Vect[2,!is.na(Wei)]*Wei[!is.na(Wei)]
+        }
         
-        ToUse <- which(!is.na(Cor.Test.Vect[2,]))
+        ToUse <- !is.na(Cor.Test.Vect[2,])
         if (!is.null(Thr)) {
           ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
         }
@@ -379,17 +392,21 @@ FixPCSign <-
           aggregate(x = x, by=list(AssocitedGroups), FUN = median, na.rm=TRUE)
         })
         
-        
         MediansByGroups <- sapply(GroupMedians, function(x) {
           x[,2]
         })
         
+        print("Computing correlations")
         Cor.Test.Vect <- apply(MediansByGroups, 1, function(x){
-          CT <- cor.test(x, PCWeigth*Wei)
-          c(CT$p.value, CT$estimate)
+          if(length(unique(x)) > 2 & length(unique(PCWeigth*Wei)) > 2){
+            CT <- cor.test(x, PCWeigth*Wei)
+            c(CT$p.value, CT$estimate)
+          } else {
+            c(NA, NA)
+          }
         })
         
-        ToUse <- which(!is.na(Cor.Test.Vect[2,]))
+        ToUse <- !is.na(Cor.Test.Vect[2,])
         if (!is.null(Thr)) {
           ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
         }
@@ -406,12 +423,18 @@ FixPCSign <-
         names(PCWeigth) <- rownames(ExpMat)
         PCWeigth <- PCWeigth*Wei
         
+        print("Computing correlations")
         Cor.Test.Vect <- apply(ExpMat, 2, function(x){
-          CT <- cor.test(x, PCWeigth)
-          c(CT$p.value, CT$estimate)
+          if(length(unique(x)) > 2 & length(unique(PCWeigth)) > 2){
+            CT <- cor.test(x, PCWeigth)
+            c(CT$p.value, CT$estimate)
+          } else {
+            c(NA, NA)
+          }
         })
         
-        ToUse <- which(!is.na(Cor.Test.Vect[2,]))
+        
+        ToUse <- !is.na(Cor.Test.Vect[2,])
         if (!is.null(Thr)) {
           ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
         }
