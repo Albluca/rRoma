@@ -181,7 +181,7 @@ filePaths = getGEOSuppFiles("GSE50760")
 ## OK
 ```
 
-Now we can construct the expression matrix. Note that the code below is designed to work on a Unix-like environment (e.g. MacOS).
+Now we can construct the expression matrix. Note that the code below is designed to work on a Unix-like environment (e.g. MacOS). The execution on a Windows environment may require replacing `"/"` with `"\"`.
 
 
 ```r
