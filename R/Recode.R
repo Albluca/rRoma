@@ -119,7 +119,7 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     
     
     # Getting the distance from the median PC1
-    GenesOut <- scater::isOutlier(AllPCA1, metric = GeneOutThr)
+    GenesOut <- scater::isOutlier(AllPCA1, nmads = GeneOutThr)
     
     if(PlotData){
       # Plotting the distances from the median PC1
@@ -283,6 +283,7 @@ FixPCSign <-
         print("Not enough weights, PC will be oriented randomly")
         return(1)
       }
+      
       
       if(!is.null(Grouping)){
         print("Using groups")
@@ -1061,27 +1062,36 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     # Compute the sign correction
     
-    ExpMat <- NULL
-    if(PCSignMode %in% c("CorrelateAllWeightsByGene", "CorrelateKnownWeightsByGene",
-                         "CorrelateAllWeightsBySample", "CorrelateKnownWeightsBySample")){
-      ExpMat <- OrgExpMatrix[SelGenes, ]
-    }
-    
-    
-    
     if(GroupPCSign){
       GroupPCsVect <- Grouping
     } else {
       GroupPCsVect <- NULL
     }
     
+    
+    
+    ExpMat <- NULL
+    if(PCSignMode %in% c("CorrelateAllWeightsByGene", "CorrelateKnownWeightsByGene",
+                         "CorrelateAllWeightsBySample", "CorrelateKnownWeightsBySample")){
+      ExpMat <- OrgExpMatrix[CompatibleGenes, ]
+    }
+    
     CorrectSignUnf <- FixPCSign(PCWeigth = PCBaseUnf$rotation[,1], PCProj = PCBaseUnf$x[,1],
                                 Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
                              Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr, Grouping = GroupPCsVect, ExpMat = ExpMat)
     
+    
+    
+    ExpMat <- NULL
+    if(PCSignMode %in% c("CorrelateAllWeightsByGene", "CorrelateKnownWeightsByGene",
+                         "CorrelateAllWeightsBySample", "CorrelateKnownWeightsBySample")){
+      ExpMat <- OrgExpMatrix[SelGenes, ]
+    }
+    
     CorrectSign1 <- FixPCSign(PCWeigth = PCBase$rotation[,1], PCProj = PCBase$x[,1],
                               Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
                              Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr, Grouping = GroupPCsVect, ExpMat = ExpMat)
+    
     
     if(PCADims >= 2){
       CorrectSign2 <- FixPCSign(PCWeigth = PCBase$rotation[,2], PCProj = PCBase$x[,2],
