@@ -309,9 +309,9 @@ FixPCSign <-
         SelGenesWei <- Wei[!is.na(Wei)]
         names(SelGenesWei) <- names(GroupMedians)
         
-        ToUse <- rep(TRUE, length(SelGenesWei))
+        ToUse <- which(!is.na(Cor.Test.Vect[2,]))
         if (!is.null(Thr)) {
-          ToUse <- Cor.Test.Vect[1,] < Thr
+          ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
         }
         
         if(sum(Cor.Test.Vect[2,ToUse]*SelGenesWei[ToUse])>0){
@@ -332,12 +332,12 @@ FixPCSign <-
         
         Cor.Test.Vect[2,!is.na(Wei)] <- Cor.Test.Vect[2,!is.na(Wei)]*Wei[!is.na(Wei)]
         
-        ToUse <- rep(TRUE, ncol(Cor.Test.Vect))
+        ToUse <- which(!is.na(Cor.Test.Vect[2,]))
         if (!is.null(Thr)) {
-          ToUse <- Cor.Test.Vect[1,] < Thr
+          ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
         }
         
-        if(sum(Cor.Test.Vect[2,ToUse])>1){
+        if(sum(Cor.Test.Vect[2,ToUse])>0){
           return(1)
         } else {
           return(-1)
@@ -389,9 +389,9 @@ FixPCSign <-
           c(CT$p.value, CT$estimate)
         })
         
-        ToUse <- rep(TRUE, length(PCWeigth))
+        ToUse <- which(!is.na(Cor.Test.Vect[2,]))
         if (!is.null(Thr)) {
-          ToUse <- Cor.Test.Vect[1,] < Thr
+          ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
         }
         
         if(sum(Cor.Test.Vect[2,ToUse])>0){
@@ -411,9 +411,9 @@ FixPCSign <-
           c(CT$p.value, CT$estimate)
         })
         
-        ToUse <- rep(TRUE, ncol(Cor.Test.Vect))
+        ToUse <- which(!is.na(Cor.Test.Vect[2,]))
         if (!is.null(Thr)) {
-          ToUse <- Cor.Test.Vect[1,] < Thr
+          ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
         }
         
         if(sum(Cor.Test.Vect[2,ToUse])>0){
@@ -702,11 +702,15 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   ToFilter <- (nGenes > MaxGenes | nGenes < MinGenes)
   ToUse <- !ToFilter
   
-  print("The following genesets will be ignored due to the number of genes being outside the specified range")
+  if(sum(ToFilter)>1){
+    print("The following genesets will be ignored due to the number of genes being outside the specified range")
+    print(unlist(lapply(ModuleList[ToFilter], "[[", "Name")))
+    ModuleList <- ModuleList[ToUse]
+  } else {
+    print("All the genesets will be used")
+  }
   
-  print(unlist(lapply(ModuleList[ToFilter], "[[", "Name")))
-  
-  ModuleList <- ModuleList[ToUse]
+
   
   if(UseParallel){
     
