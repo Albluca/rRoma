@@ -94,6 +94,8 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
     
     SplitData <- split(data.frame(t(PlotMat)), f=GroupInfo)
     
+    RetData <- list()
+    
     for(i in 1:length(AggByGroupsFL)){
       
       Aggmat <- sapply(SplitData, function(x) {
@@ -102,16 +104,21 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
       
       if(Transpose){
         pheatmap::pheatmap(t(Aggmat), color = ColorGradient,
-                           main = paste(HMTite, AggByGroupsFL[[i]]),
+                           main = paste(HMTite, "/", AggByGroupsFL[[i]]),
                            cluster_rows = cluster_cols)
       } else {
         pheatmap::pheatmap(Aggmat, color = ColorGradient,
-                           main = paste(HMTite, AggByGroupsFL[[i]]),
+                           main = paste(HMTite, "/", AggByGroupsFL[[i]]),
                            cluster_cols = cluster_cols)
       }
+      
+      RetData[[length(RetData)+1]] <- Aggmat
 
     }
+    
+    names(RetData) <- AggByGroupsFL
 
+    return(RetData)
   }
   
 }
