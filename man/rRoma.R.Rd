@@ -6,7 +6,7 @@
 \usage{
 rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
   UseWeigths = FALSE, DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000,
-  ApproxSamples = 2, nSamples = 100, OutGeneNumber = 5, Ncomp = 10,
+  ApproxSamples = 5, nSamples = 100, OutGeneNumber = 5, Ncomp = 10,
   OutGeneSpace = 5, FixedCenter = TRUE, GeneOutDetection = "L1OutExpOut",
   GeneOutThr = 5, GeneSelMode = "All", SampleFilter = TRUE,
   MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PCSignMode = "none",
