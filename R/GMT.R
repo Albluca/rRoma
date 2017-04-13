@@ -80,7 +80,7 @@ ReadGMTFile <- function(FileLocation, SearchString = NULL, Mode = "ANY") {
   }
   
   
-  print("The following genesets have been loaded and selected")
+  print("The following genesets have been loaded and selected:")
   print(paste(unlist(lapply(GeneList[SelGeneSets], "[[", "Name")),
               " (",
               unlist(lapply(lapply(GeneList[SelGeneSets], "[[", "Genes"), length)),
@@ -156,7 +156,7 @@ SelectFromMSIGdb <- function(SearchString, Version = "6.0", Mode = "ANY") {
   
   SelGeneSets <- unique(SelGeneSets)
   
-  print("The following genesets have been selected")
+  print("The following genesets have been selected:")
   print(paste(unlist(lapply(InternalDB[SelGeneSets], "[[", "Name")),
         " (",
         unlist(lapply(lapply(InternalDB[SelGeneSets], "[[", "Genes"), length)),
