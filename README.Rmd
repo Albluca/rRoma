@@ -1,7 +1,7 @@
 ---
 title: "rROMA"
-author: "Luca Albergante (luca.albergante@gmail.com)"
-date: "`r Sys.Date()`"
+author: "[Luca Albergante](luca.albergante@gmail.com)"
+date: "April 2017"
 output:  
       html_document:  
         keep_md: true
