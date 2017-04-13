@@ -493,7 +493,8 @@ FixPCSign <-
 #' For example 5, means that samples re recalculated only if the number of genes in the geneset has increased by at least 5\%.
 #' @param OutGeneNumber scalar, number of median-absolute-deviations away from median required for the total number of genes expressed in a sample to be called an outlier
 #' @param Ncomp iteger, number of principal components used to filter samples in the gene expression space
-#' @param OutGeneSpace scalar, number of median-absolute-deviations away from median required for in a sample to be called an outlier in the gene expression space
+#' @param OutGeneSpace scalar, number of median-absolute-deviations away from median required for in a sample to be called
+#' an outlier in the gene expression space. If set to NULL, the gene space filtering will not be performed.
 #' @param FixedCenter logical, should PCA with fixed center be used?
 #' @param GeneOutDetection character scalar, the algorithm used to filter genes in a module. Possible values are
 #' \itemize{
@@ -548,7 +549,7 @@ FixPCSign <-
 #' @examples
 rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, ModuleList, UseWeigths = FALSE,
                     DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000, ApproxSamples = 5,
-                    nSamples = 100, OutGeneNumber = 5, Ncomp = 10, OutGeneSpace = 5, FixedCenter = TRUE,
+                    nSamples = 100, OutGeneNumber = 5, Ncomp = 10, OutGeneSpace = NULL, FixedCenter = TRUE,
                     GeneOutDetection = "L1OutExpOut", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = TRUE,
                     MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PCSignMode ='none', PCSignThr = NULL,
                     UseParallel = FALSE, nCores = NULL, ClusType = "PSOCK", SamplingGeneWeights = NULL,
@@ -592,7 +593,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     stop("Not enough module genes found in the matrix. Impossible to proceed")
   }
   
-  if(ncol(ExpressionMatrix) <= SAMPLE_WARNING){
+  if(ncol(ExpressionMatrix) <= SAMPLE_WARNING & interactive()){
     print(paste("Only", ncol(ExpressionMatrix), "sample found"))
     print("The number of samples may be too small to guarantee a reliable analysis")
     Ans <- readline("Do you want to continue anyway? (y/n)")
@@ -605,12 +606,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     stop("Module gene are not unique in the matrix. Impossible to proceed.")
   }
   
-  if(any(duplicated(AllGenesMatrix))){
+  if(any(duplicated(AllGenesMatrix)) & interactive()){
     print("Duplicated gene names detected. This may create inconsistencies in the analysis. Consider fixing this problem.")
     readline("Press any key")
   }
   
-  if(FullSampleInfo){
+  if(FullSampleInfo & interactive()){
     print("PC projections and weigths will be computed and reoriented for sampled genesets. This is potentially very time consuming.")
     Ans <- readline("Are you sure you want to do that? (y/n)")
     if(Ans != "y" & Ans != "Y"){
@@ -623,7 +624,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   
   
   
-  if(PlotData){
+  if(PlotData & interactive()){
     print("Diagnostic plots will be produced. This is time consuming and can produce errors expecially if done interactivelly.")
     print("It is advisable to only use this option if a relatively small number of genesets is analyzed and/or to redirect the graphic out (e.g. with pdf())")
     Ans <- readline("Are you sure you want to do that? (y/n)")
@@ -654,16 +655,18 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       Ncomp <- ncol(ExpressionMatrix)
     }
     
-    GeneSpaceOUT <- scater::isOutlier(rowSums(prcomp(t(ExpressionMatrix), center = TRUE, retx = TRUE)$x[,1:Ncomp]^2),
-                                      nmads = OutGeneSpace)
-    
-    print(paste(sum(GeneSpaceOUT), "sample(s) will be filtered:"))
-    if(sum(GeneSpaceOUT)>0){
-      print(names(which(GeneSpaceOUT)))
+    if(!is.null(OutGeneSpace)){
+      GeneSpaceOUT <- scater::isOutlier(rowSums(prcomp(t(ExpressionMatrix), center = TRUE, retx = TRUE)$x[,1:Ncomp]^2),
+                                        nmads = OutGeneSpace)
+      
+      print(paste(sum(GeneSpaceOUT), "sample(s) will be filtered:"))
+      if(sum(GeneSpaceOUT)>0){
+        print(names(which(GeneSpaceOUT)))
+      }
+      
+      ExpressionMatrix <- ExpressionMatrix[, !GeneDetectesOUT & !GeneSpaceOUT]
     }
-    
-    ExpressionMatrix <- ExpressionMatrix[, !GeneDetectesOUT & !GeneSpaceOUT]
-    
+
   }
   
   # Look at groups
@@ -1329,21 +1332,44 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
   }
   
+  # Makes sure ModuleMatrix is treated as a matrix
+  if(length(ModuleMatrix) == 6){
+    dim(ModuleMatrix) <- c(1, 6)
+  }
+  
   colnames(ModuleMatrix) <- c("L1", "ppv L1", "L1/L2", "ppv L1/L2", "Median Exp", "ppv Median Exp")
   rownames(ModuleMatrix) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
+  
+  # Makes sure PVVectMat is treated as a matrix
+  if(length(PVVectMat) == 6){
+    dim(PVVectMat) <- c(1, 6)
+  }
   
   colnames(PVVectMat) <- c("L1 WT less pv", "L1 WT greater pv", "L1/L2 WT less pv", "L1/2 WT greater pv",
                            "Median Exp WT less pv", "Median Exp WT greater pv")
   rownames(PVVectMat) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
   
+  # Makes sure ProjMatrix is treated as a matrix
+  if(length(ProjMatrix) == colnames(ExpressionMatrix)){
+    dim(ProjMatrix) <- c(1, colnames(ExpressionMatrix))
+  }
+  
   colnames(ProjMatrix) <- colnames(ExpressionMatrix)
   rownames(ProjMatrix) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
   
-  ReorderIdxs <- order(ModuleOrder[UsedModules])
+  if(length(UsedModules)>1){
+    ReorderIdxs <- order(ModuleOrder[UsedModules])
+    
+    return(list(ModuleMatrix = ModuleMatrix[ReorderIdxs,], ProjMatrix = ProjMatrix[ReorderIdxs,], ModuleSummary = ModuleSummary[ReorderIdxs],
+                WeigthList = WeigthList[ReorderIdxs], PVVectMat = PVVectMat[ReorderIdxs,], OutLiersList = OutLiersList[ReorderIdxs],
+                GeneCenters = GeneCenters, SampleCenters = SampleCenters))
+  } else {
+    return(list(ModuleMatrix = ModuleMatrix, ProjMatrix = ProjMatrix, ModuleSummary = ModuleSummary,
+               WeigthList = WeigthList, PVVectMat = PVVectMat, OutLiersList = OutLiersList,
+               GeneCenters = GeneCenters, SampleCenters = SampleCenters))
+  }
   
-  return(list(ModuleMatrix = ModuleMatrix[ReorderIdxs,], ProjMatrix = ProjMatrix[ReorderIdxs,], ModuleSummary = ModuleSummary[ReorderIdxs],
-              WeigthList = WeigthList[ReorderIdxs], PVVectMat = PVVectMat[ReorderIdxs,], OutLiersList = OutLiersList[ReorderIdxs],
-              GeneCenters = GeneCenters, SampleCenters = SampleCenters))
+  
   
 }
 

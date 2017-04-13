@@ -7,12 +7,13 @@
 rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
   UseWeigths = FALSE, DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000,
   ApproxSamples = 5, nSamples = 100, OutGeneNumber = 5, Ncomp = 10,
-  OutGeneSpace = 5, FixedCenter = TRUE, GeneOutDetection = "L1OutExpOut",
-  GeneOutThr = 5, GeneSelMode = "All", SampleFilter = TRUE,
-  MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PCSignMode = "none",
-  PCSignThr = NULL, UseParallel = FALSE, nCores = NULL,
-  ClusType = "PSOCK", SamplingGeneWeights = NULL, FillNAMethod = list(),
-  Grouping = NULL, FullSampleInfo = FALSE, GroupPCSign = FALSE)
+  OutGeneSpace = NULL, FixedCenter = TRUE,
+  GeneOutDetection = "L1OutExpOut", GeneOutThr = 5, GeneSelMode = "All",
+  SampleFilter = TRUE, MoreInfo = FALSE, PlotData = FALSE, PCADims = 2,
+  PCSignMode = "none", PCSignThr = NULL, UseParallel = FALSE,
+  nCores = NULL, ClusType = "PSOCK", SamplingGeneWeights = NULL,
+  FillNAMethod = list(), Grouping = NULL, FullSampleInfo = FALSE,
+  GroupPCSign = FALSE)
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -40,7 +41,8 @@ For example 5, means that samples re recalculated only if the number of genes in
 
 \item{Ncomp}{iteger, number of principal components used to filter samples in the gene expression space}
 
-\item{OutGeneSpace}{scalar, number of median-absolute-deviations away from median required for in a sample to be called an outlier in the gene expression space}
+\item{OutGeneSpace}{scalar, number of median-absolute-deviations away from median required for in a sample to be called
+an outlier in the gene expression space. If set to NULL, the gene space filtering will not be performed.}
 
 \item{FixedCenter}{logical, should PCA with fixed center be used?}
 
