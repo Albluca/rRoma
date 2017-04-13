@@ -354,7 +354,7 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
     PrjList <- lapply(RomaData$ModuleSummary[[i]]$SampledExp, "[[", "PCProj")
     
     if(any(sapply(PrjList, is.null)) | !all(PlotPCProj != "none")){
-      return(NULL)
+      next()
     }
     
     PC1Sample <- unlist(lapply(PrjList, function(x){if(all(!is.na(x))) x[,1]}), use.names = FALSE)
