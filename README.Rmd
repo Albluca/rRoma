@@ -1,6 +1,6 @@
 ---
 title: "rROMA"
-author: "[Luca Albergante](luca.albergante@gmail.com)"
+author: "[Luca Albergante](mailto:luca.albergante@gmail.com)"
 date: "April 2017"
 output:  
       html_document:  
