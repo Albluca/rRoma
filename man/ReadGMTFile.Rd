@@ -2,13 +2,19 @@
 % Please edit documentation in R/GMT.R
 \name{ReadGMTFile}
 \alias{ReadGMTFile}
-\title{Load a GMT file from disc}
+\title{Load a GMT file from a file}
 \usage{
-ReadGMTFile(FileLocation)
+ReadGMTFile(FileLocation, SearchString = NULL, Mode = "ANY")
 }
 \arguments{
-\item{FileLocation}{}
+\item{FileLocation}{the location of the GMT file to load. It can be a local or remote location.}
+
+\item{SearchString}{string vector, the keywords to search in the loaded GMT file}
+
+\item{Mode}{string scalar, the search mode for the keywords.
+It can be "ALL" (genesets with all the keywords will be returned) or
+"ANY" (genesets with at at least one keyword will be returned)}
 }
 \description{
-Load a GMT file from disc
+Load a GMT file from a file
 }

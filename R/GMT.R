@@ -1,12 +1,16 @@
-#' Load a GMT file from disc
+#' Load a GMT file from a file
 #'
-#' @param FileLocation 
+#' @param FileLocation the location of the GMT file to load. It can be a local or remote location.
+#' @param SearchString string vector, the keywords to search in the loaded GMT file
+#' @param Mode string scalar, the search mode for the keywords.
+#' It can be "ALL" (genesets with all the keywords will be returned) or
+#' "ANY" (genesets with at at least one keyword will be returned)
 #'
 #' @return
 #' @export
 #'
 #' @examples
-ReadGMTFile <- function(FileLocation) {
+ReadGMTFile <- function(FileLocation, SearchString = NULL, Mode = "ANY") {
   
   Done <- FALSE
   GeneList <- list()
@@ -45,7 +49,45 @@ ReadGMTFile <- function(FileLocation) {
     
   }
   
-  return(GeneList)
+  if(!is.null(SearchString)){
+    SelGeneSets <- NULL
+    for(i in 1:length(SearchString)){
+      if(Mode == "ANY"){
+        SelGeneSets <- union(SelGeneSets,
+                             grep(pattern = tolower(SearchString[i]),
+                                  x = tolower(unlist(lapply(GeneList, "[[", "Name"))),
+                                  fixed = TRUE)
+        )
+      }
+      if(Mode == "ALL"){
+        if(!is.null(SelGeneSets)){
+          SelGeneSets <- intersect(SelGeneSets,
+                                   grep(pattern = tolower(SearchString[i]),
+                                        x = tolower(unlist(lapply(GeneList, "[[", "Name"))),
+                                        fixed = TRUE)
+          )
+        } else {
+          SelGeneSets <- grep(pattern = tolower(SearchString[i]),
+                              x = tolower(unlist(lapply(GeneList, "[[", "Name"))),
+                              fixed = TRUE)
+        }
+      }
+    }
+    
+    SelGeneSets <- unique(SelGeneSets)
+  } else {
+    SelGeneSets <- 1:length(GeneList)
+  }
+  
+  
+  print("The following genesets have been loaded and selected")
+  print(paste(unlist(lapply(GeneList[SelGeneSets], "[[", "Name")),
+              "(",
+              unlist(lapply(lapply(GeneList[SelGeneSets], "[[", "Genes"), length)),
+              "genes)"))
+  
+  return(GeneList[SelGeneSets])
+  
 }
 
 
@@ -60,31 +102,68 @@ ReadGMTFile <- function(FileLocation) {
 
 #' Return a subset of Msigdb containing the provided search string
 #'
-#' @param SearchString string scalar, the keyword to search 
+#' @param SearchString string vector, the keywords to search 
+#' @param Version string scalar, the version of Msigdb to use. Only "5.2" and "6.0" are currently available.
+#' @param Mode string scalar, the search mode for the keywords.
+#' It can be "ALL" (genesets with all the keywords will be returned) or
+#' "ANY" (genesets with at at least one keyword will be returned)
 #'
 #' @return
 #' @export
 #'
 #' @examples
-SelectFromMSIGdb <- function(SearchString, Version = "6.0") {
+SelectFromMSIGdb <- function(SearchString, Version = "6.0", Mode = "ANY") {
+  
+  InternalDB <- list()
   
   if(Version == "6.0"){
-    print("Searching in MsigDB v6.0")
     
-    return(rRoma::Msigdb.v6.0.symbols.all[grep(pattern = tolower(SearchString),
-                                               x = tolower(unlist(lapply(rRoma::Msigdb.v6.0.symbols.all, "[[", "Name"))),
-                                               fixed = TRUE)])
+    print("Searching in MsigDB v6.0")
+    InternalDB <- rRoma::Msigdb.v6.0.symbols.all
+    
   }
   
   if(Version == "5.2"){
-    print("Searching in MsigDB v5.2")
     
-    return(rRoma::Msigdb.v5.2.symbols.all[grep(pattern = tolower(SearchString),
-                                               x = tolower(unlist(lapply(rRoma::Msigdb.v5.2.symbols.all, "[[", "Name"))),
-                                               fixed = TRUE)])
+    print("Searching in MsigDB v5.2")
+    InternalDB <- rRoma::Msigdb.v5.2.symbols.all
+    
   }
 
-  print("Versione unavailable")
+  SelGeneSets <- NULL
+  for(i in 1:length(SearchString)){
+    if(Mode == "ANY"){
+      SelGeneSets <- union(SelGeneSets,
+                           grep(pattern = tolower(SearchString[i]),
+                                x = tolower(unlist(lapply(InternalDB, "[[", "Name"))),
+                                fixed = TRUE)
+      )
+    }
+    if(Mode == "ALL"){
+      if(!is.null(SelGeneSets)){
+        SelGeneSets <- intersect(SelGeneSets,
+                                 grep(pattern = tolower(SearchString[i]),
+                                      x = tolower(unlist(lapply(InternalDB, "[[", "Name"))),
+                                      fixed = TRUE)
+        )
+      } else {
+        SelGeneSets <- grep(pattern = tolower(SearchString[i]),
+                            x = tolower(unlist(lapply(InternalDB, "[[", "Name"))),
+                            fixed = TRUE)
+      }
+    }
+  }
+  
+  SelGeneSets <- unique(SelGeneSets)
+  
+  print("The following genesets have been selected")
+  print(paste(unlist(lapply(InternalDB[SelGeneSets], "[[", "Name")),
+        "(",
+        unlist(lapply(lapply(InternalDB[SelGeneSets], "[[", "Genes"), length)),
+        "genes)"))
+  
+  return(InternalDB[SelGeneSets])
+  
 }
 
 
