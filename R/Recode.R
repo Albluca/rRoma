@@ -1350,8 +1350,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   rownames(PVVectMat) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
   
   # Makes sure ProjMatrix is treated as a matrix
-  if(length(ProjMatrix) == colnames(ExpressionMatrix)){
-    dim(ProjMatrix) <- c(1, colnames(ExpressionMatrix))
+  if(length(ProjMatrix) == ncol(ExpressionMatrix)){
+    dim(ProjMatrix) <- c(1, ncol(ExpressionMatrix))
   }
   
   colnames(ProjMatrix) <- colnames(ExpressionMatrix)
