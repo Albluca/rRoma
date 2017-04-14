@@ -130,6 +130,8 @@ For convenience, we will transform `Type` into a factor:
 Type <- factor(Type, levels = c("normal", "primary", "metastasized"))
 ```
 
+This will allow plotting functions, such as `Plot.Genesets`, to use more meaningful ordering when reporting information. 
+
 ### Selecting the module list
 
 At this point we can create the metagene files. We will extract all the "HALLMARK" geneset from MSig. We will also remove "HALLMARK_" from the names to simplify the graphical representation. 
@@ -189,7 +191,7 @@ We can now explore the overdispersed genesets in ROMA with fixed center. Since w
 
 ```{r, fig.height=6, fig.width=12, eval=TRUE}
 AggData.FC <- Plot.Genesets(RomaData = Data.FC,
-              Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-3,
+              Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-3,
                                         VarMode = "Wil", VarType = "Over"),
               GenesetMargin = 20, SampleMargin = 14, cluster_cols = FALSE,
               GroupInfo = Type, AggByGroupsFL = c("mean", "sd"),
@@ -200,7 +202,7 @@ We can perform the same analysis on the data produced by ROMA without fixed cent
 
 ```{r, fig.height=6, fig.width=12, eval=TRUE}
 Plot.Genesets(RomaData = Data.NFC,
-              Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 1e-3,
+              Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 5e-2,
                                         VarMode = "Wil", VarType = "Over"),
               GenesetMargin = 20, SampleMargin = 14, cluster_cols = FALSE,
               GroupInfo = Type, AggByGroupsFL = c("mean", "sd"),
@@ -212,9 +214,9 @@ We can also look at underdispersed datasets. In this case we will also look at t
 
 ```{r, fig.height=6, fig.width=12, eval=TRUE}
 Plot.Genesets(RomaData = Data.FC,
-              Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-3,
+              Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-2,
                                         VarMode = "Wil", VarType = "Under",
-                                        MedThr = 1e-3, MedMode = "Wil", MedType = "Over"),
+                                        MedThr = 5e-3, MedMode = "Wil", MedType = "Over"),
               GenesetMargin = 20, SampleMargin = 14, cluster_cols = FALSE,
               GroupInfo = Type, AggByGroupsFL = c("mean", "sd"),
               HMTite = "Underdispersed genesets (Fixed center)")
@@ -225,9 +227,9 @@ and without the fixed center
 
 ```{r, fig.height=6, fig.width=12, eval=TRUE}
 Plot.Genesets(RomaData = Data.NFC,
-              Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 1e-3,
+              Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 5e-2,
                                         VarMode = "Wil", VarType = "Under",
-                                        MedThr = 1e-3, MedMode = "Wil", MedType = "Over"),
+                                        MedThr = 5e-3, MedMode = "Wil", MedType = "Over"),
               GenesetMargin = 20, SampleMargin = 14, cluster_cols = FALSE,
               GroupInfo = Type, AggByGroupsFL = c("mean", "sd"),
               HMTite = "Underdispersed genesets (Non fixed center)")
@@ -239,7 +241,7 @@ Visual inspection already stresses the difference between the groups. It is poss
 
 ```{r, eval=TRUE}
 CompareAcrossSamples(RomaData = Data.FC,
-                     Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-3,
+                     Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-2,
                                                VarMode = "Wil", VarType = "Over"),
                      Groups = Type)
 ```
@@ -248,7 +250,7 @@ CompareAcrossSamples(RomaData = Data.FC,
 
 ```{r, eval=TRUE}
 CompareAcrossSamples(RomaData = Data.NFC,
-                     Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-3,
+                     Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-2,
                                                VarMode = "Wil", VarType = "Over"),
                      Groups = Type)
 ```
@@ -264,7 +266,7 @@ We can also explore the gene weigths with the fixed center
 ```{r, eval=TRUE}
 PlotGeneWeight(RomaData = Data.FC, PlotGenes = 30,
                ExpressionMatrix = MatData, LogExpression = FALSE,
-               Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-3,
+               Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-2,
                                          VarMode = "Wil", VarType = "Over"),
                PlotWeigthSign = TRUE)
 ```
@@ -274,7 +276,7 @@ and without the fixed center
 ```{r, eval=TRUE}
 PlotGeneWeight(RomaData = Data.NFC, PlotGenes = 30,
                ExpressionMatrix = MatData, LogExpression = FALSE,
-               Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 1e-3,
+               Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 5e-2,
                                          VarMode = "Wil", VarType = "Over"),
                PlotWeigthSign = TRUE)
 
@@ -287,7 +289,7 @@ Moreover, we can look at the projections of the samples with the fixed center
 ```{r, eval=TRUE}
 PlotSampleProjections(RomaData = Data.FC, PlotSamples = 30,
                       ExpressionMatrix = MatData, LogExpression = FALSE,
-                      Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-3,
+                      Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-3,
                                                 VarMode = "Wil", VarType = "Over"),
                       PlotPCProj = "none")
 ```
@@ -297,7 +299,7 @@ and without the fixed center
 ```{r, eval=TRUE}
 PlotSampleProjections(RomaData = Data.NFC, PlotSamples = 30,
                       ExpressionMatrix = MatData, LogExpression = FALSE,
-                      Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 1e-3,
+                      Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 5e-3,
                                                 VarMode = "Wil", VarType = "Over"),
                       PlotPCProj = "none")
 ```
@@ -308,7 +310,7 @@ Finally, we can look at genes which appear across different genesests and explor
 
 ```{r, eval=TRUE}
 PlotRecurringGenes(RomaData = Data.NFC,
-                   Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 1e-3,
+                   Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 5e-3,
                                              VarMode = "Wil", VarType = "Over"),
                    GenesByGroup = 25, MinMult = 3)
 ```
