@@ -319,7 +319,7 @@ PlotRecurringGenes(RomaData = Data.NFC,
 By default, rRoma will perform the appropiate anaysis without showing all the details to the users. However, it is possible to obtain additioanl graphical and textual information. This will results in a large amount of inromation being derived an plotted. Hence, it is not advisable to do that for large analysis. To show an example of the extended information that can be produced, we will first obtain a smaller module list.
 
 ```{r}
-RedGMT <- SelectFromMSIGdb(SearchString = "GO_POSITIVE_REGULATION_OF_CELL_CYCLE_ARREST", Mode = "ALL")
+RedGMT <- SelectFromMSIGdb(SearchString = c("xenobiotic", "keg"), Mode = "ALL")
 ```
 
 Wen perfoming ROMA we will now set `PlotData = TRUE` (to produce diagnostic plots), `MoreInfo = TRUE` (to print additional diagnostic information), and `FullSampleInfo = TRUE` (to compute and save additional information on the samples). Note that rRoma will ask to confim cetain choiches if R is run interactivelly.
