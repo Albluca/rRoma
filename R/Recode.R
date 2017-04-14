@@ -1383,54 +1383,6 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
 
 
 
-#' Produce a list of genesets with their overdispersion
-#'
-#' @param GeneExpressionMatrix 
-#' @param nSamples 
-#' @param nGenes 
-#' @param GeneOutDetection 
-#' @param GeneOutThr 
-#' @param CenterPCA 
-#' @param PlotData 
-#' @param ModuleName 
-#' @param PrintInfo 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-SelectOverDispersedGeneSet <- function(GeneExpressionMatrix, nSamples, nGenes, GeneOutDetection = 'none', GeneOutThr = 1,
-                                       CenterPCA = FALSE, PlotData = FALSE, ModuleName = '', PrintInfo = FALSE, PCADims = 2) {
-  
-  if(PCADims > 2){
-    PCADims = 2
-  }
-  
-  SampledsGeneList <- lapply(as.list(1:nSamples), function(i){sample(x = rownames(GeneExpressionMatrix), size = nGenes, replace = FALSE)})
-  
-  pb <- txtProgressBar(min = 0, max = nSamples, initial = 0, style = 3)
-
-  SampledExp <- sapply(as.list(1:length(SampledsGeneList)), function(i){
-    if(SampleFilter){
-      SelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
-                                 CompatibleGenes = SampledsGeneList[[i]], ExpressionData = ExpressionMatrix[SampledsGeneList[[i]], ],
-                                 PlotData = FALSE, ModuleName = '', PrintInfo = FALSE)
-      setTxtProgressBar(pb, i)
-    } else {
-      SelGenes <- SampledsGeneList[[i]]
-    }
-    PCSamp <- irlba::prcomp_irlba(x = ExpressionMatrix[SelGenes, ], n = PCADims, center = CenterPCA, scale. = FALSE)
-    return((PCSamp$sdev^2)/sum(apply(scale(ExpressionData[SelGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)))
-  })
-  
-  SampledExp <- rbind(SampledExp[1,], SampledExp[1,]/SampledExp[2,])
-  
-  return(list(SampledsGenes = SampledsGeneList[order(SampledExp[1,], decreasing = TRUE)],
-              SampledExp = SampledExp[, order(SampledExp[1,], decreasing = TRUE)]))
-  
-}
-
-
 
 
 

@@ -282,12 +282,12 @@ SelectGeneSets <- function(RomaData, VarThr = 1e-3, VarMode = "Wil", VarType = "
     }
     
     if(VarMode == 'PPV' & VarType == "Over"){
-      print(paste("Using genestes underdispersed according to pseudo pv. VarThr =", VarThr))
+      print(paste("Using genestes overdispersed according to pseudo pv. VarThr =", VarThr))
       Selected <- which(RomaData$ModuleMatrix[,2]<VarThr)
       break
     }
     
-    if(VarMode == 'PPV' & VarType == "Over"){
+    if(VarMode == 'PPV' & VarType == "Under"){
       print(paste("Using genestes underdispersed according to pseudo pv. VarThr =", VarThr))
       Selected <- which(RomaData$ModuleMatrix[,2]<1-VarThr)
       break
@@ -300,25 +300,25 @@ SelectGeneSets <- function(RomaData, VarThr = 1e-3, VarMode = "Wil", VarType = "
   while(!is.null(Selected) & !is.null(MedThr)){
     
     if(MedMode == 'Wil' & MedType == "Over"){
-      print(paste("Using genestes overdispersed according to Wilcoxon test. MedThr =", MedThr))
+      print(paste("Using genestes overexpressed according to Wilcoxon test. MedThr =", MedThr))
       Selected <- intersect(which(RomaData$PVVectMat[,5]<MedThr), Selected)
       break
     }
     
     if(MedMode == 'Wil' & MedType == "Under"){
-      print(paste("Using genestes underdispersed according to Wilcoxon test. MedThr =", MedThr))
+      print(paste("Using genestes underexpressed according to Wilcoxon test. MedThr =", MedThr))
       Selected <- intersect(which(RomaData$PVVectMat[,6]<MedThr), Selected)
       break
     }
     
     if(MedMode == 'PPV' & MedType == "Over"){
-      print(paste("Using genestes underdispersed according to pseudo pv. MedThr =", MedThr))
+      print(paste("Using genestes overexpressed according to pseudo pv. MedThr =", MedThr))
       Selected <- intersect(which(RomaData$ModuleMatrix[,6]<MedThr), Selected)
       break
     }
     
-    if(MedMode == 'PPV' & MedType == "Over"){
-      print(paste("Using genestes underdispersed according to pseudo pv. MedThr =", MedThr))
+    if(MedMode == 'PPV' & MedType == "Under"){
+      print(paste("Using genestes underexpressed according to pseudo pv. MedThr =", MedThr))
       Selected <- intersect(which(RomaData$ModuleMatrix[,6]<1-MedThr), Selected)
       break
     }
