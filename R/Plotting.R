@@ -61,7 +61,19 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
   par(op)
   
   if(!is.null(GroupInfo)){
-    AddInfo <- data.frame(Groups = GroupInfo)
+    
+    FoundSamp <- sum(colnames(RomaData$ProjMatrix) %in% names(GroupInfo))
+    print(paste(FoundSamp, "samples have an associated group"))
+    
+    if(FoundSamp > 2){
+      if(!is.factor(GroupInfo)){
+        GroupInfo <- as.factor(GroupInfo)
+      }
+      AddInfo <- data.frame(Groups = GroupInfo)
+    } else {
+      AddInfo = NULL
+    }
+    
   } else {
     AddInfo = NULL
   }
@@ -90,9 +102,9 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
   
   
   
-  if(length(AggByGroupsFL)>0 & !is.null(GroupInfo)){
+  if(length(AggByGroupsFL)>0 & !is.null(AddInfo)){
     
-    SplitData <- split(data.frame(t(PlotMat)), f=GroupInfo)
+    SplitData <- split(data.frame(t(PlotMat[,rownames(AddInfo)])), f=AddInfo$Groups)
     
     RetData <- list()
     
