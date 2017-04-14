@@ -558,15 +558,19 @@ PlotRecurringGenes  <- function(RomaData, Selected = NULL,
 #' @param OrderType string scalar. The mode of selection for the top contributing genes.
 #' The current implementation allow "Abs" (genes with the largest weight in absolute value),
 #' "Pos" (genes with the largest weight), and "Neg" (genes with the largest negative weight)
-#' @param ResolveMult string scalar. The name of the function to apply to genes appearing in multiple genesets.
-#' By default it "mean".
-#'
+#' @param ColorGradient vector, string. The colors used for the heatmap.
+#' @param cluster_cols boolean, should the genesets be reordered according to the dendrogram?
+#' @param HMTite scalar, string. The title of the heatmap.
+#' @param Transpose boolean, should the genes by plotted on the rows instead of the columns?
+
 #' @return
 #' @export
 #'
 #' @examples
-GetTopContrib <- function(RomaData, Selected = NULL, nGenes = 10,
-                          OrderType = "Abs", ResolveMult = "mean") {
+GetTopContrib <- function(RomaData, Selected = NULL, nGenes = 4,
+                          ColorGradient = colorRamps::blue2red(50),
+                          cluster_cols = FALSE, HMTite = "Top contributing genes",
+                          OrderType = "Abs", Transpose = FALSE) {
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$ProjMatrix)
@@ -587,28 +591,24 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = 10,
   # GeneMatVal <- mapply("[", RomaData$ProjLists, OrderList)
   # GeneMatVal[is.na(GeneMatVal)] <- 0
   
-  AllGenes <- unlist(GenesWei)
-  SplitWei <- split(AllGenes, names(AllGenes))
-  
-  FixedGeneWei <- sapply(SplitWei,  function(x){
-    if(length(x)>1){
-      do.call(ResolveMult, list(x))
-    } else {
-      x
-    }} )
+  AllGenesNames <- unique(names(unlist(GenesWei)))
   
   PlotMat <- sapply(as.list(Selected), function(i) {
-    GenNam <- intersect(names(RomaData$WeigthList[[i]]), names(FixedGeneWei))
-    Vect <- rep(0, length(FixedGeneWei))
-    names(Vect) <- names(FixedGeneWei)
-    Vect[GenNam] <- FixedGeneWei[GenNam]
+    GenNam <- intersect(names(RomaData$WeigthList[[i]]), AllGenesNames)
+    Vect <- rep(0, length(AllGenesNames))
+    names(Vect) <- AllGenesNames
+    Vect[GenNam] <- RomaData$WeigthList[[i]][GenNam]
     Vect
   })
   
   colnames(PlotMat) <- rownames(RomaData$ModuleMatrix)[Selected] 
   
   
-  pheatmap::pheatmap(t(PlotMat))
+  if(Transpose){
+    pheatmap::pheatmap(t(PlotMat), color = ColorGradient, main = HMTite, cluster_rows = cluster_cols)
+  } else {
+    pheatmap::pheatmap(PlotMat, color = ColorGradient, main = HMTite, cluster_cols = cluster_cols)
+  }
   
   return(PlotMat)
 }

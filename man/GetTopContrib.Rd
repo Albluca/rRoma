@@ -4,8 +4,9 @@
 \alias{GetTopContrib}
 \title{Get the top contributing genes per geneset}
 \usage{
-GetTopContrib(RomaData, Selected = NULL, nGenes = 10, OrderType = "Abs",
-  ResolveMult = "mean")
+GetTopContrib(RomaData, Selected = NULL, nGenes = 4,
+  ColorGradient = colorRamps::blue2red(50), cluster_cols = FALSE,
+  HMTite = "Top contributing genes", OrderType = "Abs", Transpose = FALSE)
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
@@ -14,12 +15,17 @@ GetTopContrib(RomaData, Selected = NULL, nGenes = 10, OrderType = "Abs",
 
 \item{nGenes}{integer scalar. The number of genes to extract per geneset}
 
+\item{ColorGradient}{vector, string. The colors used for the heatmap.}
+
+\item{cluster_cols}{boolean, should the genesets be reordered according to the dendrogram?}
+
+\item{HMTite}{scalar, string. The title of the heatmap.}
+
 \item{OrderType}{string scalar. The mode of selection for the top contributing genes.
 The current implementation allow "Abs" (genes with the largest weight in absolute value),
 "Pos" (genes with the largest weight), and "Neg" (genes with the largest negative weight)}
 
-\item{ResolveMult}{string scalar. The name of the function to apply to genes appearing in multiple genesets.
-By default it "mean".}
+\item{Transpose}{boolean, should the genes by plotted on the rows instead of the columns?}
 }
 \description{
 Get the top contributing genes per geneset
