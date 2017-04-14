@@ -10,7 +10,7 @@ PlotRecurringGenes(RomaData, Selected = NULL, GenesByGroup = 20,
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
 
-\item{Selected}{vector, integer. The position of the genesets to plot}
+\item{Selected}{vector, integer. The indices of the genesets to plot}
 
 \item{GenesByGroup}{scalar, integer. The number of genes per plot}
 

@@ -445,7 +445,7 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
 #' Plot the weigth of genes appearing across multiple genesets
 #'
 #' @param RomaData list, the analysis returned by rRoma
-#' @param Selected vector, integer. The position of the genesets to plot 
+#' @param Selected vector, integer. The indices of the genesets to plot 
 #' @param GenesByGroup scalar, integer. The number of genes per plot
 #' @param MinMult scalar, integer. The minimal multiplicity to plot 
 #'
@@ -546,3 +546,69 @@ PlotRecurringGenes  <- function(RomaData, Selected = NULL,
 
 
 
+
+
+
+
+#' Get the top contributing genes per geneset
+#'
+#' @param RomaData list, the analysis returned by rRoma
+#' @param Selected vector, integer. The indices of the genesets to plot 
+#' @param nGenes integer scalar. The number of genes to extract per geneset
+#' @param OrderType string scalar. The mode of selection for the top contributing genes.
+#' The current implementation allow "Abs" (genes with the largest weight in absolute value),
+#' "Pos" (genes with the largest weight), and "Neg" (genes with the largest negative weight)
+#' @param ResolveMult string scalar. The name of the function to apply to genes appearing in multiple genesets.
+#' By default it "mean".
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetTopContrib <- function(RomaData, Selected = NULL, nGenes = 10,
+                          OrderType = "Abs", ResolveMult = "mean") {
+  
+  if(is.null(Selected)){
+    Selected <- 1:nrow(RomaData$ProjMatrix)
+  }
+  
+  if(OrderType == "Abs"){
+    GenesWei <- lapply(lapply(lapply(RomaData$WeigthList[Selected], abs), sort, decreasing = TRUE), "[", 1:nGenes)
+  }
+  
+  if(OrderType == "Pos"){
+    GenesWei <- lapply(lapply(RomaData$WeigthList[Selected], sort, decreasing = TRUE), "[", 1:nGenes)
+  }
+  
+  if(OrderType == "Neg"){
+    GenesWei <- lapply(lapply(RomaData$WeigthList[Selected], sort, decreasing = FALSE), "[", 1:nGenes)
+  }
+  
+  # GeneMatVal <- mapply("[", RomaData$ProjLists, OrderList)
+  # GeneMatVal[is.na(GeneMatVal)] <- 0
+  
+  AllGenes <- unlist(GenesWei)
+  SplitWei <- split(AllGenes, names(AllGenes))
+  
+  FixedGeneWei <- sapply(SplitWei,  function(x){
+    if(length(x)>1){
+      do.call(ResolveMult, list(x))
+    } else {
+      x
+    }} )
+  
+  PlotMat <- sapply(as.list(Selected), function(i) {
+    GenNam <- intersect(names(RomaData$WeigthList[[i]]), names(FixedGeneWei))
+    Vect <- rep(0, length(FixedGeneWei))
+    names(Vect) <- names(FixedGeneWei)
+    Vect[GenNam] <- FixedGeneWei[GenNam]
+    Vect
+  })
+  
+  colnames(PlotMat) <- rownames(RomaData$ModuleMatrix)[Selected] 
+  
+  
+  pheatmap::pheatmap(t(PlotMat))
+  
+  return(PlotMat)
+}
