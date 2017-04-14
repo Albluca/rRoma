@@ -15,9 +15,11 @@ A Java implementation developed by Andrei Zynovyev and is also [available](https
 
 The rRoma package relies on the `scater` package, which is available only on BioConductor. This package can be installed with the following command
 
-```{r, eval=FALSE}
-source("https://bioconductor.org/biocLite.R")
-biocLite("scater")
+```{r, eval=TRUE}
+if(!require("devtools")){
+  source("https://bioconductor.org/biocLite.R")
+  biocLite("scater")
+}
 ```
 
 rRoma can then be installed using `devtools`
@@ -152,6 +154,12 @@ if(any(duplicated(rownames(MatData)))){
 }
 ```
 
+Moreover, we will use pseudocount transformation to boost the normality of the data
+
+```{r, eval=TRUE}
+MatData <- log2(MatData + 1)
+```
+
 And now we are ready to perform ROMA by using the `rRoma.R` function. The function has a number of parameters that can be used to control its behaviour, but can be run with a minimal set of input: the expression matrix (ExpressionMatrix) and the module list (ModuleList). In the following example we will also used `FixedCenter` (which control if PCA with fuixed center should be used), `UseParallel` (which control if the computation should be done in parallel,   analyzsis  with fuixed center should be used), `nCores` (the number of cores to use), and `ClusType` (the type of parallel environment to use). We will also use a PC orientation mode that will try to correlates gene expression level and module score (`PCSignMode="CorrelateAllWeightsByGene"`). Other parameters are described in the fucntion manual.
 
 To perform ROMA without fixed center in parallel, by using 6 cores, it is sufficient write:
@@ -279,7 +287,7 @@ Moreover, we can look at the projections of the samples with the fixed center
 ```{r, eval=TRUE}
 PlotSampleProjections(RomaData = Data.FC, PlotSamples = 30,
                       ExpressionMatrix = MatData, LogExpression = FALSE,
-                      Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-6,
+                      Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-3,
                                                 VarMode = "Wil", VarType = "Over"),
                       PlotPCProj = "none")
 ```
@@ -289,7 +297,7 @@ and without the fixed center
 ```{r, eval=TRUE}
 PlotSampleProjections(RomaData = Data.NFC, PlotSamples = 30,
                       ExpressionMatrix = MatData, LogExpression = FALSE,
-                      Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 1e-6,
+                      Selected = SelectGeneSets(RomaData = Data.NFC, VarThr = 1e-3,
                                                 VarMode = "Wil", VarType = "Over"),
                       PlotPCProj = "none")
 ```
