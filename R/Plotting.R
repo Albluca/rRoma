@@ -606,7 +606,6 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = 4,
   
   colnames(PlotMat) <- rownames(RomaData$ModuleMatrix)[Selected] 
   
-  
   if(Transpose){
     pheatmap::pheatmap(t(PlotMat), color = ColorGradient, main = HMTite, cluster_rows = cluster_cols)
   } else {
