@@ -5,16 +5,26 @@
 \title{Correct the sign of the principal component}
 \usage{
 FixPCSign(PCWeigth, PCProj, Wei = NULL, Mode = "none", DefWei = 1,
-  Thr = NULL, Grouping = NULL, ExpMat = NULL)
+  Thr = NULL, Grouping = NULL, ExpMat = NULL, CorMethod = "pearson")
 }
 \arguments{
+\item{PCWeigth}{}
+
+\item{PCProj}{}
+
 \item{Wei}{vector, numeric optional vector of weigths}
 
 \item{Mode}{scalar, character. Mode to correct the sign}
 
+\item{DefWei}{}
+
 \item{Thr}{scalar, numeric quantile threshold}
 
-\item{PC1Rotation}{vector, numeric Principal component values}
+\item{Grouping}{}
+
+\item{ExpMat}{}
+
+\item{CorMethod}{c("pearson", "kendall", "spearman")}
 }
 \description{
 Correct the sign of the principal component

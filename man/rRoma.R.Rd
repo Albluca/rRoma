@@ -13,7 +13,7 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
   PCSignMode = "none", PCSignThr = NULL, UseParallel = FALSE,
   nCores = NULL, ClusType = "PSOCK", SamplingGeneWeights = NULL,
   FillNAMethod = list(), Grouping = NULL, FullSampleInfo = FALSE,
-  GroupPCSign = FALSE)
+  GroupPCSign = FALSE, CorMethod = "pearson")
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -106,6 +106,9 @@ which should be faster.}
 \item{FullSampleInfo}{boolean, should full PC information be computed and saved for all the randomised genesets?}
 
 \item{GroupPCSign}{boolean, should grouping information to be used to orient PCs?}
+
+\item{CorMethod}{character string indicating which correlation coefficient is to be used
+for orienting the principal components. Can be "pearson", "kendall", or "spearman".}
 }
 \description{
 Perform ROMA on a datasets

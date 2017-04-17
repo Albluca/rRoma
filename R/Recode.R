@@ -1,13 +1,21 @@
 
 #' Detect outliers
 #'
-#' @param GeneOutDetection 
-#' @param GeneOutThr 
+#' @param GeneOutDetection character scalar, the algorithm used to filter genes in a module. Possible values are
+#' \itemize{
+#' \item 'L1OutVarPerc': percentage variation relative to the median variance explained supporgted by a leave one out approach 
+#' \item 'L1OutVarDC': dendrogram clustering statistics on variance explained supported by a leave one out approach
+#' \item 'L1OutExpOut': number of median-absolute-deviations away from median explined variance
+#' \item 'L1OutSdMean': Number of standard deviations away from the mean
+#' }
+#' The option "L1OutExpOut" requires the scater package to be installed.
+#' @param GeneOutThr scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC"), 
+#' minimal percentage variation (L1OutVarPerc) or the number of median-absolute-deviations away from median ("L1OutExpOut")
 #' @param ModulePCACenter 
 #' @param Genes 
 #' @param ExpressionData 
 #' @param PlotData 
-#' @param ModuleName 
+#' @param ModuleName
 #'
 #' @return
 #' @export
@@ -217,17 +225,23 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
 
 #' Correct the sign of the principal component 
 #'
-#' @param PC1Rotation vector, numeric Principal component values
 #' @param Wei vector, numeric optional vector of weigths
 #' @param Mode scalar, character. Mode to correct the sign
 #' @param Thr scalar, numeric quantile threshold 
+#' @param PCWeigth 
+#' @param PCProj 
+#' @param DefWei 
+#' @param Grouping 
+#' @param ExpMat 
+#' @param CorMethod c("pearson", "kendall", "spearman")
 #'
 #' @return
 #' @export
 #'
 #' @examples
 FixPCSign <-
-  function(PCWeigth, PCProj, Wei = NULL, Mode = 'none', DefWei = 1, Thr = NULL, Grouping = NULL, ExpMat = NULL) {
+  function(PCWeigth, PCProj, Wei = NULL, Mode = 'none', DefWei = 1,
+           Thr = NULL, Grouping = NULL, ExpMat = NULL, CorMethod = "pearson") {
     
     if (Mode == 'none') {
       
@@ -288,7 +302,7 @@ FixPCSign <-
     
     if (Mode == 'CorrelateKnownWeightsByGene') {
       
-      print("Orienting PC by correlating gene expression and PC projections")
+      print(paste("Orienting PC by correlating gene expression and PC projections (", CorMethod, ")", sep = ''))
       
       if(sum(!is.na(Wei))<1){
         print("Not enough weights, PC will be oriented randomly")
@@ -316,7 +330,7 @@ FixPCSign <-
         print("Computing correlations")
         Cor.Test.Vect <- sapply(GroupMedians, function(x){
           if(length(unique(x[,2])) > 2 & length(unique(MedianProj[,2])) > 2){
-            CT <- cor.test(x[,2], MedianProj[,2])
+            CT <- cor.test(x[,2], MedianProj[,2], method = CorMethod)
             c(CT$p.value, CT$estimate)
           } else {
             c(NA, NA)
@@ -345,7 +359,7 @@ FixPCSign <-
         print("Computing correlations")
         Cor.Test.Vect <- apply(ExpMat, 1, function(x){
           if(length(unique(x)) > 2 & length(unique(PCProj)) > 2){
-            CT <- cor.test(x, PCProj)
+            CT <- cor.test(x, PCProj, method = CorMethod)
             c(CT$p.value, CT$estimate)
           } else {
             c(NA, NA)
@@ -382,7 +396,7 @@ FixPCSign <-
     
     if (Mode == 'CorrelateKnownWeightsBySample') {
       
-      print("Orienting PC by correlating gene expression and PC weights")
+      print(paste("Orienting PC by correlating gene expression and PC weights (", CorMethod, ")", sep = ''))
       
       if(sum(!is.na(Wei))<1){
         print("Not enough weights, PC will be oriented randomly")
@@ -411,7 +425,7 @@ FixPCSign <-
         print("Computing correlations")
         Cor.Test.Vect <- apply(MediansByGroups, 1, function(x){
           if(length(unique(x)) > 2 & length(unique(PCWeigth*Wei)) > 2){
-            CT <- cor.test(x, PCWeigth*Wei)
+            CT <- cor.test(x, PCWeigth*Wei, method = CorMethod)
             c(CT$p.value, CT$estimate)
           } else {
             c(NA, NA)
@@ -438,7 +452,7 @@ FixPCSign <-
         print("Computing correlations")
         Cor.Test.Vect <- apply(ExpMat, 2, function(x){
           if(length(unique(x)) > 2 & length(unique(PCWeigth)) > 2){
-            CT <- cor.test(x, PCWeigth)
+            CT <- cor.test(x, PCWeigth, method = CorMethod)
             c(CT$p.value, CT$estimate)
           } else {
             c(NA, NA)
@@ -542,6 +556,8 @@ FixPCSign <-
 #' @param Grouping named vector, the groups associated with the sample.
 #' @param FullSampleInfo boolean, should full PC information be computed and saved for all the randomised genesets?
 #' @param GroupPCSign boolean, should grouping information to be used to orient PCs?
+#' @param CorMethod character string indicating which correlation coefficient is to be used
+#' for orienting the principal components. Can be "pearson", "kendall", or "spearman".
 #' 
 #' @return
 #' @export
@@ -553,7 +569,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                     GeneOutDetection = "L1OutExpOut", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = TRUE,
                     MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PCSignMode ='none', PCSignThr = NULL,
                     UseParallel = FALSE, nCores = NULL, ClusType = "PSOCK", SamplingGeneWeights = NULL,
-                    FillNAMethod = list(), Grouping = NULL, FullSampleInfo = FALSE, GroupPCSign = FALSE) {
+                    FillNAMethod = list(), Grouping = NULL, FullSampleInfo = FALSE, GroupPCSign = FALSE,
+                    CorMethod = "pearson") {
   
   if(PCADims < 1){
     stop("PCADims should be >= 1")
@@ -934,12 +951,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             CorrectSign1 <- FixPCSign(PCWeigth = PCSamp$rotation[,1], PCProj = PCSamp$x[,1],
                                       Wei = SamplingGeneWeights[SampleSelGenes],
                                       Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
-                                      Grouping = Grouping, ExpMat = ExpMat)
+                                      Grouping = Grouping, ExpMat = ExpMat, CorMethod = CorMethod)
             if(PCADims > 1){
               CorrectSign2 <- FixPCSign(PCWeigth = PCSamp$rotation[,2], PCProj = PCSamp$x[,2],
                                         Wei = SamplingGeneWeights[SampleSelGenes],
                                         Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
-                                        Grouping = Grouping, ExpMat = ExpMat)
+                                        Grouping = Grouping, ExpMat = ExpMat, CorMethod = CorMethod)
             } else {
               CorrectSign2 = NULL
             }
@@ -1092,7 +1109,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     CorrectSignUnf <- FixPCSign(PCWeigth = PCBaseUnf$rotation[,1], PCProj = PCBaseUnf$x[,1],
                                 Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
-                             Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr, Grouping = GroupPCsVect, ExpMat = ExpMat)
+                             Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
+                             Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
     
     
     
@@ -1104,13 +1122,15 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     CorrectSign1 <- FixPCSign(PCWeigth = PCBase$rotation[,1], PCProj = PCBase$x[,1],
                               Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
-                             Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr, Grouping = GroupPCsVect, ExpMat = ExpMat)
+                             Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
+                             Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
     
     
     if(PCADims >= 2){
       CorrectSign2 <- FixPCSign(PCWeigth = PCBase$rotation[,2], PCProj = PCBase$x[,2],
                                 Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
-                                Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr, Grouping = GroupPCsVect, ExpMat = ExpMat)
+                                Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
+                                Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
       
     } else {
       CorrectSign2 <- NULL
