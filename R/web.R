@@ -53,13 +53,15 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   
   par(mfcol=c(1,3))
   
-  boxplot(AllGenesWei.Var, ylab = "Variance of gene weight")
+  B <- boxplot(x = AllGenesWei.Var, at = 1, ylab = "Variance of gene weight")
   
   if(!is.null(FilterByWei)){
-    Outliers <- scater::isOutlier(AllGenesWei.Var, nmads = FilterByWei, na.rm = TRUE)
+    Outliers <- scater::isOutlier(AllGenesWei.Var, nmads = FilterByWei)
     print("The following genes will be ignored:")
     print(names(which(Outliers)))
     ToPlot <- setdiff(ToPlot, names(which(Outliers)))
+    points(x = rep(1, length(which(Outliers))), y = AllGenesWei.Var[names(which(Outliers))], col="red", pch=20)
+    legend("topright", legend = "Outliers", pch=20, col="red")
   }
 
   if(any(DispMode == "Module")){
