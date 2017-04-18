@@ -8,9 +8,17 @@ DetectOutliers(GeneOutDetection, GeneOutThr, ModulePCACenter, CompatibleGenes,
   ExpressionData, PlotData = FALSE, ModuleName = "", PrintInfo = TRUE)
 }
 \arguments{
-\item{GeneOutDetection}{}
+\item{GeneOutDetection}{character scalar, the algorithm used to filter genes in a module. Possible values are
+\itemize{
+\item 'L1OutVarPerc': percentage variation relative to the median variance explained supporgted by a leave one out approach 
+\item 'L1OutVarDC': dendrogram clustering statistics on variance explained supported by a leave one out approach
+\item 'L1OutExpOut': number of median-absolute-deviations away from median explined variance
+\item 'L1OutSdMean': Number of standard deviations away from the mean
+}
+The option "L1OutExpOut" requires the scater package to be installed.}
 
-\item{GeneOutThr}{}
+\item{GeneOutThr}{scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC"), 
+minimal percentage variation (L1OutVarPerc) or the number of median-absolute-deviations away from median ("L1OutExpOut")}
 
 \item{ModulePCACenter}{}
 

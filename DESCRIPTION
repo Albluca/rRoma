@@ -20,4 +20,5 @@ Imports:
       parallel,
       reshape
 Suggests:
-      mice
+      mice,
+      RNaviCell
