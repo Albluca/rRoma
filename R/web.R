@@ -1,13 +1,18 @@
-#' Title
+#' Project ROMA results onto ACSN maps
 #'
-#' @param RomaData 
+#' @param RomaData list, the analysis returned by rRoma
+#' @param Selected vector, integer. The position of the genesets to plot
 #' @param SampleName 
-#' @param AggSampFun 
-#' @param Selected 
 #' @param FilterByWei 
 #' @param AggGeneFun 
 #' @param DispMode 
 #' @param DataName 
+#' @param AggScoreFun 
+#' @param QTop 
+#' @param QBottom 
+#' @param Steps 
+#' @param MapURL 
+#' @param DefDispVal 
 #'
 #' @return
 #' @export
@@ -17,7 +22,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
                        QTop = NULL, QBottom = NULL, Steps = 2,
                        MapURL = "", Selected = NULL, FilterByWei = NULL,
                        AggGeneFun = "mean", DispMode = "Module",
-                       DataName = "Sample") {
+                       DataName = "Sample", DefDispVal = 0) {
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$ProjMatrix)
@@ -46,8 +51,11 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   
   ToPlot <- unique(names(AllGenesWei))
   
+  par(mfcol=c(1,3))
+  
+  boxplot(AllGenesWei.Var, ylab = "Variance of gene weight")
+  
   if(!is.null(FilterByWei)){
-    boxplot(AllGenesWei.Var, ylab = "Variance of gene weight")
     Outliers <- scater::isOutlier(AllGenesWei.Var, nmads = FilterByWei, na.rm = TRUE)
     print("The following genes will be ignored:")
     print(names(which(Outliers)))
@@ -68,10 +76,25 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
       GeneScores
     })
    
+    names(AllGeneScores) <- NULL
+    
     AllGeneScores <- unlist(AllGeneScores, use.names = TRUE)
     AllGeneScores.Split <- split(AllGeneScores, names(AllGeneScores))
+    AllGeneScores.Var <- sapply(AllGeneScores.Split, var)
+    
+    barplot(table(is.na(AllGeneScores.Var)), names.arg = c("Multi", "Mono"),
+            ylab = "Number of genes")
+    boxplot(AllGeneScores.Var, ylab = "Variance of module score (per gene)")
+    
+    par(mfcol=c(1,1))
+    
+    
     DataToPlot <- sapply(AllGeneScores.Split, get(AggGeneFun))
     
+    if(any(is.na(DataToPlot))){
+      DataToPlot[is.na(DataToPlot)] <- DefDispVal
+    }
+   
     DataToPlot <- data.matrix(DataToPlot)
     colnames(DataToPlot) <- "data"
     
