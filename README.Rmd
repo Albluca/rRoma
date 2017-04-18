@@ -3,7 +3,12 @@ title: "rROMA"
 author: "[Luca Albergante](mailto:luca.albergante@gmail.com)"
 date: "April 2017"
 output:  
-      html_document:  
+      html_document:
+        toc: true # table of content true
+        depth: 3  # upto three depths of headings (specified by #, ## and ###)
+        number_sections: true  ## if you want number sections at each table header
+        theme: united  # many options for theme, this one is my favorite.
+        highlight: tango
         keep_md: true
 ---
 
@@ -11,7 +16,7 @@ This package provides an R implementation of [ROMA](http://journal.frontiersin.o
 
 A Java implementation developed by Andrei Zynovyev and is also [available](https://github.com/sysbio-curie/Roma).
 
-## Intalling rROMA
+# Intalling rROMA
 
 The rRoma package relies on the `scater` package, which is available only on BioConductor. This package can be installed with the following command
 
@@ -31,7 +36,22 @@ if(!require("devtools")){
 devtools::install_github("Albluca/rROMA")
 ```
 
-The packages `GEOquery`, `tictoc`, and `readr` are not required to run rROMA, but are used in the following example and need to be installed to reproduce the analysis 
+To fill missing values rRoma uses the mice package. This package needs to be installed manually if datasets with missing values need to be analysed:
+
+```{r, eval=FALSE}
+install.packages("tictoc")
+```
+
+Finally, rRoma allow projecting the results of the analysis on [ACSN maps](https://acsn.curie.fr). To use this functionality it is necessary to install the `RNaviCell` package:
+
+```{r, eval=FALSE}
+if(!require("devtools")){
+  install.packages("devtools")
+}
+devtools::install_github("sysbio-curie/RNaviCell")
+```
+
+The packages `GEOquery`, `tictoc`, and `readr` are not required to run rRoma, but are used in the following example and need to be installed to reproduce the analysis 
 
 ```{r, eval=TRUE}
 if(!require("GEOquery")){
@@ -48,7 +68,7 @@ if(!require("tictoc")){
 }
 ```
 
-## Using rROMA
+# Using rROMA
 
 The package can be loaded with the usual syntax, i.e., by typing
 
@@ -60,11 +80,11 @@ rRoma requires a gene expression matrix - with column names indicating samples a
 
 Various functions are then available to explore the analysis, including plotting and statistical cross sample analysis.
 
-## An example
+# An example
 
 To show a concrete example of rROMA we will use a dataset available on GEO. 
 
-### Getting teh dataset
+## Getting the dataset
 
 Let us begin by getting the description of the dataset
 
@@ -146,7 +166,7 @@ AllHall <- lapply(AllHall, function(x){
 
 ```
 
-### Performing ROMA
+## Performing ROMA
 
 To reduce potential problems we will remove genes with a duplicated name
 
@@ -175,7 +195,7 @@ tictoc::toc()
 
 ```
 
-### Module activity
+## Module activity
 
 We can now explore the overdispersed genesets in ROMA with fixed center. Since we have information on the groups, we can also aggregate the module weigths by groups and consider the mean and standard deviation. Note how we used the `SelectGeneSets` function to determind the overdispersed genesets. 
 
@@ -207,7 +227,7 @@ AggData2.FC <- Plot.Genesets(RomaData = Data.FC,
 
 ```
 
-### Statistical comparison across samples
+## Statistical comparison across samples
 
 Visual inspection already stresses the difference between the groups. It is possible to quantify theses differnces performing statistical testing:
 
@@ -219,7 +239,7 @@ CompareAcrossSamples(RomaData = Data.FC,
 ```
 
 
-### Top contributing genes
+## Top contributing genes
 
 We can also explore the top contributing genes, i.e., the genes with the largers weights in the selected modules:
 
@@ -230,7 +250,7 @@ GeneMat <- GetTopContrib(Data.FC, Selected = SelectGeneSets(RomaData = Data.FC, 
 
 This allow us to quicky determine if a set of genes play a strong (potentially opposite) role across different genesets. The function also returns the matrix used to plot the heatmap.
 
-### Gene weights
+## Gene weights
 
 We can also explore the gene weigths with the fixed center
 
@@ -243,7 +263,7 @@ PlotGeneWeight(RomaData = Data.FC, PlotGenes = 30,
 ```
 
 
-### Sample projections
+## Sample projections
 
 Moreover, we can look at the projections of the samples with the fixed center
 
@@ -256,7 +276,7 @@ PlotSampleProjections(RomaData = Data.FC, PlotSamples = 30,
 ```
 
 
-### Recurrent genes
+## Recurrent genes
 
 Finally, we can look at genes which appear across different genesests and explore thier weithgs
 
@@ -268,7 +288,7 @@ PlotRecurringGenes(RomaData = Data.FC,
 ```
 
 
-### Looking at the details 
+## Looking at the details 
 
 By default, rRoma will perform the appropiate anaysis without showing all the details to the users. However, it is possible to obtain additioanl graphical and textual information. This will results in a large amount of inromation being derived an plotted. Hence, it is not advisable to do that for large analysis. To show an example of the extended information that can be produced, we will first obtain a smaller module list.
 
@@ -296,10 +316,34 @@ PlotSampleProjections(RomaData = RedData.NFC, PlotSamples = 30,
                       Selected = NULL,
                       PlotPCProj = c('Points', 'Density',  'Bins'))
 ```
+
+## Visualising on ACSN 
+
+It is possible to project the results of rRoma analysis on a map. This functionality is currently experimental. ACSN maps needs gene lists. Therefore it is necessary to map the module activity to a gene specific value. Since a gene can be associated with multiple modules, it is possible to filter genes with a large variation in the gene weigths, as this is associated with a larger variation, and hence uncertainlty, on the contribution of the gene. The function takes several parameters: `SampleName`, which indicates the name of the sample(s) to consider, `AggScoreFun`, which describes the function used to group the module scores when different samples are present, `FilterByWei`, which is a parameters used to filter genes based on the variance of the gene weight across modules, and `AggGeneFun`, which describes the function used to obtain the value associated to a gene when the multiples weigths and scores are present. The parameters `QTop`, `QBottom`, and `Steps` control the heatmap of the plot. Finally, `DispMode` indicates which quantities should be projected on the maps, the module score ("Module"), or the gene weigths ("Gene").
+
+The following commands will open a windows in the default browser to visualize the map
+
+```{r}
+PlotOnACSN(RomaData = RedData.NFC, SampleName = names(Type[Type = "normal"]),
+           AggScoreFun = "median", FilterByWei = 30, 
+           DispMode = c("Module", "Gene"), DataName = "Normal", 
+           QTop = .99, QBottom = .1, Steps = 5, 
+           Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3,
+                                       VarMode = "Wil", VarType = "Over"),
+           AggGeneFun = "median")
 ```
 
 
 
+```{r}
+PlotOnACSN(RomaData = RedData.NFC, SampleName = names(Type[Type = "metastasized"]),
+           AggScoreFun = "median", FilterByWei = 30, 
+           DispMode = c("Module", "Gene"), DataName = "Metastasized", 
+           QTop = .99, QBottom = .1, Steps = 5, 
+           Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3,
+                                       VarMode = "Wil", VarType = "Over"),
+           AggGeneFun = "median")
+```
 
 
 
