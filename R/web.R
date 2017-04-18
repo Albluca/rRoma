@@ -88,9 +88,6 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
             ylab = "Number of genes")
     boxplot(AllGeneScores.Var, ylab = "Variance of module score (per gene)")
     
-    par(mfcol=c(1,1))
-    
-    
     DataToPlot <- sapply(AllGeneScores.Split, get(AggGeneFun))
     
     if(any(is.na(DataToPlot))){
@@ -133,6 +130,8 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     Session.Navicell$mapStainingEditorApply()
     
   }
+  
+  par(mfcol=c(1,1))
   
   if(any(DispMode == "Gene")){
     
