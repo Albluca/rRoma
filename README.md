@@ -6,7 +6,7 @@ This package provides an R implementation of [ROMA](http://journal.frontiersin.o
 
 A Java implementation developed by Andrei Zynovyev and is also [available](https://github.com/sysbio-curie/Roma).
 
-## Intalling rROMA
+# Intalling rROMA
 
 The rRoma package relies on the `scater` package, which is available only on BioConductor. This package can be installed with the following command
 
@@ -32,7 +32,24 @@ if(!require("devtools")){
 devtools::install_github("Albluca/rROMA")
 ```
 
-The packages `GEOquery`, `tictoc`, and `readr` are not required to run rROMA, but are used in the following example and need to be installed to reproduce the analysis 
+To fill missing values rRoma uses the mice package. This package needs to be installed manually if datasets with missing values need to be analysed:
+
+
+```r
+install.packages("tictoc")
+```
+
+Finally, rRoma allow projecting the results of the analysis on [ACSN maps](https://acsn.curie.fr). To use this functionality it is necessary to install the `RNaviCell` package:
+
+
+```r
+if(!require("devtools")){
+  install.packages("devtools")
+}
+devtools::install_github("sysbio-curie/RNaviCell")
+```
+
+The packages `GEOquery`, `tictoc`, and `readr` are not required to run rRoma, but are used in the following example and need to be installed to reproduce the analysis 
 
 
 ```r
@@ -125,7 +142,7 @@ if(!require("tictoc")){
 ## Loading required package: tictoc
 ```
 
-## Using rROMA
+# Using rROMA
 
 The package can be loaded with the usual syntax, i.e., by typing
 
@@ -138,11 +155,11 @@ rRoma requires a gene expression matrix - with column names indicating samples a
 
 Various functions are then available to explore the analysis, including plotting and statistical cross sample analysis.
 
-## An example
+# An example
 
 To show a concrete example of rROMA we will use a dataset available on GEO. 
 
-### Getting teh dataset
+## Getting the dataset
 
 Let us begin by getting the description of the dataset
 
@@ -173,7 +190,7 @@ gse <- getGEO("GSE50760", GSEMatrix = TRUE)
 ```
 
 ```
-## /tmp/Rtmpp8VpvG/GPL11154.soft
+## /tmp/RtmpZgRHZU/GPL11154.soft
 ```
 
 Then we get the actual expression expression files
@@ -758,7 +775,7 @@ AllHall <- lapply(AllHall, function(x){
 })
 ```
 
-### Performing ROMA
+## Performing ROMA
 
 To reduce potential problems we will remove genes with a duplicated name
 
@@ -792,7 +809,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Centering gene expression over samples"
 ## [1] "Using global center (centering over genes)"
 ## [1] "All the genesets will be used"
-## [1] "2017-04-14 18:13:24 CEST"
+## [1] "2017-04-19 11:33:54 CEST"
 ## [1] "[1/50] Working on NOTCH_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_NOTCH_SIGNALING"
 ## [1] "32 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -800,34 +817,34 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "WNT2"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.7729627544363 L1/L2 = 20.4674907313462"
+## [1] "L1 = 0.772962754436301 L1/L2 = 20.4674907313448"
 ## [1] "Median expression (uncentered): 13.5150221827314"
 ## [1] "Median expression (centered/weighted): 0.0288003550423865"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.19780208002591 L1/L2 = 1.53191768525602"
+## [1] "L1 = 0.19780208002591 L1/L2 = 1.53191768525737"
 ## [1] "Median expression (uncentered): 13.5291252684908"
 ## [1] "Median expression (centered/weighted): 0.0230072380009256"
 ## [1] "Previous sample size: 0"
 ## [1] "Next sample size: 32"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.083   0.160   8.062 
+##   0.107   0.140   8.117 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:13:37 CEST"
+## [1] "2017-04-19 11:34:07 CEST"
 ## [1] "[2/50] Working on HEDGEHOG_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_HEDGEHOG_SIGNALING"
 ## [1] "36 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -835,34 +852,34 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "SCG2"   "SLIT1"  "PLG"    "NKX6-1" "CNTFR" 
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.368491187370065 L1/L2 = 1.79553927815685"
+## [1] "L1 = 0.368491187370065 L1/L2 = 1.79553927816142"
 ## [1] "Median expression (uncentered): 13.1529183587471"
 ## [1] "Median expression (centered/weighted): 0.00223034662800391"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.247256821908337 L1/L2 = 2.26610674514894"
+## [1] "L1 = 0.247256821908336 L1/L2 = 2.26610674520261"
 ## [1] "Median expression (uncentered): 13.2823644791553"
 ## [1] "Median expression (centered/weighted): 0.0064586698739066"
 ## [1] "Previous sample size: 32"
 ## [1] "Next sample size: 36"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.100   0.166   1.738 
+##   0.096   0.166   1.738 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:13:39 CEST"
+## [1] "2017-04-19 11:34:09 CEST"
 ## [1] "[3/50] Working on ANGIOGENESIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ANGIOGENESIS"
 ## [1] "36 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -870,32 +887,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "PF4"     "OLR1"    "PGLYRP1" "CXCL6"  
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.364934677972989 L1/L2 = 1.49553133747497"
+## [1] "L1 = 0.364934677972988 L1/L2 = 1.49553133747523"
 ## [1] "Median expression (uncentered): 13.211812247159"
 ## [1] "Median expression (centered/weighted): 0.0245384923834588"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.649945580328027 L1/L2 = 6.84232902782348"
+## [1] "L1 = 0.649945580328027 L1/L2 = 6.84232902782479"
 ## [1] "Median expression (uncentered): 13.3594749443633"
 ## [1] "Median expression (centered/weighted): -0.00271666625244847"
 ## [1] "Previous sample size: 36"
 ## [1] "Next sample size: 36"
 ## [1] "Reusing previous sampling (Same metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:13:39 CEST"
+## [1] "2017-04-19 11:34:09 CEST"
 ## [1] "[4/50] Working on PANCREAS_BETA_CELLS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_PANCREAS_BETA_CELLS"
 ## [1] "40 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -904,34 +921,34 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [8] "IAPP"    "G6PC2"  
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.414306587930285 L1/L2 = 4.08905160156134"
+## [1] "L1 = 0.414306587930285 L1/L2 = 4.08905160156143"
 ## [1] "Median expression (uncentered): 12.5489421629889"
 ## [1] "Median expression (centered/weighted): 0.109141826550011"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.449933099557887 L1/L2 = 2.64396512655177"
+## [1] "L1 = 0.449933099557887 L1/L2 = 2.64396512643695"
 ## [1] "Median expression (uncentered): 13.0369459690312"
 ## [1] "Median expression (centered/weighted): 0.107384554050584"
 ## [1] "Previous sample size: 36"
 ## [1] "Next sample size: 40"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.105   0.172   1.968 
+##   0.095   0.169   1.970 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:13:41 CEST"
+## [1] "2017-04-19 11:34:11 CEST"
 ## [1] "[5/50] Working on WNT_BETA_CATENIN_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_WNT_BETA_CATENIN_SIGNALING"
 ## [1] "42 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -939,32 +956,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "WNT6" "DKK4" "DKK1" "WNT1"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.520038868255264 L1/L2 = 2.56977403073158"
+## [1] "L1 = 0.520038868255263 L1/L2 = 2.56977403073158"
 ## [1] "Median expression (uncentered): 13.3219279229047"
 ## [1] "Median expression (centered/weighted): 0.0252941445542472"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.235144742884089 L1/L2 = 2.15765414057558"
+## [1] "L1 = 0.235144742884089 L1/L2 = 2.15765414057556"
 ## [1] "Median expression (uncentered): 13.4160717745688"
 ## [1] "Median expression (centered/weighted): -0.00505501664700372"
 ## [1] "Previous sample size: 40"
 ## [1] "Next sample size: 42"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:13:41 CEST"
+## [1] "2017-04-19 11:34:12 CEST"
 ## [1] "[6/50] Working on APICAL_SURFACE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_APICAL_SURFACE"
 ## [1] "44 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -977,30 +994,30 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Median expression (uncentered): 13.078317612573"
 ## [1] "Median expression (centered/weighted): 0.0615200797577556"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.312869371176746 L1/L2 = 3.02417262742629"
+## [1] "L1 = 0.312869371176746 L1/L2 = 3.02417262742414"
 ## [1] "Median expression (uncentered): 13.4014128725526"
 ## [1] "Median expression (centered/weighted): 0.0245102665025946"
 ## [1] "Previous sample size: 40"
 ## [1] "Next sample size: 44"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.114   0.160   2.856 
+##   0.110   0.175   2.997 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:13:44 CEST"
+## [1] "2017-04-19 11:34:15 CEST"
 ## [1] "[7/50] Working on REACTIVE_OXIGEN_SPECIES_PATHWAY - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_REACTIVE_OXIGEN_SPECIES_PATHWAY"
 ## [1] "48 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1008,7 +1025,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "MPO"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.54897536488735 L1/L2 = 7.97282092986272"
+## [1] "L1 = 0.54897536488735 L1/L2 = 7.97282092986281"
 ## [1] "Median expression (uncentered): 13.6307790036278"
 ## [1] "Median expression (centered/weighted): 0.0204939834579211"
 ## [1] "Post-filter data"
@@ -1019,23 +1036,23 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 48"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.113   0.165   2.453 
+##   0.114   0.173   2.500 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:13:47 CEST"
+## [1] "2017-04-19 11:34:17 CEST"
 ## [1] "[8/50] Working on TGF_BETA_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_TGF_BETA_SIGNALING"
 ## [1] "54 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1043,7 +1060,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "LEFTY2" "NOG"   
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.543219309042768 L1/L2 = 5.94334567414201"
+## [1] "L1 = 0.543219309042769 L1/L2 = 5.94334567493892"
 ## [1] "Median expression (uncentered): 13.6414872140507"
 ## [1] "Median expression (centered/weighted): 0.0335821943623831"
 ## [1] "Post-filter data"
@@ -1054,57 +1071,57 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 54"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.124   0.155   2.922 
+##   0.139   0.146   3.111 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:13:50 CEST"
+## [1] "2017-04-19 11:34:21 CEST"
 ## [1] "[9/50] Working on MYC_TARGETS_V2 - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_MYC_TARGETS_V2"
 ## [1] "58 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
 ## [1] "No gene will be filtered"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.277178834773448 L1/L2 = 2.10208475280704"
+## [1] "L1 = 0.277178834773449 L1/L2 = 2.10208475311358"
 ## [1] "Median expression (uncentered): 13.5235005936785"
 ## [1] "Median expression (centered/weighted): 0.0355963366138567"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.277178834773449 L1/L2 = 2.10208475294491"
+## [1] "L1 = 0.277178834773448 L1/L2 = 2.1020847526786"
 ## [1] "Median expression (uncentered): 13.5235005936785"
 ## [1] "Median expression (centered/weighted): 0.0355963366138567"
 ## [1] "Previous sample size: 54"
 ## [1] "Next sample size: 58"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.133   0.158   4.195 
+##   0.139   0.157   4.178 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:13:54 CEST"
+## [1] "2017-04-19 11:34:25 CEST"
 ## [1] "[10/50] Working on CHOLESTEROL_HOMEOSTASIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_CHOLESTEROL_HOMEOSTASIS"
 ## [1] "74 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1112,7 +1129,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "ADH4"   "AVPR1A"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.172200609164141 L1/L2 = 1.34243465219807"
+## [1] "L1 = 0.172200609164142 L1/L2 = 1.34243465219807"
 ## [1] "Median expression (uncentered): 13.5770747151966"
 ## [1] "Median expression (centered/weighted): 0.0261952514023445"
 ## [1] "Post-filter data"
@@ -1123,23 +1140,23 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 74"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.139   0.159   4.918 
+##   0.147   0.134   4.909 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:00 CEST"
+## [1] "2017-04-19 11:34:30 CEST"
 ## [1] "[11/50] Working on IL6_JAK_STAT3_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_IL6_JAK_STAT3_SIGNALING"
 ## [1] "87 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1158,23 +1175,23 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 87"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.152   0.142   7.308 
+##   0.150   0.166   7.608 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:07 CEST"
+## [1] "2017-04-19 11:34:38 CEST"
 ## [1] "[12/50] Working on PROTEIN_SECRETION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_PROTEIN_SECRETION"
 ## [1] "96 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1182,7 +1199,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "SH3GL2"   "ATP6V1B1"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.454001061572679 L1/L2 = 2.4925682645763"
+## [1] "L1 = 0.454001061572678 L1/L2 = 2.49256826457629"
 ## [1] "Median expression (uncentered): 13.52851515655"
 ## [1] "Median expression (centered/weighted): -0.0081114967003805"
 ## [1] "Post-filter data"
@@ -1193,23 +1210,23 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 96"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.154   0.156   8.064 
+##   0.165   0.153   8.011 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:16 CEST"
+## [1] "2017-04-19 11:34:47 CEST"
 ## [1] "[13/50] Working on INTERFERON_ALPHA_RESPONSE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_INTERFERON_ALPHA_RESPONSE"
 ## [1] "97 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1217,32 +1234,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "SAMD9"   "TMEM140" "IL7"    
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.124548239305662 L1/L2 = 1.09571729826163"
+## [1] "L1 = 0.124548239305654 L1/L2 = 1.09571729826157"
 ## [1] "Median expression (uncentered): 13.5266826196238"
 ## [1] "Median expression (centered/weighted): 0.0263565592174932"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.119095347645235 L1/L2 = 1.16509980698086"
+## [1] "L1 = 0.119095347644849 L1/L2 = 1.16509980698865"
 ## [1] "Median expression (uncentered): 13.5263769664826"
 ## [1] "Median expression (centered/weighted): 0.025869481899564"
 ## [1] "Previous sample size: 96"
 ## [1] "Next sample size: 97"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:17 CEST"
+## [1] "2017-04-19 11:34:48 CEST"
 ## [1] "[14/50] Working on ANDROGEN_RESPONSE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ANDROGEN_RESPONSE"
 ## [1] "101 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1250,32 +1267,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "KLK3"   "KLK2"   "BMPR1B" "MAK"   
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.338120066940926 L1/L2 = 1.44483482562939"
+## [1] "L1 = 0.338120066940906 L1/L2 = 1.44483482562942"
 ## [1] "Median expression (uncentered): 13.5126787432295"
 ## [1] "Median expression (centered/weighted): 0.0161008043790264"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.165533978959496 L1/L2 = 1.37919342021131"
+## [1] "L1 = 0.165533978959497 L1/L2 = 1.37919342021131"
 ## [1] "Median expression (uncentered): 13.5330254869332"
 ## [1] "Median expression (centered/weighted): 0.0122530290349184"
 ## [1] "Previous sample size: 96"
 ## [1] "Next sample size: 101"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:17 CEST"
+## [1] "2017-04-19 11:34:48 CEST"
 ## [1] "[15/50] Working on PEROXISOME - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_PEROXISOME"
 ## [1] "103 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1284,34 +1301,34 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ##  [7] "UGT2B17"  "SERPINA6" "CRABP1"   "FABP6"    "CACNA1B" 
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.36323721917504 L1/L2 = 2.11695878905139"
+## [1] "L1 = 0.363237219175039 L1/L2 = 2.11695878905138"
 ## [1] "Median expression (uncentered): 13.4885931973324"
 ## [1] "Median expression (centered/weighted): 0.0435682700069628"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.199225330240566 L1/L2 = 2.26150080467639"
+## [1] "L1 = 0.199225330240566 L1/L2 = 2.26150080467685"
 ## [1] "Median expression (uncentered): 13.5633750472982"
 ## [1] "Median expression (centered/weighted): 0.0225902487278652"
 ## [1] "Previous sample size: 96"
 ## [1] "Next sample size: 103"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.171   0.173   9.544 
+##   0.164   0.175   9.583 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:27 CEST"
+## [1] "2017-04-19 11:34:58 CEST"
 ## [1] "[16/50] Working on PI3K_AKT_MTOR_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_PI3K_AKT_MTOR_SIGNALING"
 ## [1] "105 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1330,21 +1347,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 105"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:28 CEST"
+## [1] "2017-04-19 11:34:59 CEST"
 ## [1] "[17/50] Working on UNFOLDED_PROTEIN_RESPONSE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_UNFOLDED_PROTEIN_RESPONSE"
 ## [1] "112 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1352,34 +1369,34 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "IGFBP1" "STC2"  
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.2393863231164 L1/L2 = 1.430367827807"
+## [1] "L1 = 0.239386323116412 L1/L2 = 1.43036782781393"
 ## [1] "Median expression (uncentered): 13.5550683863539"
 ## [1] "Median expression (centered/weighted): -0.00431731167247401"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.219921969163851 L1/L2 = 1.7556960449481"
+## [1] "L1 = 0.219921969163851 L1/L2 = 1.75569604494809"
 ## [1] "Median expression (uncentered): 13.5609298477138"
 ## [1] "Median expression (centered/weighted): -0.00384545319501089"
 ## [1] "Previous sample size: 103"
 ## [1] "Next sample size: 112"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.177   0.178  11.102 
+##   0.176   0.179  11.021 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:40 CEST"
+## [1] "2017-04-19 11:35:11 CEST"
 ## [1] "[18/50] Working on BILE_ACID_METABOLISM - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_BILE_ACID_METABOLISM"
 ## [1] "112 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1390,32 +1407,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [22] "NR0B2"  
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.337501748834405 L1/L2 = 2.96115713031046"
+## [1] "L1 = 0.337501748834407 L1/L2 = 2.96115713031049"
 ## [1] "Median expression (uncentered): 13.3039947238114"
 ## [1] "Median expression (centered/weighted): 0.0628334546694925"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.313806280271421 L1/L2 = 2.01376447522519"
+## [1] "L1 = 0.313806280271421 L1/L2 = 2.01376447522518"
 ## [1] "Median expression (uncentered): 13.5042603675207"
 ## [1] "Median expression (centered/weighted): 0.0336177113650119"
 ## [1] "Previous sample size: 112"
 ## [1] "Next sample size: 112"
 ## [1] "Reusing previous sampling (Same metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:40 CEST"
+## [1] "2017-04-19 11:35:11 CEST"
 ## [1] "[19/50] Working on SPERMATOGENESIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_SPERMATOGENESIS"
 ## [1] "133 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1430,34 +1447,34 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [43] "GAD1"     "HOXB1"   
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.161899009884753 L1/L2 = 1.98544871164035"
+## [1] "L1 = 0.161899009884753 L1/L2 = 1.98544871134847"
 ## [1] "Median expression (uncentered): 12.3032098359823"
 ## [1] "Median expression (centered/weighted): 0.00316725566488098"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.178892714153006 L1/L2 = 1.40532041872972"
+## [1] "L1 = 0.178892714153006 L1/L2 = 1.40532041872954"
 ## [1] "Median expression (uncentered): 13.2196221902304"
 ## [1] "Median expression (centered/weighted): 0.0157392001166526"
 ## [1] "Previous sample size: 112"
 ## [1] "Next sample size: 133"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.206   0.157  15.029 
+##   0.202   0.157  14.624 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:56 CEST"
+## [1] "2017-04-19 11:35:27 CEST"
 ## [1] "[20/50] Working on COAGULATION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_COAGULATION"
 ## [1] "137 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1474,28 +1491,28 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Median expression (uncentered): 13.3824889301197"
 ## [1] "Median expression (centered/weighted): 0.0394884730726891"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.249409066531517 L1/L2 = 2.83368866893347"
+## [1] "L1 = 0.249409066531517 L1/L2 = 2.8336886698232"
 ## [1] "Median expression (uncentered): 13.5316251384226"
 ## [1] "Median expression (centered/weighted): 0.0227827182813579"
 ## [1] "Previous sample size: 133"
 ## [1] "Next sample size: 137"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:14:57 CEST"
+## [1] "2017-04-19 11:35:28 CEST"
 ## [1] "[21/50] Working on UV_RESPONSE_DN - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_UV_RESPONSE_DN"
 ## [1] "144 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1504,34 +1521,34 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ##  [7] "COL11A1"  "KCNMA1"   "SCHIP1"   "PTGFR"    "KIT"     
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.214760028792223 L1/L2 = 1.68937913401952"
+## [1] "L1 = 0.214760028792224 L1/L2 = 1.68937913401952"
 ## [1] "Median expression (uncentered): 13.5051292259532"
 ## [1] "Median expression (centered/weighted): 0.034281438313519"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.126338726131126 L1/L2 = 1.25211993682921"
+## [1] "L1 = 0.126338726131126 L1/L2 = 1.2521199368292"
 ## [1] "Median expression (uncentered): 13.5444211458705"
 ## [1] "Median expression (centered/weighted): 0.0297874779990328"
 ## [1] "Previous sample size: 133"
 ## [1] "Next sample size: 144"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.223   0.176  17.161 
+##   0.226   0.191  17.566 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:15:15 CEST"
+## [1] "2017-04-19 11:35:46 CEST"
 ## [1] "[22/50] Working on DNA_REPAIR - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_DNA_REPAIR"
 ## [1] "149 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1539,7 +1556,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "CCNO"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.187686991156833 L1/L2 = 1.50146286908886"
+## [1] "L1 = 0.187686991156833 L1/L2 = 1.50146286908887"
 ## [1] "Median expression (uncentered): 13.5689654831483"
 ## [1] "Median expression (centered/weighted): 0.00999210525327615"
 ## [1] "Post-filter data"
@@ -1550,21 +1567,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 149"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:15:16 CEST"
+## [1] "2017-04-19 11:35:47 CEST"
 ## [1] "[23/50] Working on FATTY_ACID_METABOLISM - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_FATTY_ACID_METABOLISM"
 ## [1] "158 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1574,7 +1591,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [15] "BMPR1B" 
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.309734654762709 L1/L2 = 2.16947888590269"
+## [1] "L1 = 0.309734654762709 L1/L2 = 2.16947888590268"
 ## [1] "Median expression (uncentered): 13.5139742684693"
 ## [1] "Median expression (centered/weighted): 0.0292705282678304"
 ## [1] "Post-filter data"
@@ -1585,23 +1602,23 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 158"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.239   0.175  19.757 
+##   0.227   0.186  19.669 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:15:37 CEST"
+## [1] "2017-04-19 11:36:08 CEST"
 ## [1] "[24/50] Working on UV_RESPONSE_UP - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_UV_RESPONSE_UP"
 ## [1] "158 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1610,7 +1627,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ##  [8] "COL2A1"  "NTRK3"   "FGF18"   "SLC6A12" "ONECUT1" "TACR3"   "CCK"    
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.285175326811779 L1/L2 = 1.94590392794633"
+## [1] "L1 = 0.285175326811779 L1/L2 = 1.94590392794635"
 ## [1] "Median expression (uncentered): 13.5058115485883"
 ## [1] "Median expression (centered/weighted): 0.0272850948434725"
 ## [1] "Post-filter data"
@@ -1621,21 +1638,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 158"
 ## [1] "Reusing previous sampling (Same metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:15:39 CEST"
+## [1] "2017-04-19 11:36:10 CEST"
 ## [1] "[25/50] Working on APOPTOSIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_APOPTOSIS"
 ## [1] "161 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1644,32 +1661,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ##  [8] "CCNA1"  "GUCY2D" "AVPR1A"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.200668700874952 L1/L2 = 1.27417289768288"
+## [1] "L1 = 0.200668700874952 L1/L2 = 1.27417289768308"
 ## [1] "Median expression (uncentered): 13.5023967412149"
 ## [1] "Median expression (centered/weighted): 0.030497893698589"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.153666313413995 L1/L2 = 1.40703144193427"
+## [1] "L1 = 0.153666313413996 L1/L2 = 1.40703144193427"
 ## [1] "Median expression (uncentered): 13.5304673003377"
 ## [1] "Median expression (centered/weighted): 0.0243620603790383"
 ## [1] "Previous sample size: 158"
 ## [1] "Next sample size: 161"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:15:40 CEST"
+## [1] "2017-04-19 11:36:11 CEST"
 ## [1] "[26/50] Working on ADIPOGENESIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ADIPOGENESIS"
 ## [1] "197 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1677,7 +1694,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "FABP4"  "ADIPOQ" "ACADL"  "LEP"    "RETN"   "CYP4B1" "OMD"    "CIDEA" 
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.357695651962399 L1/L2 = 2.48799890983763"
+## [1] "L1 = 0.3576956519624 L1/L2 = 2.48799890983766"
 ## [1] "Median expression (uncentered): 13.5298575391099"
 ## [1] "Median expression (centered/weighted): 0.0203073654865543"
 ## [1] "Post-filter data"
@@ -1688,23 +1705,23 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 197"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.296   0.174  31.982 
+##   0.289   0.180  31.555 
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:14 CEST"
+## [1] "2017-04-19 11:36:45 CEST"
 ## [1] "[27/50] Working on COMPLEMENT - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_COMPLEMENT"
 ## [1] "198 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1715,32 +1732,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [19] "SCG3"     "APOA4"    "IL6"     
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.254908170952829 L1/L2 = 1.57688877335298"
+## [1] "L1 = 0.254908170952829 L1/L2 = 1.57688877335297"
 ## [1] "Median expression (uncentered): 13.4448854735829"
 ## [1] "Median expression (centered/weighted): 0.0356517573290445"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.168009604183691 L1/L2 = 1.60374558650169"
+## [1] "L1 = 0.168009604183691 L1/L2 = 1.60374558650235"
 ## [1] "Median expression (uncentered): 13.5052533180781"
 ## [1] "Median expression (centered/weighted): 0.0251617738332994"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 198"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:16 CEST"
+## [1] "2017-04-19 11:36:46 CEST"
 ## [1] "[28/50] Working on HEME_METABOLISM - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_HEME_METABOLISM"
 ## [1] "198 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1752,32 +1769,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [25] "HBBP1"    "TRIM58"   "ABCG2"   
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.149390754163708 L1/L2 = 1.22768898583319"
+## [1] "L1 = 0.149390754163709 L1/L2 = 1.22768898583278"
 ## [1] "Median expression (uncentered): 13.4131651120199"
 ## [1] "Median expression (centered/weighted): 0.0151387491201863"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.389443674320604 L1/L2 = 3.54611136936337"
+## [1] "L1 = 0.389443674320605 L1/L2 = 3.54611136936338"
 ## [1] "Median expression (uncentered): 13.5200047416386"
 ## [1] "Median expression (centered/weighted): 0.0133070818761943"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 198"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:18 CEST"
+## [1] "2017-04-19 11:36:48 CEST"
 ## [1] "[29/50] Working on MITOTIC_SPINDLE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_MITOTIC_SPINDLE"
 ## [1] "199 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1787,7 +1804,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [15] "CEP72" 
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.21560878289067 L1/L2 = 1.89479112538958"
+## [1] "L1 = 0.21560878289067 L1/L2 = 1.89479112538963"
 ## [1] "Median expression (uncentered): 13.4697053692697"
 ## [1] "Median expression (centered/weighted): 0.0127229257979371"
 ## [1] "Post-filter data"
@@ -1798,21 +1815,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 199"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:19 CEST"
+## [1] "2017-04-19 11:36:50 CEST"
 ## [1] "[30/50] Working on INTERFERON_GAMMA_RESPONSE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_INTERFERON_GAMMA_RESPONSE"
 ## [1] "199 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1824,28 +1841,28 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Median expression (uncentered): 13.500032686712"
 ## [1] "Median expression (centered/weighted): 0.0368830038740008"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.148131583879507 L1/L2 = 1.52689537632272"
+## [1] "L1 = 0.148131583879507 L1/L2 = 1.5268953763227"
 ## [1] "Median expression (uncentered): 13.5214777563578"
 ## [1] "Median expression (centered/weighted): 0.0317045114897241"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 199"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:21 CEST"
+## [1] "2017-04-19 11:36:52 CEST"
 ## [1] "[31/50] Working on E2F_TARGETS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_E2F_TARGETS"
 ## [1] "199 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1853,64 +1870,64 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "ORC6"   "KIF4A"  "HELLS"  "KIF18B" "DSCC1"  "DIAPH3"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.350924213891192 L1/L2 = 3.64843190119867"
+## [1] "L1 = 0.350924213891193 L1/L2 = 3.6484319011987"
 ## [1] "Median expression (uncentered): 13.580670763685"
 ## [1] "Median expression (centered/weighted): 0.0198028466949971"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.304381272796105 L1/L2 = 2.92204448712193"
+## [1] "L1 = 0.304381272796105 L1/L2 = 2.92204448712194"
 ## [1] "Median expression (uncentered): 13.5894170710207"
 ## [1] "Median expression (centered/weighted): 0.0199134089188142"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 199"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:23 CEST"
+## [1] "2017-04-19 11:36:53 CEST"
 ## [1] "[32/50] Working on MYC_TARGETS_V1 - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_MYC_TARGETS_V1"
 ## [1] "199 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
 ## [1] "No gene will be filtered"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.253502033269944 L1/L2 = 1.90646751084437"
+## [1] "L1 = 0.253502033269943 L1/L2 = 1.90646751080654"
 ## [1] "Median expression (uncentered): 13.6681093715379"
 ## [1] "Median expression (centered/weighted): -0.00250012916938683"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.253502033269943 L1/L2 = 1.90646751081336"
+## [1] "L1 = 0.253502033269943 L1/L2 = 1.9064675107513"
 ## [1] "Median expression (uncentered): 13.6681093715379"
 ## [1] "Median expression (centered/weighted): -0.00250012916938683"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 199"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:25 CEST"
+## [1] "2017-04-19 11:36:55 CEST"
 ## [1] "[33/50] Working on INFLAMMATORY_RESPONSE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_INFLAMMATORY_RESPONSE"
 ## [1] "199 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1933,21 +1950,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 199"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:27 CEST"
+## [1] "2017-04-19 11:36:57 CEST"
 ## [1] "[34/50] Working on XENOBIOTIC_METABOLISM - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_XENOBIOTIC_METABOLISM"
 ## [1] "199 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1959,7 +1976,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [29] "TAT"     "MBL2"    "ANGPTL3" "CYP2E1"  "ITIH1"  
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.349357632349227 L1/L2 = 3.50341844236563"
+## [1] "L1 = 0.349357632349227 L1/L2 = 3.50341844236612"
 ## [1] "Median expression (uncentered): 13.450824618143"
 ## [1] "Median expression (centered/weighted): 0.0288680949904655"
 ## [1] "Post-filter data"
@@ -1970,21 +1987,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 199"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:28 CEST"
+## [1] "2017-04-19 11:36:59 CEST"
 ## [1] "[35/50] Working on GLYCOLYSIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_GLYCOLYSIS"
 ## [1] "199 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1994,32 +2011,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [15] "CHST4" 
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.203202106002461 L1/L2 = 1.75814950477536"
+## [1] "L1 = 0.203202106002461 L1/L2 = 1.75814950477578"
 ## [1] "Median expression (uncentered): 13.4970409648082"
 ## [1] "Median expression (centered/weighted): 0.0198028466949971"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.207520272543672 L1/L2 = 2.08476479143322"
+## [1] "L1 = 0.207520272543673 L1/L2 = 2.08476479143322"
 ## [1] "Median expression (uncentered): 13.542850503762"
 ## [1] "Median expression (centered/weighted): 0.0134731298840469"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 199"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:30 CEST"
+## [1] "2017-04-19 11:37:01 CEST"
 ## [1] "[36/50] Working on KRAS_SIGNALING_DN - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_KRAS_SIGNALING_DN"
 ## [1] "199 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2035,32 +2052,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [49] "SERPINB2" "P2RY4"   
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.171836674751782 L1/L2 = 2.78355779453308"
+## [1] "L1 = 0.171836674751782 L1/L2 = 2.78355779454389"
 ## [1] "Median expression (uncentered): 11.801304186049"
 ## [1] "Median expression (centered/weighted): 0.0607116512246847"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.16951665620146 L1/L2 = 1.97965844203352"
+## [1] "L1 = 0.169516656201461 L1/L2 = 1.97965844203272"
 ## [1] "Median expression (uncentered): 12.3062041215584"
 ## [1] "Median expression (centered/weighted): 0.0199165924906458"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 199"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:32 CEST"
+## [1] "2017-04-19 11:37:03 CEST"
 ## [1] "[37/50] Working on TNFA_SIGNALING_VIA_NFKB - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_TNFA_SIGNALING_VIA_NFKB"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2073,28 +2090,28 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Median expression (uncentered): 13.4979141914068"
 ## [1] "Median expression (centered/weighted): 0.0437216417722608"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.208166533754724 L1/L2 = 2.53249280285964"
+## [1] "L1 = 0.208166533754724 L1/L2 = 2.5324928028596"
 ## [1] "Median expression (uncentered): 13.516684944058"
 ## [1] "Median expression (centered/weighted): 0.0381322112776709"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:34 CEST"
+## [1] "2017-04-19 11:37:04 CEST"
 ## [1] "[38/50] Working on HYPOXIA - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_HYPOXIA"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2103,32 +2120,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ##  [8] "TKTL1"  "PKP1"   "HAS1"   "INHA"   "IL6"    "LALBA"  "NCAN"  
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.226621356042958 L1/L2 = 1.68497677296706"
+## [1] "L1 = 0.226621356042958 L1/L2 = 1.68497677296707"
 ## [1] "Median expression (uncentered): 13.459175435552"
 ## [1] "Median expression (centered/weighted): 0.0218696250297438"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.35608633110885 L1/L2 = 2.17293869871998"
+## [1] "L1 = 0.35608633110885 L1/L2 = 2.17293869871538"
 ## [1] "Median expression (uncentered): 13.4943556035328"
 ## [1] "Median expression (centered/weighted): 0.0165295748389246"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:36 CEST"
+## [1] "2017-04-19 11:37:06 CEST"
 ## [1] "[39/50] Working on G2M_CHECKPOINT - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_G2M_CHECKPOINT"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2136,32 +2153,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "HOXC10" "EGF"   
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.305877054260104 L1/L2 = 1.43079797937527"
+## [1] "L1 = 0.30587705426011 L1/L2 = 1.43079797937496"
 ## [1] "Median expression (uncentered): 13.5330863421676"
 ## [1] "Median expression (centered/weighted): 0.00635705370274554"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.357487480193691 L1/L2 = 3.79226169683809"
+## [1] "L1 = 0.357487480193691 L1/L2 = 3.79226169683808"
 ## [1] "Median expression (uncentered): 13.53885578248"
 ## [1] "Median expression (centered/weighted): 0.00580154063130126"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:37 CEST"
+## [1] "2017-04-19 11:37:08 CEST"
 ## [1] "[40/50] Working on ESTROGEN_RESPONSE_EARLY - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ESTROGEN_RESPONSE_EARLY"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2182,21 +2199,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:39 CEST"
+## [1] "2017-04-19 11:37:10 CEST"
 ## [1] "[41/50] Working on ESTROGEN_RESPONSE_LATE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ESTROGEN_RESPONSE_LATE"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2218,21 +2235,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:41 CEST"
+## [1] "2017-04-19 11:37:12 CEST"
 ## [1] "[42/50] Working on MYOGENESIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_MYOGENESIS"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2246,32 +2263,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [43] "CAV3"   "MYBPC3" "STC2"   "SLN"   
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.164523800694041 L1/L2 = 1.71482332797724"
+## [1] "L1 = 0.164523800694042 L1/L2 = 1.71482332798133"
 ## [1] "Median expression (uncentered): 13.0835624270981"
 ## [1] "Median expression (centered/weighted): 0.0308616989387473"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.163346840098699 L1/L2 = 1.78334424087604"
+## [1] "L1 = 0.163346840098699 L1/L2 = 1.78334424114543"
 ## [1] "Median expression (uncentered): 13.4065372001286"
 ## [1] "Median expression (centered/weighted): 0.0244011868414699"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:43 CEST"
+## [1] "2017-04-19 11:37:14 CEST"
 ## [1] "[43/50] Working on APICAL_JUNCTION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_APICAL_JUNCTION"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2282,7 +2299,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [22] "SLC30A3" "CD209"   "NEGR1"   "PPP2R2C" "ACTA1"   "MADCAM1"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.213569869556236 L1/L2 = 1.91362650961143"
+## [1] "L1 = 0.213569869556236 L1/L2 = 1.91362650961178"
 ## [1] "Median expression (uncentered): 13.2903068962579"
 ## [1] "Median expression (centered/weighted): 0.0285629984124942"
 ## [1] "Post-filter data"
@@ -2293,21 +2310,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:45 CEST"
+## [1] "2017-04-19 11:37:15 CEST"
 ## [1] "[44/50] Working on MTORC1_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_MTORC1_SIGNALING"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2315,32 +2332,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "SLC7A11" "CCNF"    "STC1"    "NUFIP1" 
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.203967065546909 L1/L2 = 1.68805907408651"
+## [1] "L1 = 0.20396706554691 L1/L2 = 1.68805907408651"
 ## [1] "Median expression (uncentered): 13.5665892384264"
 ## [1] "Median expression (centered/weighted): 0.0119298909355557"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.176745672500794 L1/L2 = 1.39561657666749"
+## [1] "L1 = 0.176745672500835 L1/L2 = 1.39561657660958"
 ## [1] "Median expression (uncentered): 13.573292145097"
 ## [1] "Median expression (centered/weighted): 0.0123385754241434"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:47 CEST"
+## [1] "2017-04-19 11:37:17 CEST"
 ## [1] "[45/50] Working on EPITHELIAL_MESENCHYMAL_TRANSITION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2350,32 +2367,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [15] "SCG2"    "CXCL6"   "FOXC2"   "ADAM12" 
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.361582725735916 L1/L2 = 2.44824727045189"
+## [1] "L1 = 0.361582725735916 L1/L2 = 2.44824727062785"
 ## [1] "Median expression (uncentered): 13.4324114047036"
 ## [1] "Median expression (centered/weighted): 0.036947695210285"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.187050228930182 L1/L2 = 1.67993369003556"
+## [1] "L1 = 0.187050228930182 L1/L2 = 1.67993369003558"
 ## [1] "Median expression (uncentered): 13.4807270993576"
 ## [1] "Median expression (centered/weighted): 0.030698574733677"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:48 CEST"
+## [1] "2017-04-19 11:37:19 CEST"
 ## [1] "[46/50] Working on OXIDATIVE_PHOSPHORYLATION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_OXIDATIVE_PHOSPHORYLATION"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2393,21 +2410,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:50 CEST"
+## [1] "2017-04-19 11:37:21 CEST"
 ## [1] "[47/50] Working on P53_PATHWAY - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_P53_PATHWAY"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2416,7 +2433,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [7] "KRT17"    "ZBTB16"   "NHLH2"   
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.430033039712536 L1/L2 = 2.71526720581795"
+## [1] "L1 = 0.430033039712537 L1/L2 = 2.71526720581832"
 ## [1] "Median expression (uncentered): 13.5261324004452"
 ## [1] "Median expression (centered/weighted): 0.0187677972996269"
 ## [1] "Post-filter data"
@@ -2427,21 +2444,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:52 CEST"
+## [1] "2017-04-19 11:37:23 CEST"
 ## [1] "[48/50] Working on IL2_STAT5_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_IL2_STAT5_SIGNALING"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2450,32 +2467,32 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ##  [8] "GPR83"   "CCDC164" "TNFSF11"
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.215132291966354 L1/L2 = 1.18259468253238"
+## [1] "L1 = 0.215132291966353 L1/L2 = 1.18259468253239"
 ## [1] "Median expression (uncentered): 13.4083297407674"
 ## [1] "Median expression (centered/weighted): 0.0295619856208624"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.186298198027508 L1/L2 = 2.11788331969531"
+## [1] "L1 = 0.186298198027508 L1/L2 = 2.11788331973048"
 ## [1] "Median expression (uncentered): 13.4524986519525"
 ## [1] "Median expression (centered/weighted): 0.0231916517741595"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:54 CEST"
+## [1] "2017-04-19 11:37:25 CEST"
 ## [1] "[49/50] Working on ALLOGRAFT_REJECTION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ALLOGRAFT_REJECTION"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2486,7 +2503,7 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [22] "IL13"   "MBL2"   "CCL7"   "RPL3L"  "IL9"   
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.219209912164708 L1/L2 = 1.60482455255231"
+## [1] "L1 = 0.219209912164707 L1/L2 = 1.60482455255231"
 ## [1] "Median expression (uncentered): 13.3192487328175"
 ## [1] "Median expression (centered/weighted): 0.0411734727607429"
 ## [1] "Post-filter data"
@@ -2497,21 +2514,21 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
-## [1] "2017-04-14 18:16:56 CEST"
+## [1] "2017-04-19 11:37:27 CEST"
 ## [1] "[50/50] Working on KRAS_SIGNALING_UP - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_KRAS_SIGNALING_UP"
 ## [1] "200 genes available for analysis"
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2523,28 +2540,28 @@ Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter
 ## [21] "NGF"       "SNAP91"   
 ## [1] "Not using weigths for PCA computation"
 ## [1] "Pre-filter data"
-## [1] "L1 = 0.281092279363725 L1/L2 = 2.34415612082094"
+## [1] "L1 = 0.281092279363726 L1/L2 = 2.34415612082094"
 ## [1] "Median expression (uncentered): 13.3939266694146"
 ## [1] "Median expression (centered/weighted): 0.0532926016956236"
 ## [1] "Post-filter data"
-## [1] "L1 = 0.338572405035906 L1/L2 = 1.97568150191467"
+## [1] "L1 = 0.338572405035906 L1/L2 = 1.97568150192456"
 ## [1] "Median expression (uncentered): 13.4715482054085"
 ## [1] "Median expression (centered/weighted): 0.0406110378165206"
 ## [1] "Previous sample size: 197"
 ## [1] "Next sample size: 200"
 ## [1] "Reusing previous sampling (Comparable metagene size)"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
@@ -2555,10 +2572,10 @@ tictoc::toc()
 ```
 
 ```
-## 214.676 sec elapsed
+## 215.211 sec elapsed
 ```
 
-### Module activity
+## Module activity
 
 We can now explore the overdispersed genesets in ROMA with fixed center. Since we have information on the groups, we can also aggregate the module weigths by groups and consider the mean and standard deviation. Note how we used the `SelectGeneSets` function to determind the overdispersed genesets. 
 
@@ -2574,16 +2591,16 @@ AggData.FC <- Plot.Genesets(RomaData = Data.FC,
 
 ```
 ## [1] "Using genestes overdispersed according to Wilcoxon test. VarThr = 0.005"
-## [1] "8 geneset selected"
+## [1] "7 geneset selected"
 ```
 
-![](README_files/figure-html/unnamed-chunk-14-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-14-2.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-16-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
 
 ```
 ## [1] "54 samples have an associated group"
 ```
 
-![](README_files/figure-html/unnamed-chunk-14-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-14-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-14-5.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-16-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-16-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-16-5.png)<!-- -->
 
 The fucntion returns a list of matrices with the aggregated data, which we save in the `AggData.FC` variable.
 
@@ -2594,26 +2611,24 @@ AggData.FC
 
 ```
 ## $mean
-##                          normal     primary metastasized
-## HYPOXIA               -1.757217  0.14457794    1.5785980
-## G2M_CHECKPOINT        -2.395158  0.34382301    1.5702829
-## APICAL_SURFACE         1.321125 -0.06877086   -1.1996301
-## XENOBIOTIC_METABOLISM -2.938817 -1.06273977    3.8936887
-## ANGIOGENESIS          -1.401274  0.24920512    1.3053128
-## HEME_METABOLISM        2.177564 -1.67123804   -0.4589347
-## KRAS_SIGNALING_UP      3.488294 -0.38438081   -3.4371667
-## PANCREAS_BETA_CELLS    5.290600  0.33819624   -5.7489524
+##                          normal    primary metastasized
+## HYPOXIA               -1.757217  0.1445779    1.5785980
+## G2M_CHECKPOINT        -2.395158  0.3438230    1.5702829
+## XENOBIOTIC_METABOLISM -2.938817 -1.0627398    3.8936887
+## ANGIOGENESIS          -1.401274  0.2492051    1.3053128
+## HEME_METABOLISM        2.177564 -1.6712380   -0.4589347
+## KRAS_SIGNALING_UP      3.488294 -0.3843808   -3.4371667
+## PANCREAS_BETA_CELLS    5.290600  0.3381962   -5.7489524
 ## 
 ## $sd
-##                          normal   primary metastasized
-## HYPOXIA               4.0113735 4.3322063     4.365263
-## G2M_CHECKPOINT        2.1631967 3.1783537     1.929338
-## APICAL_SURFACE        0.5886345 0.9664067     0.917549
-## XENOBIOTIC_METABOLISM 2.4634685 2.4677278     1.919900
-## ANGIOGENESIS          3.7059780 2.7485044     1.352886
-## HEME_METABOLISM       3.2845504 3.1934579     3.580726
-## KRAS_SIGNALING_UP     4.0002316 4.2052500     3.315639
-## PANCREAS_BETA_CELLS   1.8352312 4.9147029     4.879615
+##                         normal  primary metastasized
+## HYPOXIA               4.011373 4.332206     4.365263
+## G2M_CHECKPOINT        2.163197 3.178354     1.929338
+## XENOBIOTIC_METABOLISM 2.463468 2.467728     1.919900
+## ANGIOGENESIS          3.705978 2.748504     1.352886
+## HEME_METABOLISM       3.284550 3.193458     3.580726
+## KRAS_SIGNALING_UP     4.000232 4.205250     3.315639
+## PANCREAS_BETA_CELLS   1.835231 4.914703     4.879615
 ```
 
 We can also look at underdispersed datasets. In this case we will also look at the expression level and select only the genesets that are significantly overexpressed (`MedType = "Over"`).
@@ -2635,15 +2650,15 @@ AggData2.FC <- Plot.Genesets(RomaData = Data.FC,
 ## [1] "38 geneset selected"
 ```
 
-![](README_files/figure-html/unnamed-chunk-16-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-16-2.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-18-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-18-2.png)<!-- -->
 
 ```
 ## [1] "54 samples have an associated group"
 ```
 
-![](README_files/figure-html/unnamed-chunk-16-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-16-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-16-5.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-18-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-18-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-18-5.png)<!-- -->
 
-### Statistical comparison across samples
+## Statistical comparison across samples
 
 Visual inspection already stresses the difference between the groups. It is possible to quantify theses differnces performing statistical testing:
 
@@ -2664,7 +2679,7 @@ CompareAcrossSamples(RomaData = Data.FC,
 ## Residuals   483   7007  14.508
 ```
 
-![](README_files/figure-html/unnamed-chunk-17-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-17-2.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-19-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-2.png)<!-- -->
 
 ```
 ## [1] "Performing Type III AOV (R default)"
@@ -2676,7 +2691,7 @@ CompareAcrossSamples(RomaData = Data.FC,
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-![](README_files/figure-html/unnamed-chunk-17-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-17-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-17-5.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-19-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-5.png)<!-- -->
 
 ```
 ## [1] "A significant difference is observed across groups and metagenes"
@@ -2684,10 +2699,10 @@ CompareAcrossSamples(RomaData = Data.FC,
 ## [1] "87 significant differences found"
 ```
 
-![](README_files/figure-html/unnamed-chunk-17-6.png)<!-- -->![](README_files/figure-html/unnamed-chunk-17-7.png)<!-- -->![](README_files/figure-html/unnamed-chunk-17-8.png)<!-- -->![](README_files/figure-html/unnamed-chunk-17-9.png)<!-- -->![](README_files/figure-html/unnamed-chunk-17-10.png)<!-- -->![](README_files/figure-html/unnamed-chunk-17-11.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-19-6.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-7.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-8.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-9.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-10.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-11.png)<!-- -->
 
 
-### Top contributing genes
+## Top contributing genes
 
 We can also explore the top contributing genes, i.e., the genes with the largers weights in the selected modules:
 
@@ -2701,11 +2716,11 @@ GeneMat <- GetTopContrib(Data.FC, Selected = SelectGeneSets(RomaData = Data.FC, 
 ## [1] "Using genestes overdispersed according to Wilcoxon test. VarThr = 1e-05"
 ```
 
-![](README_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 This allow us to quicky determine if a set of genes play a strong (potentially opposite) role across different genesets. The function also returns the matrix used to plot the heatmap.
 
-### Gene weights
+## Gene weights
 
 We can also explore the gene weigths with the fixed center
 
@@ -2723,10 +2738,10 @@ PlotGeneWeight(RomaData = Data.FC, PlotGenes = 30,
 ## [1] "9 geneset selected"
 ```
 
-![](README_files/figure-html/unnamed-chunk-19-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-2.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-5.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-6.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-7.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-8.png)<!-- -->![](README_files/figure-html/unnamed-chunk-19-9.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-21-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-2.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-5.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-6.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-7.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-8.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-9.png)<!-- -->
 
 
-### Sample projections
+## Sample projections
 
 Moreover, we can look at the projections of the samples with the fixed center
 
@@ -2741,13 +2756,13 @@ PlotSampleProjections(RomaData = Data.FC, PlotSamples = 30,
 
 ```
 ## [1] "Using genestes overdispersed according to Wilcoxon test. VarThr = 0.005"
-## [1] "8 geneset selected"
+## [1] "7 geneset selected"
 ```
 
-![](README_files/figure-html/unnamed-chunk-20-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-20-2.png)<!-- -->![](README_files/figure-html/unnamed-chunk-20-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-20-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-20-5.png)<!-- -->![](README_files/figure-html/unnamed-chunk-20-6.png)<!-- -->![](README_files/figure-html/unnamed-chunk-20-7.png)<!-- -->![](README_files/figure-html/unnamed-chunk-20-8.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-22-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-22-2.png)<!-- -->![](README_files/figure-html/unnamed-chunk-22-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-22-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-22-5.png)<!-- -->![](README_files/figure-html/unnamed-chunk-22-6.png)<!-- -->![](README_files/figure-html/unnamed-chunk-22-7.png)<!-- -->
 
 
-### Recurrent genes
+## Recurrent genes
 
 Finally, we can look at genes which appear across different genesests and explore thier weithgs
 
@@ -2761,13 +2776,13 @@ PlotRecurringGenes(RomaData = Data.FC,
 
 ```
 ## [1] "Using genestes overdispersed according to Wilcoxon test. VarThr = 0.005"
-## [1] "8 geneset selected"
+## [1] "7 geneset selected"
 ```
 
-![](README_files/figure-html/unnamed-chunk-21-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-2.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-5.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-6.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-7.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-8.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-9.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-10.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-11.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-12.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-13.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-14.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-15.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-16.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-17.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-18.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-19.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-20.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-21.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-22.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-23.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-24.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-25.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-26.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-27.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-28.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-29.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-30.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-31.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-32.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-33.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-34.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-35.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-36.png)<!-- -->![](README_files/figure-html/unnamed-chunk-21-37.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-23-1.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-2.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-4.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-5.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-6.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-7.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-8.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-9.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-10.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-11.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-12.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-13.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-14.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-15.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-16.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-17.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-18.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-19.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-20.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-21.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-22.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-23.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-24.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-25.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-26.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-27.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-28.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-29.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-30.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-31.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-32.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-33.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-34.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-35.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-36.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-37.png)<!-- -->
 
 
-### Looking at the details 
+## Looking at the details 
 
 By default, rRoma will perform the appropiate anaysis without showing all the details to the users. However, it is possible to obtain additioanl graphical and textual information. This will results in a large amount of inromation being derived an plotted. Hence, it is not advisable to do that for large analysis. To show an example of the extended information that can be produced, we will first obtain a smaller module list.
 
@@ -2798,7 +2813,7 @@ RedData.NFC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = RedGMT, FixedCen
 ## [1] "Centering gene expression over samples"
 ## [1] "Using local center (NOT centering over genes)"
 ## [1] "All the genesets will be used"
-## [1] "2017-04-14 18:17:32 CEST"
+## [1] "2017-04-19 11:38:02 CEST"
 ## [1] "[1/1] Working on KEGG_METABOLISM_OF_XENOBIOTICS_BY_CYTOCHROME_P450 - http://www.broadinstitute.org/gsea/msigdb/cards/KEGG_METABOLISM_OF_XENOBIOTICS_BY_CYTOCHROME_P450"
 ## [1] "70 genes available for analysis"
 ## [1] "The following genes will be used:"
@@ -2815,7 +2830,7 @@ RedData.NFC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = RedGMT, FixedCen
 ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
 ```
 
-![](README_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
 
 ```
 ## [1] "19 gene(s) will be filtered:"
@@ -2835,36 +2850,36 @@ RedData.NFC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = RedGMT, FixedCen
 ## [1] "Next sample size: 70"
 ## [1] "Computing samples"
 ##    user  system elapsed 
-##   0.085   0.186   9.159
+##   0.096   0.180   9.699
 ```
 
-![](README_files/figure-html/unnamed-chunk-23-2.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-4.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-25-2.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-3.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-4.png)<!-- -->
 
 ```
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ## [1] "Missing gene weights will be replaced by 1"
-## [1] "Orienting PC by correlating gene expression and PC projections"
+## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
 ## [1] "Not using groups"
 ## [1] "Computing correlations"
 ## [1] "Correcting using weights"
 ```
 
-![](README_files/figure-html/unnamed-chunk-23-5.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-25-5.png)<!-- -->
 
 ```
 ## [1] "Plotting expression VS projections"
 ```
 
-![](README_files/figure-html/unnamed-chunk-23-6.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-7.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-8.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-25-6.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-7.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-8.png)<!-- -->
 
 ```
 ## [1] "Plotting correlations of expression VS projections"
@@ -2874,7 +2889,7 @@ RedData.NFC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = RedGMT, FixedCen
 ## Warning in cor(x, y): l'écart type est nulle
 ```
 
-![](README_files/figure-html/unnamed-chunk-23-9.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-10.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-25-9.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-10.png)<!-- -->
 
 ```
 ## Warning: Removed 1 rows containing missing values (geom_errorbar).
@@ -2884,26 +2899,26 @@ RedData.NFC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = RedGMT, FixedCen
 ## Warning: Removed 1 rows containing missing values (geom_point).
 ```
 
-![](README_files/figure-html/unnamed-chunk-23-11.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-12.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-13.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-25-11.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-12.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-13.png)<!-- -->
 
 ```
 ## [1] "Plotting expression VS PC weigths"
 ```
 
-![](README_files/figure-html/unnamed-chunk-23-14.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-15.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-16.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-25-14.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-15.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-16.png)<!-- -->
 
 ```
 ## [1] "Plotting correlation of expression VS PC weigths"
 ```
 
-![](README_files/figure-html/unnamed-chunk-23-17.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-18.png)<!-- -->![](README_files/figure-html/unnamed-chunk-23-19.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-25-17.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-18.png)<!-- -->![](README_files/figure-html/unnamed-chunk-25-19.png)<!-- -->
 
 ```r
 tictoc::toc()
 ```
 
 ```
-## 25.496 sec elapsed
+## 25.761 sec elapsed
 ```
 
 
@@ -2920,29 +2935,117 @@ PlotSampleProjections(RomaData = RedData.NFC, PlotSamples = 30,
 ## [1] "1 geneset selected"
 ```
 
-![](README_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
 
 ```
 ## Warning: Removed 18 rows containing missing values (geom_point).
 ```
 
-![](README_files/figure-html/unnamed-chunk-24-2.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-26-2.png)<!-- -->
 
 ```
 ## Warning: Removed 18 rows containing non-finite values (stat_density2d).
 ```
 
-![](README_files/figure-html/unnamed-chunk-24-3.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-26-3.png)<!-- -->
 
 ```
 ## Warning: Removed 18 rows containing non-finite values (stat_bin2d).
 ```
 
-![](README_files/figure-html/unnamed-chunk-24-4.png)<!-- -->
+![](README_files/figure-html/unnamed-chunk-26-4.png)<!-- -->
+
+## Visualising on ACSN 
+
+It is possible to project the results of rRoma analysis on a map. This functionality is currently experimental. ACSN maps needs gene lists. Therefore it is necessary to map the module activity to a gene specific value. Since a gene can be associated with multiple modules, it is possible to filter genes with a large variation in the gene weigths, as this is associated with a larger variation, and hence uncertainlty, on the contribution of the gene. The function takes several parameters: `SampleName`, which indicates the name of the sample(s) to consider, `AggScoreFun`, which describes the function used to group the module scores when different samples are present, `FilterByWei`, which is a parameters used to filter genes based on the variance of the gene weight across modules, and `AggGeneFun`, which describes the function used to obtain the value associated to a gene when the multiples weigths and scores are present. The parameters `QTop`, `QBottom`, and `Steps` control the heatmap of the plot. Finally, `DispMode` indicates which quantities should be projected on the maps, the module score ("Module"), or the gene weigths ("Gene").
+
+The following commands will open a windows in the default browser to visualize the map.
+
+
+```r
+PlotOnACSN(RomaData = Data.FC, SampleName = names(Type[Type == "normal"]),
+           AggScoreFun = "median", FilterByWei = 30, 
+           DispMode = c("Module", "Gene"), DataName = "Normal", 
+           QTop = .99, QBottom = .1, Steps = 5, 
+           Selected = NULL,
+           AggGeneFun = "median")
 ```
 
+```
+## [1] "50 geneset selected"
+```
+
+![](README_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+
+```
+## [1] "The following genes will be ignored:"
+##  [1] "APC"      "CSF3R"    "DBF4"     "DUSP2"    "EFNA5"    "GSK3B"   
+##  [7] "LAMP3"    "PTPN2"    "PUS1"     "SERPINE1" "SRPX"     "STC2"    
+## [13] "TDO2"     "TNFAIP6"  "TTK"      "XIAP"
+```
+
+![](README_files/figure-html/unnamed-chunk-27-2.png)<!-- -->![](README_files/figure-html/unnamed-chunk-27-3.png)<!-- -->
+
+```
+## waiting for data to be imported...
+```
+
+```
+## data imported.
+```
+
+![](README_files/figure-html/unnamed-chunk-27-4.png)<!-- -->
+
+```
+## waiting for data to be imported...
+## data imported.
+```
+
+![](README_files/figure-html/unnamed-chunk-27-5.png)<!-- -->
 
 
+
+
+```r
+PlotOnACSN(RomaData = Data.FC, SampleName = names(Type[Type == "metastasized"]),
+           AggScoreFun = "median", FilterByWei = 30, 
+           DispMode = c("Module", "Gene"), DataName = "Metastasized", 
+           QTop = .99, QBottom = .1, Steps = 5, 
+           Selected = NULL,
+           AggGeneFun = "median")
+```
+
+```
+## [1] "50 geneset selected"
+```
+
+![](README_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
+
+```
+## [1] "The following genes will be ignored:"
+##  [1] "APC"      "CSF3R"    "DBF4"     "DUSP2"    "EFNA5"    "GSK3B"   
+##  [7] "LAMP3"    "PTPN2"    "PUS1"     "SERPINE1" "SRPX"     "STC2"    
+## [13] "TDO2"     "TNFAIP6"  "TTK"      "XIAP"
+```
+
+![](README_files/figure-html/unnamed-chunk-28-2.png)<!-- -->![](README_files/figure-html/unnamed-chunk-28-3.png)<!-- -->
+
+```
+## waiting for data to be imported...
+```
+
+```
+## data imported.
+```
+
+![](README_files/figure-html/unnamed-chunk-28-4.png)<!-- -->
+
+```
+## waiting for data to be imported...
+## data imported.
+```
+
+![](README_files/figure-html/unnamed-chunk-28-5.png)<!-- -->
 
 
 

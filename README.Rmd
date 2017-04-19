@@ -321,27 +321,25 @@ PlotSampleProjections(RomaData = RedData.NFC, PlotSamples = 30,
 
 It is possible to project the results of rRoma analysis on a map. This functionality is currently experimental. ACSN maps needs gene lists. Therefore it is necessary to map the module activity to a gene specific value. Since a gene can be associated with multiple modules, it is possible to filter genes with a large variation in the gene weigths, as this is associated with a larger variation, and hence uncertainlty, on the contribution of the gene. The function takes several parameters: `SampleName`, which indicates the name of the sample(s) to consider, `AggScoreFun`, which describes the function used to group the module scores when different samples are present, `FilterByWei`, which is a parameters used to filter genes based on the variance of the gene weight across modules, and `AggGeneFun`, which describes the function used to obtain the value associated to a gene when the multiples weigths and scores are present. The parameters `QTop`, `QBottom`, and `Steps` control the heatmap of the plot. Finally, `DispMode` indicates which quantities should be projected on the maps, the module score ("Module"), or the gene weigths ("Gene").
 
-The following commands will open a windows in the default browser to visualize the map
+The following commands will open a windows in the default browser to visualize the map.
 
 ```{r}
-PlotOnACSN(RomaData = RedData.NFC, SampleName = names(Type[Type = "normal"]),
+PlotOnACSN(RomaData = Data.FC, SampleName = names(Type[Type == "normal"]),
            AggScoreFun = "median", FilterByWei = 30, 
            DispMode = c("Module", "Gene"), DataName = "Normal", 
            QTop = .99, QBottom = .1, Steps = 5, 
-           Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3,
-                                       VarMode = "Wil", VarType = "Over"),
+           Selected = NULL,
            AggGeneFun = "median")
 ```
 
 
 
 ```{r}
-PlotOnACSN(RomaData = RedData.NFC, SampleName = names(Type[Type = "metastasized"]),
+PlotOnACSN(RomaData = Data.FC, SampleName = names(Type[Type == "metastasized"]),
            AggScoreFun = "median", FilterByWei = 30, 
            DispMode = c("Module", "Gene"), DataName = "Metastasized", 
            QTop = .99, QBottom = .1, Steps = 5, 
-           Selected = SelectGeneSets(RomaData = DataWU.NFC, VarThr = 1e-3,
-                                       VarMode = "Wil", VarType = "Over"),
+           Selected = NULL,
            AggGeneFun = "median")
 ```
 
