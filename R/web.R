@@ -2,17 +2,31 @@
 #'
 #' @param RomaData list, the analysis returned by rRoma
 #' @param Selected vector, integer. The position of the genesets to plot
-#' @param SampleName 
-#' @param FilterByWei 
-#' @param AggGeneFun 
-#' @param DispMode 
-#' @param DataName 
-#' @param AggScoreFun 
-#' @param QTop 
-#' @param QBottom 
-#' @param Steps 
-#' @param MapURL 
-#' @param DefDispVal 
+#' @param SampleName vector, string. The name(s) of the sample to consider
+#' @param FilterByWei scalar, number of median-absolute-deviations away from median variace of gene weights
+#' required for a value to be called an outlier and filtered. If NULL genes are not filtered. 
+#' @param AggGeneFun string, scalar. The name of the function used to combine scored if multiple samples are considered 
+#' @param DispMode string, vector. The quantity to be projected on the maps (in the form of an heatmap).
+#' It can be any combination of the following:
+#' \itemize{
+#' \item 'Module': gene score is obtained by aggregating the score of selected modules containing that gene. The aggregating function is specified by the AggGeneFun parameter. 
+#' \item 'Gene': gene score is obtained by aggregating the weigth of the genes across the selected modules. The aggregating function is specified by the AggGeneFun parameter. 
+#' }
+#' @param DataName string, scalar. The name of the dataset that will be reported in the web interface
+#' @param AggScoreFun string, scalar. The name of the aggregating function used to compute the valus of the gene score.
+#' Note that this function will be applied even to genes appearin in one geneset. To consider only genes found in a single module use the 'GetSingle' function
+#' @param DefDispVal numeric, scalar. The value to be used when the fucntion defined by AggScoreFun produce NA (e.g., sd applied to genes that appear only in one geneset)
+#' @param QTop numeric, scalar. The quantile threshold associted with the top saturation color. 
+#' @param QBottom numeric, scalar. The quantile threshold associted with the lower saturation color. 
+#' @param Steps numeric, scalar. The number of steps of the heatmap?? 
+#' @param MapURL string, scalar. The url of the map to use. The available maps can be seen on acsn.curie.fr and navicell.curie.fr. Possible values include
+#' \itemize{
+#' \item 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php'
+#' \item 'https://acsn.curie.fr/navicell/maps/dnarepair/master/index.php'
+#' \item 'https://acsn.curie.fr/navicell/maps/emtcellmotility/master/index.php'
+#' \item 'https://navicell.curie.fr/navicell/maps/ewing/master/index.php'
+#' \item 'https://navicell.curie.fr/navicell/maps/dendcells/master/index.php'
+#' } 
 #'
 #' @return
 #' @export
@@ -172,4 +186,21 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     
   }
   
+}
+
+
+
+
+
+
+#' Return its input if it is a single value, else return NA
+#'
+#' @param x input vector
+#'
+#' @return
+#' @export
+#'
+#' @examples
+GetSingle <- function(x) {
+  ifelse(length(x)==1, x, NA)
 }
