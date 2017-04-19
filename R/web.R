@@ -14,7 +14,7 @@
 #' }
 #' @param DataName string, scalar. The name of the dataset that will be reported in the web interface
 #' @param AggScoreFun string, scalar. The name of the aggregating function used to compute the valus of the gene score.
-#' Note that this function will be applied even to genes appearin in one geneset. To consider only genes found in a single module use the 'GetSingle' function
+#' Note that this function will be applied even to genes appearin in one geneset. To consider only genes found in a single module use the 'GetSingle' function and set DefDispVal to 0
 #' @param DefDispVal numeric, scalar. The value to be used when the fucntion defined by AggScoreFun produce NA (e.g., sd applied to genes that appear only in one geneset)
 #' @param QTop numeric, scalar. The quantile threshold associted with the top saturation color. 
 #' @param QBottom numeric, scalar. The quantile threshold associted with the lower saturation color. 
