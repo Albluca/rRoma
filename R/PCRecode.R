@@ -1,498 +1,4 @@
 
-#' Detect outliers
-#'
-#' @param GeneOutDetection character scalar, the algorithm used to filter genes in a module. Possible values are
-#' \itemize{
-#' \item 'L1OutVarPerc': percentage variation relative to the median variance explained supporgted by a leave one out approach 
-#' \item 'L1OutVarDC': dendrogram clustering statistics on variance explained supported by a leave one out approach
-#' \item 'L1OutExpOut': number of median-absolute-deviations away from median explined variance
-#' \item 'L1OutSdMean': Number of standard deviations away from the mean
-#' }
-#' The option "L1OutExpOut" requires the scater package to be installed.
-#' @param GeneOutThr scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC"), 
-#' minimal percentage variation (L1OutVarPerc) or the number of median-absolute-deviations away from median ("L1OutExpOut")
-#' @param ModulePCACenter 
-#' @param Genes 
-#' @param ExpressionData 
-#' @param PlotData 
-#' @param ModuleName
-#'
-#' @return
-#' @export
-#'
-#' @examples
-DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, CompatibleGenes, ExpressionData,
-                           PlotData = FALSE, ModuleName = '', PrintInfo = TRUE) {
-  
-  SelGenes <- CompatibleGenes
-  
-  if(GeneOutDetection == "L1OutVarPerc"){
-    
-    if(PrintInfo){
-      print("Detecting outliers using leave one out and percentage variation on variance explained by PC1")
-    }
-    
-    # Computing all the PC1
-    AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- t(ExpressionData[-i, ])
-      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
-      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
-    })
-    
-    
-    # Getting the distance from the median PC1
-    GenesOut <- abs(AllPCA1-median(AllPCA1)) > GeneOutThr/100
-    
-    if(PlotData){
-      # Plotting the distances from the median PC1
-      B <- boxplot(x = AllPCA1, at = 1, horizontal = FALSE, ylab = "Variance explained by PC1", main = ModuleName)
-    }
-    
-    if(PrintInfo){
-      print(paste(sum(GenesOut), "genes will be filtered:"))
-      if(sum(GenesOut)>0){
-        print(CompatibleGenes[GenesOut])
-      }
-    }
-
-    
-    if(PlotData){
-      # Highliting outliers
-      points(y= AllPCA1[GenesOut], x=rep(1, sum(GenesOut)), col='red', pch=20)
-      legend("left", pch = 20, col='red', legend = "Outlier(s)")
-    }
-    
-    # Updating gene list
-    SelGenes <- CompatibleGenes[!GenesOut]
-    
-  }
-  
-  if(GeneOutDetection == "L1OutVarDC"){
-    
-    if(PrintInfo){
-      print("Detecting outliers using leave one out and percentage variation on variance explained by PC1")
-    }
-    
-    # Computing all the PC1
-    AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- t(ExpressionData[-i, ])
-      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
-      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
-    })
-    
-    
-    AllPCA1ABS <- abs(AllPCA1 - median(AllPCA1))
-    names(AllPCA1ABS) <- CompatibleGenes
-    
-    HC <- hclust(dist(AllPCA1ABS))
-    
-    if(PlotData){
-      # Plotting rotated genes over PC1
-      plot(HC, xlab = "Genes", main = ModuleName)
-    }
-    
-    DGroup <- cutree(HC, k = 2)
-    G1 <- which(DGroup == 1)
-    G2 <- which(DGroup == 2)
-    
-    if(length(G1) <= GeneOutThr | length(G2) <= GeneOutThr){
-      
-      if(length(G1) < length(G2)){
-        GenesOut <- (DGroup == 1)
-      } else {
-        GenesOut <- (DGroup == 2)
-      }
-      
-    }
-    
-    if(PrintInfo){
-      if(sum(GenesOut)>0){
-        print(paste(sum(GenesOut), "gene(s) will be filtered:"))
-        print(CompatibleGenes[GenesOut])
-      } else {
-        print("No gene will be filtered")
-      }
-    }
-    
-    # Updating gene list
-    SelGenes <- CompatibleGenes[!GenesOut]
-    
-  }
-  
-  if(GeneOutDetection == "L1OutExpOut"){
-    
-    if(PrintInfo){
-      print("Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)")
-    }
-    
-    # Computing all the PC1
-    AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- t(ExpressionData[-i, ])
-      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
-      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
-    })
-    
-    
-    # Getting the distance from the median PC1
-    GenesOut <- scater::isOutlier(AllPCA1, nmads = GeneOutThr)
-    
-    if(PlotData){
-      # Plotting the distances from the median PC1
-      B <- boxplot(x = AllPCA1, at = 1, horizontal = FALSE, ylab = "Variance explained by PC1", main = ModuleName)
-    }
-    
-    if(PrintInfo){
-      if(sum(GenesOut)>0){
-        print(paste(sum(GenesOut), "gene(s) will be filtered:"))
-        print(CompatibleGenes[GenesOut])
-      } else {
-        print("No gene will be filtered")
-      }
-    }
-    
-    
-    if(PlotData){
-      # Highliting outliers
-      points(y= AllPCA1[GenesOut], x=rep(1, sum(GenesOut)), col='red', pch=20)
-      legend("left", pch = 20, col='red', legend = "Outlier(s)")
-    }
-    
-    # Updating gene list
-    SelGenes <- CompatibleGenes[!GenesOut]
-    
-  }
-  
-  if(GeneOutDetection == "L1OutSdMean"){
-    
-    if(PrintInfo){
-      print("Detecting outliers using leave one out and standards deviation away from the mean")
-    }
-    
-    # Computing all the PC1
-    AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- t(ExpressionData[-i, ])
-      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
-      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
-    })
-    
-    
-    # Getting the distance from the median PC1
-    ZScore <- (AllPCA1 - mean(AllPCA1))/sd(AllPCA1)
-    GenesOut <- abs(ZScore) > GeneOutThr
-    
-    if(PlotData){
-      # Plotting the distances from the median PC1
-      B <- boxplot(x = AllPCA1, at = 1, horizontal = FALSE, ylab = "Variance explained by PC1", main = ModuleName)
-    }
-    
-    if(PrintInfo){
-      if(sum(GenesOut)>0){
-        print(paste(sum(GenesOut), "gene(s) will be filtered:"))
-        print(CompatibleGenes[GenesOut])
-      } else {
-        print("No gene will be filtered")
-      }
-    }
-    
-    
-    if(PlotData){
-      # Highliting outliers
-      points(y= AllPCA1[GenesOut], x=rep(1, sum(GenesOut)), col='red', pch=20)
-      legend("left", pch = 20, col='red', legend = "Outlier(s)")
-    }
-    
-    # Updating gene list
-    SelGenes <- CompatibleGenes[!GenesOut]
-    
-  }
-
-  return(SelGenes)
-  
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#' Correct the sign of the principal component 
-#'
-#' @param Wei vector, numeric optional vector of weigths
-#' @param Mode scalar, character. Mode to correct the sign
-#' @param Thr scalar, numeric quantile threshold 
-#' @param PCWeigth 
-#' @param PCProj 
-#' @param DefWei 
-#' @param Grouping 
-#' @param ExpMat 
-#' @param CorMethod c("pearson", "kendall", "spearman")
-#'
-#' @return
-#' @export
-#'
-#' @examples
-FixPCSign <-
-  function(PCWeigth, PCProj, Wei = NULL, Mode = 'none', DefWei = 1,
-           Thr = NULL, Grouping = NULL, ExpMat = NULL, CorMethod = "pearson") {
-    
-    if (Mode == 'none') {
-      
-      print("Orienting PC using a random direction")
-      
-      return(1)
-    }
-    
-    if (Mode == 'PreferActivation') {
-      
-      print("Orienting PC by preferential activation")
-      
-      ToUse <- rep(TRUE, length(PC1Weigth))
-      if (!is.null(Thr)) {
-        ToUse <- abs(PCWeigth) >= quantile(abs(PCWeigth), Thr)
-      }
-      
-      if (sum(PC1Weigth[ToUse]) < 0) {
-        return(-1)
-      } else {
-        return(+1)
-      }
-    }
-    
-    if (Mode == 'UseAllWeights') {
-      
-      print(paste("Missing gene weights will be replaced by", DefWei))
-      
-      Wei[is.na(Wei)] <- DefWei
-      Mode <-  'UseKnownWeights'
-      
-    }
-    
-    if (Mode == 'UseKnownWeights') {
-      
-      print("Orienting PC by combining PC weights and gene weights")
-      print(paste("Missing gene weights will be replaced by", 0))
-      
-      ToUse <- rep(TRUE, length(PCWeigth))
-      if (!is.null(Thr)) {
-        ToUse <- abs(PCWeigth) >= quantile(abs(PCWeigth), Thr)
-      }
-      
-      if (sum(Wei[!is.na(Wei) & ToUse] * PCWeigth[!is.na(Wei) & ToUse]) < 0) {
-        return(-1)
-      } else {
-        return(+1)
-      }
-    }
-    
-    if (Mode == 'CorrelateAllWeightsByGene') {
-      
-      print(paste("Missing gene weights will be replaced by", DefWei))
-      Wei[is.na(Wei)] <- DefWei
-      Mode <-  'CorrelateKnownWeightsByGene'
-    
-    }
-    
-    if (Mode == 'CorrelateKnownWeightsByGene') {
-      
-      print(paste("Orienting PC by correlating gene expression and PC projections (", CorMethod, ")", sep = ''))
-      
-      if(sum(!is.na(Wei))<1){
-        print("Not enough weights, PC will be oriented randomly")
-        return(1)
-      }
-      
-      
-      if(!is.null(Grouping)){
-        print("Using groups")
-        
-        AssocitedGroups <- Grouping[colnames(ExpMat)]
-        TB <- table(AssocitedGroups, useNA = "no")
-        
-        if(sum(TB>0)<2){
-          print("Not enough groups, PC will be oriented randomly")
-          return(1)
-        }
-        
-        GroupMedians <- apply(ExpMat[!is.na(Wei),], 1, function(x) {
-          aggregate(x = x, by=list(AssocitedGroups), FUN = median)
-        })
-        
-        MedianProj <- aggregate(PCProj, by=list(AssocitedGroups), FUN = median)
-        
-        print("Computing correlations")
-        Cor.Test.Vect <- sapply(GroupMedians, function(x){
-          if(length(unique(x[,2])) > 2 & length(unique(MedianProj[,2])) > 2){
-            CT <- cor.test(x[,2], MedianProj[,2], method = CorMethod)
-            c(CT$p.value, CT$estimate)
-          } else {
-            c(NA, NA)
-          }
-        })
-        
-        SelGenesWei <- Wei[!is.na(Wei)]
-        names(SelGenesWei) <- names(GroupMedians)
-        
-        ToUse <- !is.na(Cor.Test.Vect[2,])
-        if (!is.null(Thr)) {
-          ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
-        }
-        
-        if(sum(Cor.Test.Vect[2,ToUse]*SelGenesWei[ToUse])>0){
-          return(1)
-        } else {
-          return(-1)
-        }
-        
-      } else {
-        print("Not using groups")
-        
-        names(PCProj) <- colnames(ExpMat)
-        
-        print("Computing correlations")
-        Cor.Test.Vect <- apply(ExpMat, 1, function(x){
-          if(length(unique(x)) > 2 & length(unique(PCProj)) > 2){
-            CT <- cor.test(x, PCProj, method = CorMethod)
-            c(CT$p.value, CT$estimate)
-          } else {
-            c(NA, NA)
-          }
-        })
-        
-        print("Correcting using weights")
-        if(sum(!is.na(Wei))>1){
-          Cor.Test.Vect[2,!is.na(Wei)] <- Cor.Test.Vect[2,!is.na(Wei)]*Wei[!is.na(Wei)]
-        }
-        
-        ToUse <- !is.na(Cor.Test.Vect[2,])
-        if (!is.null(Thr)) {
-          ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
-        }
-        
-        if(sum(Cor.Test.Vect[2,ToUse])>0){
-          return(1)
-        } else {
-          return(-1)
-        }
-        
-      }
-
-    }
-    
-    if (Mode == 'CorrelateAllWeightsBySample') {
-      
-      print(paste("Missing gene weights will be replaced by", DefWei))
-      Wei[is.na(Wei)] <- DefWei
-      Mode <-  'CorrelateKnownWeightsBySample'
-      
-    }
-    
-    if (Mode == 'CorrelateKnownWeightsBySample') {
-      
-      print(paste("Orienting PC by correlating gene expression and PC weights (", CorMethod, ")", sep = ''))
-      
-      if(sum(!is.na(Wei))<1){
-        print("Not enough weights, PC will be oriented randomly")
-        return(1)
-      }
-      
-      if(!is.null(Grouping)){
-        print("Using groups")
-        
-        AssocitedGroups <- Grouping[colnames(ExpMat)]
-        TB <- table(AssocitedGroups, useNA = "no")
-        
-        if(sum(TB>0)<2){
-          print("Not enough groups, PC will be oriented randomly")
-          return(1)
-        }
-        
-        GroupMedians <- apply(ExpMat, 1, function(x) {
-          aggregate(x = x, by=list(AssocitedGroups), FUN = median, na.rm=TRUE)
-        })
-        
-        MediansByGroups <- sapply(GroupMedians, function(x) {
-          x[,2]
-        })
-        
-        print("Computing correlations")
-        Cor.Test.Vect <- apply(MediansByGroups, 1, function(x){
-          if(length(unique(x)) > 2 & length(unique(PCWeigth*Wei)) > 2){
-            CT <- cor.test(x, PCWeigth*Wei, method = CorMethod)
-            c(CT$p.value, CT$estimate)
-          } else {
-            c(NA, NA)
-          }
-        })
-        
-        ToUse <- !is.na(Cor.Test.Vect[2,])
-        if (!is.null(Thr)) {
-          ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
-        }
-        
-        if(sum(Cor.Test.Vect[2,ToUse])>0){
-          return(1)
-        } else {
-          return(-1)
-        }
-        
-      } else {
-        print("Not using groups")
-        
-        names(PCWeigth) <- rownames(ExpMat)
-        PCWeigth <- PCWeigth*Wei
-        
-        print("Computing correlations")
-        Cor.Test.Vect <- apply(ExpMat, 2, function(x){
-          if(length(unique(x)) > 2 & length(unique(PCWeigth)) > 2){
-            CT <- cor.test(x, PCWeigth, method = CorMethod)
-            c(CT$p.value, CT$estimate)
-          } else {
-            c(NA, NA)
-          }
-        })
-        
-        
-        ToUse <- !is.na(Cor.Test.Vect[2,])
-        if (!is.null(Thr)) {
-          ToUse <- (Cor.Test.Vect[1,] < Thr) & ToUse
-        }
-        
-        if(sum(Cor.Test.Vect[2,ToUse])>0){
-          return(1)
-        } else {
-          return(-1)
-        }
-        
-      }
-      
-    }
-    
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #' Perform ROMA on a datasets
 #'
@@ -563,7 +69,7 @@ FixPCSign <-
 #' @export
 #'
 #' @examples
-rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, ModuleList, UseWeigths = FALSE,
+PCrRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, ModuleList, UseWeigths = FALSE,
                     DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000, ApproxSamples = 5,
                     nSamples = 100, OutGeneNumber = 5, Ncomp = 10, OutGeneSpace = NULL, FixedCenter = TRUE,
                     GeneOutDetection = "L1OutExpOut", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = TRUE,
@@ -683,7 +189,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       
       ExpressionMatrix <- ExpressionMatrix[, !GeneDetectesOUT & !GeneSpaceOUT]
     }
-
+    
   }
   
   # Look at groups
@@ -701,7 +207,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       print(colnames(ExpressionMatrix)[NotFoundSampNames])
       print("They will NOT be considered for group associated analysis")
     }
-
+    
   } else {
     FoundSampNames <- NULL
     Grouping <- rep("N/A", ncol(ExpressionMatrix))
@@ -765,29 +271,29 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     print("All the genesets will be used")
   }
   
-
   
-  if(UseParallel){
-    
-    no_cores <- parallel::detectCores()
-    
-    if(is.null(nCores)){
-      # Calculate the number of cores
-      nCores = no_cores - 1
-    }
-    
-    if(nCores >= no_cores){
-      nCores = no_cores - 1
-    }
-    
-    # Initiate cluster
-    cl <- parallel::makeCluster(nCores, type = ClusType)
-    
-    parallel::clusterExport(cl=cl, varlist=c("SampleFilter", "GeneOutDetection", "GeneOutThr",
-                                   "ModulePCACenter", "ExpressionMatrix", "DetectOutliers",
-                                   "PCADims", "OrgExpMatrix", "FullSampleInfo", "FoundSampNames"), 
-                          envir = environment())
-  }
+  
+  # if(UseParallel){
+  #   
+  #   no_cores <- parallel::detectCores()
+  #   
+  #   if(is.null(nCores)){
+  #     # Calculate the number of cores
+  #     nCores = no_cores - 1
+  #   }
+  #   
+  #   if(nCores >= no_cores){
+  #     nCores = no_cores - 1
+  #   }
+  #   
+  #   # Initiate cluster
+  #   cl <- parallel::makeCluster(nCores, type = ClusType)
+  #   
+  #   parallel::clusterExport(cl=cl, varlist=c("SampleFilter", "GeneOutDetection", "GeneOutThr",
+  #                                            "ModulePCACenter", "ExpressionMatrix", "DetectOutliers",
+  #                                            "PCADims", "OrgExpMatrix", "FullSampleInfo", "FoundSampNames"), 
+  #                           envir = environment())
+  # }
   
   ModuleOrder <- order(unlist(lapply(lapply(ModuleList, "[[", "Genes"), length)))
   ModuleList <- ModuleList[ModuleOrder]
@@ -810,20 +316,20 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     }
     
     # Filtering genes
-    SelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
-                               CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ],
-                               PlotData = PlotData, ModuleName = ModuleList[[i]]$Name)
-    
-    if(length(SelGenes) > MaxGenes | length(SelGenes) < MinGenes){
-      print("Number of selected genes outside the specified range")
-      print("Skipping module")
-      next()
-    } else {
-      UsedModules <- c(UsedModules, i)
-    }
-    
+    # SelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
+    #                            CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ],
+    #                            PlotData = PlotData, ModuleName = ModuleList[[i]]$Name)
+    # 
+    # if(length(SelGenes) > MaxGenes | length(SelGenes) < MinGenes){
+    #   print("Number of selected genes outside the specified range")
+    #   print("Skipping module")
+    #   next()
+    # } else {
+    #   UsedModules <- c(UsedModules, i)
+    # }
+    # 
     # Keep track of outliers
-    OutLiersList[[i]] <- setdiff(CompatibleGenes, SelGenes)
+    # OutLiersList[[i]] <- setdiff(CompatibleGenes, SelGenes)
     
     # Computing PC on the unfiltered data (only for reference)
     
@@ -840,13 +346,9 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     BaseMatrix <- t(Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ])
     
-    if(PCADims > min(dim(ExpressionMatrix[CompatibleGenes, ])/3)){
-      PCBase <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE)
-    } else {
-      PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000)
-    }
+    BasePC <- analogue::prcurve(BaseMatrix, method = "ca", trace = TRUE, maxit = 50)
     
-    ExpVar <- (PCBase$sdev^2)/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var))
+    ExpVar <- 1 - BasePC$dist/BasePC$totalDist
     
     PCBaseUnf <- PCBase
     ExpVarUnf <- ExpVar
@@ -990,7 +492,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             )
             
           }
-        
+          
         }
         
         
@@ -1025,7 +527,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         
         SampleExpVar <- sapply(SampledExp, "[[", "ExpVar")
         SampleMedianExp <- sapply(SampledExp, "[[", "MedianExp")
-
+        
         if(PCADims >= 2){
           SampleExpVar <- rbind(SampleExpVar[1,], SampleExpVar[1,]/SampleExpVar[2,], SampleExpVar[2,])
         } else {
@@ -1109,8 +611,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     CorrectSignUnf <- FixPCSign(PCWeigth = PCBaseUnf$rotation[,1], PCProj = PCBaseUnf$x[,1],
                                 Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
-                             Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
-                             Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
+                                Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
+                                Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
     
     
     
@@ -1122,8 +624,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     
     CorrectSign1 <- FixPCSign(PCWeigth = PCBase$rotation[,1], PCProj = PCBase$x[,1],
                               Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
-                             Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
-                             Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
+                              Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
+                              Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
     
     
     if(PCADims >= 2){
@@ -1135,7 +637,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     } else {
       CorrectSign2 <- NULL
     }
-
+    
     if(PlotData){
       
       if(PCADims >= 2){
@@ -1183,7 +685,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         MeltData$Wei <- factor(MeltData$Wei)
         
         SplitGroups <- cut(seq(from=1, by=1, to = length(unique(MeltData$Gene))),
-            breaks = seq(from=0, to=length(unique(MeltData$Gene))+16, by=16))
+                           breaks = seq(from=0, to=length(unique(MeltData$Gene))+16, by=16))
         
         names(SplitGroups) <- unique(MeltData$Gene)
         
@@ -1199,7 +701,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               ggplot2::scale_shape_discrete(name = "Weight") + ggplot2::scale_color_discrete(name = "Group")
             print(p)
           }
- 
+          
           
         }
         
@@ -1242,9 +744,9 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             
             print(p)
           }
-
+          
         }
-       
+        
         
         
         print("Plotting expression VS PC weigths")
@@ -1289,7 +791,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         CorData$Est <- as.numeric(as.character(CorData$Est))
         CorData$Low <- as.numeric(as.character(CorData$Low))
         CorData$High <- as.numeric(as.character(CorData$High))
-     
+        
         
         # print(CorData)
         
@@ -1316,10 +818,10 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           
           print(p)
         }
-         
+        
       }
       
-     }
+    }
     
     # Correct the sign of the first PC projections
     ModProjSamples <- CorrectSign1*PCBase$x[,1]
@@ -1337,12 +839,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     WeigthList[[length(WeigthList)+1]] <- tWeigths
     
     ModuleSummary[[length(ModuleSummary)+1]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
-                               OriginalGenes = CompatibleGenes, UsedGenes = SelGenes, SampledGenes = SampledsGeneList,
-                               PCABase = PCBase, PCBaseUnf = PCBaseUnf,
-                               CorrectSign1 = CorrectSign1, CorrectSign2 = CorrectSign2, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
-                               PC1Weight.SignFixed = tWeigths, PC1WeightUnf.SignFixed = tWeigthsUnf,
-                               GMTWei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes])
-  
+                                                     OriginalGenes = CompatibleGenes, UsedGenes = SelGenes, SampledGenes = SampledsGeneList,
+                                                     PCABase = PCBase, PCBaseUnf = PCBaseUnf,
+                                                     CorrectSign1 = CorrectSign1, CorrectSign2 = CorrectSign2, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
+                                                     PC1Weight.SignFixed = tWeigths, PC1WeightUnf.SignFixed = tWeigthsUnf,
+                                                     GMTWei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes])
+    
   }
   
   if(UseParallel){
@@ -1385,8 +887,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                 GeneCenters = GeneCenters, SampleCenters = SampleCenters))
   } else {
     return(list(ModuleMatrix = ModuleMatrix, ProjMatrix = ProjMatrix, ModuleSummary = ModuleSummary,
-               WeigthList = WeigthList, PVVectMat = PVVectMat, OutLiersList = OutLiersList,
-               GeneCenters = GeneCenters, SampleCenters = SampleCenters))
+                WeigthList = WeigthList, PVVectMat = PVVectMat, OutLiersList = OutLiersList,
+                GeneCenters = GeneCenters, SampleCenters = SampleCenters))
   }
   
   
@@ -1396,48 +898,3 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
 
 
 
-
-
-
-
-
-
-
-
-
-
-#' Infer weigths from expression data
-#'
-#' @param ExpressionMatrix 
-#' @param ModuleList 
-#' @param FillAllNA 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-InferBinaryWeigth <- function(ExpressionMatrix, ModuleList, FillAllNA = TRUE) {
-  
-  MedianExpr <- apply(ExpressionMatrix, 1, median, na.rm=TRUE)
-  GeneWei <- as.integer(MedianExpr >= median(ExpressionMatrix))
-  GeneWei[GeneWei == 0] <- -1
-  names(GeneWei) <- names(MedianExpr)
-  
-  for(i in 1:length(ModuleList)){
-    
-    if(!FillAllNA & any(!is.na(ModuleList[[i]]$Weigths))){
-      next
-    }
-
-    ModuleList[[i]]$Weigths[is.na(ModuleList[[i]]$Weigths)] <-
-      GeneWei[ModuleList[[i]]$Genes[is.na(ModuleList[[i]]$Weigths)]]
-    
-    if(any(is.na(ModuleList[[i]]$Weigths))){
-      print(paste("Warning:", sum(is.na(ModuleList[[i]]$Weigths)), "gene(s) not found in the expression matrix"))
-    }
-    
-  }
-  
-  return(ModuleList)
-  
-}

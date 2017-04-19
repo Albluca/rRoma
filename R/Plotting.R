@@ -61,7 +61,21 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
   par(op)
   
   if(!is.null(GroupInfo)){
-    AddInfo <- data.frame(Groups = GroupInfo)
+    
+    FoundSamp <- intersect(colnames(RomaData$ProjMatrix), names(GroupInfo))
+    print(paste(length(FoundSamp), "samples have an associated group"))
+    
+    GroupInfo <- GroupInfo[FoundSamp]
+    
+    if(length(FoundSamp) > 2){
+      if(!is.factor(GroupInfo)){
+        GroupInfo <- as.factor(GroupInfo)
+      }
+      AddInfo <- data.frame(Groups = GroupInfo)
+    } else {
+      AddInfo = NULL
+    }
+    
   } else {
     AddInfo = NULL
   }
@@ -90,9 +104,10 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
   
   
   
-  if(length(AggByGroupsFL)>0 & !is.null(GroupInfo)){
+  if(length(AggByGroupsFL)>0 & !is.null(AddInfo)){
     
-    SplitData <- split(data.frame(t(PlotMat)), f=GroupInfo)
+    
+    SplitData <- split(data.frame(t(PlotMat[,FoundSamp])), f=AddInfo$Groups)
     
     RetData <- list()
     
@@ -433,7 +448,7 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
 #' Plot the weigth of genes appearing across multiple genesets
 #'
 #' @param RomaData list, the analysis returned by rRoma
-#' @param Selected vector, integer. The position of the genesets to plot 
+#' @param Selected vector, integer. The indices of the genesets to plot 
 #' @param GenesByGroup scalar, integer. The number of genes per plot
 #' @param MinMult scalar, integer. The minimal multiplicity to plot 
 #'
@@ -534,3 +549,68 @@ PlotRecurringGenes  <- function(RomaData, Selected = NULL,
 
 
 
+
+
+
+
+#' Get the top contributing genes per geneset
+#'
+#' @param RomaData list, the analysis returned by rRoma
+#' @param Selected vector, integer. The indices of the genesets to plot 
+#' @param nGenes integer scalar. The number of genes to extract per geneset
+#' @param OrderType string scalar. The mode of selection for the top contributing genes.
+#' The current implementation allow "Abs" (genes with the largest weight in absolute value),
+#' "Pos" (genes with the largest weight), and "Neg" (genes with the largest negative weight)
+#' @param ColorGradient vector, string. The colors used for the heatmap.
+#' @param cluster_cols boolean, should the genesets be reordered according to the dendrogram?
+#' @param HMTite scalar, string. The title of the heatmap.
+#' @param Transpose boolean, should the genes by plotted on the rows instead of the columns?
+
+#' @return
+#' @export
+#'
+#' @examples
+GetTopContrib <- function(RomaData, Selected = NULL, nGenes = 4,
+                          ColorGradient = colorRamps::blue2red(50),
+                          cluster_cols = FALSE, HMTite = "Top contributing genes",
+                          OrderType = "Abs", Transpose = FALSE) {
+  
+  if(is.null(Selected)){
+    Selected <- 1:nrow(RomaData$ProjMatrix)
+  }
+  
+  if(OrderType == "Abs"){
+    GenesWei <- lapply(lapply(lapply(RomaData$WeigthList[Selected], abs), sort, decreasing = TRUE), "[", 1:nGenes)
+  }
+  
+  if(OrderType == "Pos"){
+    GenesWei <- lapply(lapply(RomaData$WeigthList[Selected], sort, decreasing = TRUE), "[", 1:nGenes)
+  }
+  
+  if(OrderType == "Neg"){
+    GenesWei <- lapply(lapply(RomaData$WeigthList[Selected], sort, decreasing = FALSE), "[", 1:nGenes)
+  }
+  
+  # GeneMatVal <- mapply("[", RomaData$ProjLists, OrderList)
+  # GeneMatVal[is.na(GeneMatVal)] <- 0
+  
+  AllGenesNames <- unique(names(unlist(GenesWei)))
+  
+  PlotMat <- sapply(as.list(Selected), function(i) {
+    GenNam <- intersect(names(RomaData$WeigthList[[i]]), AllGenesNames)
+    Vect <- rep(0, length(AllGenesNames))
+    names(Vect) <- AllGenesNames
+    Vect[GenNam] <- RomaData$WeigthList[[i]][GenNam]
+    Vect
+  })
+  
+  colnames(PlotMat) <- rownames(RomaData$ModuleMatrix)[Selected] 
+  
+  if(Transpose){
+    pheatmap::pheatmap(t(PlotMat), color = ColorGradient, main = HMTite, cluster_rows = cluster_cols)
+  } else {
+    pheatmap::pheatmap(PlotMat, color = ColorGradient, main = HMTite, cluster_cols = cluster_cols)
+  }
+  
+  return(PlotMat)
+}
