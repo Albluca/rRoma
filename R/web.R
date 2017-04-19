@@ -38,6 +38,10 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
                        AggGeneFun = "mean", DispMode = "Module",
                        DataName = "Sample", DefDispVal = 0) {
   
+  if(!requireNamespace("RNaviCell", quietly = TRUE)){
+    stop("Unable to load RNaviCell Impossible to proceed")
+  }
+  
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$ProjMatrix)
   }
