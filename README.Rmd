@@ -1,16 +1,16 @@
 ---
 title: "rROMA"
-author: "[Luca Albergante](mailto:luca.albergante@gmail.com)"
+author: '[Luca Albergante](mailto:luca.albergante@gmail.com)'
 date: "April 2017"
 output:
-      md_document:
-            toc: true
-            toc_depth: 2
-      html_document:
-        toc: true # table of content true
-        depth: 3  # upto three depths of headings (specified by #, ## and ###)
-        number_sections: true  ## if you want number sections at each table header
-        keep_md: true
+  html_document:
+    depth: 3
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+  md_document:
+    toc: yes
+    toc_depth: 2
 ---
 
 This package provides an R implementation of [ROMA](http://journal.frontiersin.org/article/10.3389/fgene.2016.00018/full). The package is under active development and is currently being tested.
