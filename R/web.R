@@ -51,8 +51,6 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   
   ToPlot <- unique(names(AllGenesWei))
   
-  par(mfcol=c(1,3))
-  
   B <- boxplot(x = AllGenesWei.Var, at = 1, ylab = "Variance of gene weight")
   
   if(!is.null(FilterByWei)){
@@ -97,7 +95,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     DataToPlot <- data.matrix(DataToPlot)
     colnames(DataToPlot) <- "data"
     
-    hist(DataToPlot)
+    hist(DataToPlot, xlab="Score (per gene)", main = "Module score distribution across genes")
     
     Session.Navicell <- RNaviCell::NaviCell(SetUrl = MapURL)
     
@@ -140,7 +138,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     DataToPlot <- data.matrix(DataToPlot)
     colnames(DataToPlot) <- "data"
     
-    hist(DataToPlot)
+    hist(DataToPlot, xlab="Weight (per gene)", main = "Weight distribution across genes")
     
     Session.Navicell <- RNaviCell::NaviCell(SetUrl = MapURL)
     
