@@ -6,6 +6,7 @@ output:
   md_document:
     toc: yes
     toc_depth: 2
+    number_sections: yes
   html_document:
     depth: 3
     keep_md: yes
