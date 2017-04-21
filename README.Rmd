@@ -6,7 +6,6 @@ output:
   md_document:
     toc: yes
     toc_depth: 2
-    number_sections: yes
   html_document:
     depth: 3
     keep_md: yes
@@ -23,7 +22,7 @@ A Java implementation developed by Andrei Zynovyev and is also [available](https
 The rRoma package relies on the `scater` package, which is available only on BioConductor. This package can be installed with the following command
 
 ```{r, eval=TRUE}
-if(!require("devtools")){
+if(!require("scater")){
   source("https://bioconductor.org/biocLite.R")
   biocLite("scater")
 }
@@ -353,7 +352,7 @@ PlotOnACSN(RomaData = Data.NFC.CC, SampleName = names(Type[Type == "normal"]),
 ```{r}
 PlotOnACSN(RomaData = Data.NFC.CC, SampleName = names(Type[Type == "metastasized"]),
            AggScoreFun = "median", FilterByWei = 30, 
-           DispMode = c("Module", "Gene"), DataName = "Metastasized", 
+           DispMode = "Module", DataName = "Metastasized", 
            QTop = .99, QBottom = .1, Steps = 5, 
            Selected = SelectGeneSets(RomaData = Data.NFC.CC, VarThr = 5e-3,
                                         VarMode = "Wil", VarType = "Over"),
