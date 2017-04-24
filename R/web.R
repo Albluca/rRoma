@@ -51,6 +51,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     return()
   } else {
     SelSampleNames <- intersect(SampleName, colnames(RomaData$ProjMatrix))
+    print(paste(length(SelSampleNames), "sample(s) selected"))
   }
   
   if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
@@ -81,10 +82,14 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   }
 
   if(any(DispMode == "Module")){
+    
     ModuleScore <- RomaData$ProjMatrix[Selected, SelSampleNames]
     
     if(length(SelSampleNames)>1){
       FilteredScores <- apply(ModuleScore, 1, get(AggScoreFun))
+    } else {
+      print("Single sampled selected. Aggregating function will not be applied.")
+      FilteredScores <- ModuleScore
     }
     
     AllGeneScores <- lapply(as.list(Selected), function(i){
