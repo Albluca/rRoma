@@ -3,13 +3,14 @@
 #' @param RomaData 
 #' @param Groups 
 #' @param ExpMat 
+#' @param Interactive 
 #'
 #' @return
 #' @export
 #'
 #' @examples
 #' 
-DashboardA <- function(RomaData, Groups, ExpMat, Interactive = FALSE) {
+DashboardA <- function(RomaData, ExpMat, Groups = NULL, Interactive = FALSE) {
   
   library(shiny)
   
@@ -245,14 +246,13 @@ DashboardA <- function(RomaData, Groups, ExpMat, Interactive = FALSE) {
 #'
 #' @param RomaData 
 #' @param Groups 
-#' @param ExpMat 
 #'
 #' @return
 #' @export
 #'
 #' @examples
 #' 
-DashboardB <- function(RomaData, Groups, Interactive = FALSE) {
+DashboardB <- function(RomaData, Groups = NULL) {
   
   library(shiny)
   
@@ -326,12 +326,7 @@ DashboardB <- function(RomaData, Groups, Interactive = FALSE) {
     ),
     
     mainPanel(
-      if(Interactive){
-        plotlyOutput("hmPlot", height = "800px")
-      } else {
-        plotOutput("hmPlot", height = "800px")
-      }
-      
+      plotOutput("hmPlot", height = "800px")
     )
     
   )
@@ -359,81 +354,77 @@ DashboardB <- function(RomaData, Groups, Interactive = FALSE) {
     })
     
     
-    if(Interactive){
-
-    } else {
-      output$hmPlot <- renderPlot({
-
-        SelectedGS <- SelGS()
+    output$hmPlot <- renderPlot({
+      
+      SelectedGS <- SelGS()
+      
+      PlotMat <- RomaData$ProjMatrix[SelectedGS,]
+      
+      if(input$htype == "sample"){
         
-        PlotMat <- RomaData$ProjMatrix[SelectedGS,]
-        
-        if(input$htype == "sample"){
+        if(length(SelectedGS)>1){
           
-          if(length(SelectedGS)>1){
-          
-            if(Transpose()){
-              pheatmap::pheatmap(PlotMat, color = colorRamps::blue2red(50),
-                                 cluster_rows = ClusterGS(), cluster_cols = ClusterSA(),
-                                 annotation_col = AddInfo)
-            } else {
-              pheatmap::pheatmap(t(PlotMat), color = colorRamps::blue2red(50),
-                                 cluster_rows = ClusterSA(), cluster_cols = ClusterGS(),
-                                 annotation_row = AddInfo)
-            }
-            
-            
-          }
-          
-          if(length(SelectedGS) == 1){
-            
-            names(PlotMat) <- colnames(RomaData$ProjMatrix)
-            
+          if(Transpose()){
+            pheatmap::pheatmap(PlotMat, color = colorRamps::blue2red(50),
+                               cluster_rows = ClusterGS(), cluster_cols = ClusterSA(),
+                               annotation_col = AddInfo)
+          } else {
             pheatmap::pheatmap(t(PlotMat), color = colorRamps::blue2red(50),
-                               cluster_rows = FALSE, cluster_cols = FALSE,
-                               main = rownames(RomaData$ProjMatrix)[SelectedGS])
-            
+                               cluster_rows = ClusterSA(), cluster_cols = ClusterGS(),
+                               annotation_row = AddInfo)
           }
+          
+          
         }
         
-        if(input$htype == "group"){
+        if(length(SelectedGS) == 1){
           
-          if(length(SelectedGS) > 1){
-            
-            SplitData <- split(data.frame(t(PlotMat[,FoundSamp])), f=AddInfo$Groups)
-            
-            Aggmat <- sapply(SplitData, function(x) {
-              apply(x, 2, get(input$aggfun))
-            })
-            
-            if(Transpose()){
-              pheatmap::pheatmap(Aggmat, color = colorRamps::blue2red(50),
-                                 cluster_rows = ClusterGS(), cluster_cols = ClusterSA())
-            } else {
-              pheatmap::pheatmap(t(Aggmat), color = colorRamps::blue2red(50),
-                                 cluster_rows = ClusterSA(), cluster_cols = ClusterGS())
-            }
-            
-          }
+          names(PlotMat) <- colnames(RomaData$ProjMatrix)
           
-          if(length(SelectedGS) == 1){
-            
-            # names(PlotMat) <- colnames(RomaData$ProjMatrix)
-            SplitData <- split(data.frame(PlotMat[FoundSamp]), f=AddInfo$Groups)
-            
-            Aggmat <- sapply(SplitData, function(x) {
-              do.call(input$aggfun, list(unlist(x)))
-            })
-            
+          pheatmap::pheatmap(t(PlotMat), color = colorRamps::blue2red(50),
+                             cluster_rows = FALSE, cluster_cols = FALSE,
+                             main = rownames(RomaData$ProjMatrix)[SelectedGS])
+          
+        }
+      }
+      
+      if(input$htype == "group"){
+        
+        if(length(SelectedGS) > 1){
+          
+          SplitData <- split(data.frame(t(PlotMat[,FoundSamp])), f=AddInfo$Groups)
+          
+          Aggmat <- sapply(SplitData, function(x) {
+            apply(x, 2, get(input$aggfun))
+          })
+          
+          if(Transpose()){
+            pheatmap::pheatmap(Aggmat, color = colorRamps::blue2red(50),
+                               cluster_rows = ClusterGS(), cluster_cols = ClusterSA())
+          } else {
             pheatmap::pheatmap(t(Aggmat), color = colorRamps::blue2red(50),
-                               cluster_rows = FALSE, cluster_cols = FALSE,
-                               main = rownames(RomaData$ProjMatrix)[SelectedGS])
+                               cluster_rows = ClusterSA(), cluster_cols = ClusterGS())
           }
           
         }
         
-      })
-    }
+        if(length(SelectedGS) == 1){
+          
+          # names(PlotMat) <- colnames(RomaData$ProjMatrix)
+          SplitData <- split(data.frame(PlotMat[FoundSamp]), f=AddInfo$Groups)
+          
+          Aggmat <- sapply(SplitData, function(x) {
+            do.call(input$aggfun, list(unlist(x)))
+          })
+          
+          pheatmap::pheatmap(t(Aggmat), color = colorRamps::blue2red(50),
+                             cluster_rows = FALSE, cluster_cols = FALSE,
+                             main = rownames(RomaData$ProjMatrix)[SelectedGS])
+        }
+        
+      }
+      
+    })
     
   }
   
