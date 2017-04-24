@@ -588,7 +588,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   
   if(any(is.na(ExpressionMatrix))){
     
-    if(!require(mice)){
+    if(!requireNamespace("mice", quietly = TRUE)){
       stop("Unable to load mice. Impossible to proceed")
     } else {
       print("Filling NA with mice")

@@ -3,6 +3,7 @@
 export(CompareAcrossSamples)
 export(DetectOutliers)
 export(FixPCSign)
+export(GetSingle)
 export(GetTopContrib)
 export(InferBinaryWeigth)
 export(PCrRoma.R)
