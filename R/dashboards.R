@@ -74,9 +74,15 @@ DashboardA <- function(RomaData, Groups, ExpMat, Interactive = FALSE) {
     
     mainPanel(
       if(Interactive){
-        plotlyOutput("scatPlot")
+        tabPanel("Plot",
+                 plotlyOutput("scatPlot"),
+                 plotOutput("boxPlot")
+        )
       } else {
-        plotOutput("scatPlot")
+        tabPanel("Plot",
+                 plotOutput("scatPlot"),
+                 plotOutput("boxPlot")
+        )
       }
       
     )
@@ -129,6 +135,36 @@ DashboardA <- function(RomaData, Groups, ExpMat, Interactive = FALSE) {
       
     })
     
+    output$boxPlot <- renderPlot({
+      
+      Projs <- GetProj()
+      
+      if(is.null(Projs)){
+        Projs <- PCAProj
+      }
+      
+      GetComb <- function(GrpLevs) {
+        RetList <- list()
+        for(i in 1:length(GrpLevs)){
+          for(j in 1:length(GrpLevs)){
+            if(i<j){
+              RetList[[length(RetList)+1]] <- c(i, j)
+            }
+          }
+        }
+        return(RetList)
+      }
+      
+      p <- ggplot2::ggplot(data = data.frame(Score = RomaData$ProjMatrix[SelectedGS(), ProcessedSamples],
+                                             Group = Groups[ProcessedSamples]),
+                           ggplot2::aes(x = Group, y = Score)) +
+        ggplot2::geom_boxplot() +
+        ggsignif::geom_signif(comparisons = GetComb(unique(Groups[ProcessedSamples])),
+                              map_signif_level=TRUE, test = "wilcox.test", step_increase = .1)
+      
+      print(p)
+    })
+    
     if(Interactive){
       output$scatPlot <- renderPlotly({
         
@@ -151,6 +187,7 @@ DashboardA <- function(RomaData, Groups, ExpMat, Interactive = FALSE) {
         print(ggplotly(p))
       })
     } else {
+      
       output$scatPlot <- renderPlot({
         
         Projs <- GetProj()
@@ -164,13 +201,14 @@ DashboardA <- function(RomaData, Groups, ExpMat, Interactive = FALSE) {
                                                Score = RomaData$ProjMatrix[SelectedGS(), ProcessedSamples],
                                                Group = Groups[ProcessedSamples]),
                              ggplot2::aes(x = Comp1, y = Comp2, shape = Group, color = Score)) +
-          ggplot2::geom_point(ggplot2::aes(text = rownames(Projs)), size = 3) +
+          ggplot2::geom_point(size = 3) +
           ggplot2::scale_color_gradient2(low = "blue", high = "red", mid = "white") +
           ggplot2::labs(x = "Component 1", y = "Component 2", shape = "",
                         title = rownames(RomaData$ProjMatrix)[SelectedGS()])
         
         print(p)
       })
+      
     }
     
   }
@@ -287,9 +325,9 @@ DashboardB <- function(RomaData, Groups, Interactive = FALSE) {
     
     mainPanel(
       if(Interactive){
-        plotlyOutput("hmPlot", height = "800px")
+        plotlyOutput("hmPlot", height = "600px")
       } else {
-        plotOutput("hmPlot", height = "800px")
+        plotOutput("hmPlot", height = "600px")
       }
       
     )
