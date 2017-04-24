@@ -18,9 +18,10 @@ Imports:
       gridExtra,
       pheatmap,
       parallel,
-      reshape
+      reshape,
+      Rtsne,
+      shiny
 Suggests:
       mice,
       RNaviCell,
-      plotly,
-      shyny
+      plotly
