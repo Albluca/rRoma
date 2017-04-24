@@ -1,4 +1,4 @@
-#' Title
+#' Sample dashboard
 #'
 #' @param RomaData 
 #' @param Groups 
@@ -8,22 +8,17 @@
 #' @export
 #'
 #' @examples
-DashboardA <- function(RomaData, Groups, ExpMat, Interactive = TRUE) {
-  
-  #
-  # This is a Shiny web application. You can run the application by clicking
-  # the 'Run App' button above.
-  #
-  # Find out more about building applications with Shiny here:
-  #
-  #    http://shiny.rstudio.com/
-  #
+#' 
+DashboardA <- function(RomaData, Groups, ExpMat, Interactive = FALSE) {
   
   library(shiny)
+  
   if(Interactive){
+    print("Using plotly. This can cause problems on some systems. Try setting 'Interactive = FALSE' if errors are encountered")
     library(plotly)
   } else {
     if(R.utils::isPackageLoaded("plotly")){
+      print("Detaching plotly.")
       detach("package:plotly", unload=TRUE)
     }
   }
@@ -175,6 +170,228 @@ DashboardA <- function(RomaData, Groups, ExpMat, Interactive = TRUE) {
                         title = rownames(RomaData$ProjMatrix)[SelectedGS()])
         
         print(p)
+      })
+    }
+    
+  }
+  
+  # Run the application 
+  shinyApp(ui = ui, server = server)
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#' Genesets dashboard
+#'
+#' @param RomaData 
+#' @param Groups 
+#' @param ExpMat 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' 
+DashboardB <- function(RomaData, Groups, Interactive = FALSE) {
+  
+  library(shiny)
+  
+  if(Interactive){
+    print("Using plotly. This can cause problems on some systems. Try setting 'Interactive = FALSE' if errors are encountered")
+    library(plotly)
+  } else {
+    if(R.utils::isPackageLoaded("plotly")){
+      print("Detaching plotly.")
+      detach("package:plotly", unload=TRUE)
+    }
+  }
+  
+  ProcessedSamples <- colnames(RomaData$ProjMatrix)
+  
+  if(!is.null(Groups)){
+    
+    FoundSamp <- intersect(colnames(RomaData$ProjMatrix), names(Groups))
+    Groups <- Groups[FoundSamp]
+    
+    if(length(FoundSamp) > 2){
+      if(!is.factor(Groups)){
+        Groups <- as.factor(Groups)
+      }
+      AddInfo <- data.frame(Groups = Groups)
+    } else {
+      AddInfo = NULL
+    }
+    
+  } else {
+    AddInfo = NULL
+  }
+  
+  
+  # Projs <- PCAProj
+  
+  # Define UI for application that draws a histogram
+  ui <- pageWithSidebar(
+    
+    # Application title
+    headerPanel("rRoma / Genesets dashboard"),
+    
+    # Sidebar with a slider input for number of bins
+    
+    sidebarPanel(
+      
+      selectInput("htype", "Heatmap type:",
+                  list("By group" = "group", "By sample" = "sample")),
+      selectInput("aggfun", "Aggregating function:",
+                  list("Mean" = "mean", "Median" = "median")),
+      hr(),
+      
+      checkboxInput("gsclus", "Cluster genesets", FALSE),
+      checkboxInput("saclus", "Cluster samples / groups", FALSE),
+      checkboxInput("gscol", "Samples on columns", FALSE),
+      hr(),
+      
+      selectInput("disp", "Dispersion filter:",
+                  list("Overdispersed" = "Over", "Underdispersed" = "Under", "None" = "None")),
+      sliderInput("pdisp", "Log 10 p-value threshold:",
+                  max = 0,  min = -10,  value = 0, step = .1),
+      hr(),
+      
+      selectInput("exp", "Expression filter:",
+                  list("Overexpressed" = "Over", "Underexpressed" = "Under", "None" = "None")),
+      sliderInput("pexp", "Log 10 p-value threshold:",
+                  max = 0,  min = -10,  value = 0, step = .1)
+      
+    ),
+    
+    mainPanel(
+      if(Interactive){
+        plotlyOutput("hmPlot", height = "800px")
+      } else {
+        plotOutput("hmPlot", height = "800px")
+      }
+      
+    )
+    
+  )
+  
+  # Define server logic required to draw a histogram
+  server <- function(input, output, session) {
+
+    SelGS <- reactive({
+      SelectGeneSets(RomaData = RomaData, VarThr = 10^input$pdisp, VarMode = "Wil",
+                     VarType = input$disp,
+                     MedThr = 10^input$pexp, MedMode = "Wil",
+                     MedType = input$exp)
+    })
+    
+    ClusterGS <- reactive({
+      input$gsclus
+    })
+    
+    ClusterSA <- reactive({
+      input$saclus
+    })
+    
+    Transpose <- reactive({
+      input$gscol
+    })
+    
+    
+    if(Interactive){
+
+    } else {
+      output$hmPlot <- renderPlot({
+
+        SelectedGS <- SelGS()
+        
+        PlotMat <- RomaData$ProjMatrix[SelectedGS,]
+        
+        if(input$htype == "sample"){
+          
+          if(length(SelectedGS)>1){
+          
+            if(Transpose()){
+              pheatmap::pheatmap(PlotMat, color = colorRamps::blue2red(50),
+                                 cluster_rows = ClusterGS(), cluster_cols = ClusterSA(),
+                                 annotation_col = AddInfo)
+            } else {
+              pheatmap::pheatmap(t(PlotMat), color = colorRamps::blue2red(50),
+                                 cluster_rows = ClusterSA(), cluster_cols = ClusterGS(),
+                                 annotation_row = AddInfo)
+            }
+            
+            
+          }
+          
+          if(length(SelectedGS) == 1){
+            
+            names(PlotMat) <- colnames(RomaData$ProjMatrix)
+            
+            pheatmap::pheatmap(t(PlotMat), color = colorRamps::blue2red(50),
+                               cluster_rows = FALSE, cluster_cols = FALSE,
+                               main = rownames(RomaData$ProjMatrix)[SelectedGS])
+            
+          }
+        }
+        
+        if(input$htype == "group"){
+          
+          if(length(SelectedGS) > 1){
+            
+            SplitData <- split(data.frame(t(PlotMat[,FoundSamp])), f=AddInfo$Groups)
+            
+            Aggmat <- sapply(SplitData, function(x) {
+              apply(x, 2, get(input$aggfun))
+            })
+            
+            if(Transpose()){
+              pheatmap::pheatmap(Aggmat, color = colorRamps::blue2red(50),
+                                 cluster_rows = ClusterGS(), cluster_cols = ClusterSA())
+            } else {
+              pheatmap::pheatmap(t(Aggmat), color = colorRamps::blue2red(50),
+                                 cluster_rows = ClusterSA(), cluster_cols = ClusterGS())
+            }
+            
+          }
+          
+          if(length(SelectedGS) == 1){
+            
+            # names(PlotMat) <- colnames(RomaData$ProjMatrix)
+            SplitData <- split(data.frame(PlotMat[FoundSamp]), f=AddInfo$Groups)
+            
+            Aggmat <- sapply(SplitData, function(x) {
+              do.call(input$aggfun, list(unlist(x)))
+            })
+            
+            pheatmap::pheatmap(t(Aggmat), color = colorRamps::blue2red(50),
+                               cluster_rows = FALSE, cluster_cols = FALSE,
+                               main = rownames(RomaData$ProjMatrix)[SelectedGS])
+          }
+          
+        }
+        
       })
     }
     
