@@ -2,7 +2,7 @@
 % Please edit documentation in R/PCRecode.R
 \name{PCrRoma.R}
 \alias{PCrRoma.R}
-\title{Perform ROMA on a datasets}
+\title{Perform PcROMA on a datasets}
 \usage{
 PCrRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE,
   ModuleList, UseWeigths = FALSE, DefaultWeight = 1, MinGenes = 10,
@@ -111,5 +111,5 @@ which should be faster.}
 for orienting the principal components. Can be "pearson", "kendall", or "spearman".}
 }
 \description{
-Perform ROMA on a datasets
+Perform PcROMA on a datasets
 }

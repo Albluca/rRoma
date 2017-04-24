@@ -15,7 +15,7 @@ PlotOnACSN(RomaData, SampleName, AggScoreFun = "mean", QTop = NULL,
 \item{SampleName}{vector, string. The name(s) of the sample to consider}
 
 \item{AggScoreFun}{string, scalar. The name of the aggregating function used to compute the valus of the gene score.
-Note that this function will be applied even to genes appearin in one geneset. To consider only genes found in a single module use the 'GetSingle' function}
+Note that this function will be applied even to genes appearin in one geneset. To consider only genes found in a single module use the 'GetSingle' function and set DefDispVal to 0}
 
 \item{QTop}{numeric, scalar. The quantile threshold associted with the top saturation color.}
 

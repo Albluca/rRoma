@@ -2,6 +2,7 @@
 
 export(CompareAcrossSamples)
 export(DashboardA)
+export(DashboardB)
 export(DetectOutliers)
 export(FixPCSign)
 export(GetSingle)
