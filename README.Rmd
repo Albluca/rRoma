@@ -318,6 +318,21 @@ PlotSampleProjections(RomaData = RedData.NFC, PlotSamples = 30,
                       PlotPCProj = c('Points', 'Density',  'Bins'))
 ```
 
+
+## Using the interactive dashboards
+
+It is possible to explore interactivelly the results of the ananlysis via two interactive dashboards:
+
+```{r, eval=FALSE}
+DashboardA(RomaData = Data.FC, Groups = Type, ExpMat = MatData)
+```
+
+and 
+
+```{r, eval=FALSE}
+DashboardB(RomaData = Data.FC, Groups = Type)
+```
+
 ## Visualising on ACSN 
 
 It is possible to project the results of rRoma analysis on a map. This functionality is currently experimental. ACSN maps needs gene lists. Therefore it is necessary to map the module activity to a gene specific value. Since a gene can be associated with multiple modules, it is possible to filter genes with a large variation in the gene weigths, as this is associated with a larger variation, and hence uncertainlty, on the contribution of the gene. The function takes several parameters: `SampleName`, which indicates the name of the sample(s) to consider, `AggScoreFun`, which describes the function used to group the module scores when different samples are present, `FilterByWei`, which is a parameters used to filter genes based on the variance of the gene weight across modules, and `AggGeneFun`, which describes the function used to obtain the value associated to a gene when the multiples weigths and scores are present. The parameters `QTop`, `QBottom`, and `Steps` control the heatmap of the plot. Finally, `DispMode` indicates which quantities should be projected on the maps, the module score ("Module"), or the gene weigths ("Gene").
