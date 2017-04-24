@@ -1,4 +1,4 @@
-#' Title
+#' Compare ROMA scores across samples from different populations
 #'
 #' @param RomaData list, the analysis returned by rRoma
 #' @param Groups string vector, a vector of group identifier described by strings
