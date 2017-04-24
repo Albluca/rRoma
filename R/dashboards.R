@@ -281,9 +281,13 @@ DashboardB <- function(RomaData, Groups, Interactive = FALSE) {
     } else {
       AddInfo = NULL
     }
+    SelList <- list("By group" = "group", "By sample" = "sample")
+    SelListAF <- list("By group" = "group", "By sample" = "sample")
     
   } else {
     AddInfo = NULL
+    SelList <- list("By sample" = "sample")
+    SelListAF <- list()
   }
   
   
@@ -299,10 +303,8 @@ DashboardB <- function(RomaData, Groups, Interactive = FALSE) {
     
     sidebarPanel(
       
-      selectInput("htype", "Heatmap type:",
-                  list("By group" = "group", "By sample" = "sample")),
-      selectInput("aggfun", "Aggregating function:",
-                  list("Mean" = "mean", "Median" = "median")),
+      selectInput("htype", "Heatmap type:", SelList),
+      selectInput("aggfun", "Aggregating function:", SelListAF),
       hr(),
       
       checkboxInput("gsclus", "Cluster genesets", FALSE),
@@ -325,9 +327,9 @@ DashboardB <- function(RomaData, Groups, Interactive = FALSE) {
     
     mainPanel(
       if(Interactive){
-        plotlyOutput("hmPlot", height = "600px")
+        plotlyOutput("hmPlot", height = "800px")
       } else {
-        plotOutput("hmPlot", height = "600px")
+        plotOutput("hmPlot", height = "800px")
       }
       
     )
