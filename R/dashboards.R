@@ -256,16 +256,6 @@ DashboardB <- function(RomaData, Groups = NULL) {
   
   library(shiny)
   
-  if(Interactive){
-    print("Using plotly. This can cause problems on some systems. Try setting 'Interactive = FALSE' if errors are encountered")
-    library(plotly)
-  } else {
-    if(R.utils::isPackageLoaded("plotly")){
-      print("Detaching plotly.")
-      detach("package:plotly", unload=TRUE)
-    }
-  }
-  
   ProcessedSamples <- colnames(RomaData$ProjMatrix)
   
   if(!is.null(Groups)){
@@ -282,7 +272,7 @@ DashboardB <- function(RomaData, Groups = NULL) {
       AddInfo = NULL
     }
     SelList <- list("By group" = "group", "By sample" = "sample")
-    SelListAF <- list("By group" = "group", "By sample" = "sample")
+    SelListAF <- list("Mean" = "mean", "Median" = "median", "Std. dev." = "sd", "IQR" = "IQR")
     
   } else {
     AddInfo = NULL
