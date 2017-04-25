@@ -374,8 +374,11 @@ PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "metastasized
            AggGeneFun = "median")
 ```
 
+## Session information
 
-
+```{r}
+sessionInfo()
+```
 
 
 
