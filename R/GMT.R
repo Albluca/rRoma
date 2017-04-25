@@ -165,3 +165,48 @@ SelectFromMSIGdb <- function(SearchString, Version = "6.0", Mode = "ANY") {
   return(InternalDB[SelGeneSets])
   
 }
+
+
+
+
+
+
+
+
+
+#' Infer weigths from expression data
+#'
+#' @param ExpressionMatrix 
+#' @param ModuleList 
+#' @param FillAllNA 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+InferBinaryWeigth <- function(ExpressionMatrix, ModuleList, FillAllNA = TRUE) {
+  
+  MedianExpr <- apply(ExpressionMatrix, 1, median, na.rm=TRUE)
+  GeneWei <- as.integer(MedianExpr >= median(ExpressionMatrix))
+  GeneWei[GeneWei == 0] <- -1
+  names(GeneWei) <- names(MedianExpr)
+  
+  for(i in 1:length(ModuleList)){
+    
+    if(!FillAllNA & any(!is.na(ModuleList[[i]]$Weigths))){
+      next
+    }
+    
+    ModuleList[[i]]$Weigths[is.na(ModuleList[[i]]$Weigths)] <-
+      GeneWei[ModuleList[[i]]$Genes[is.na(ModuleList[[i]]$Weigths)]]
+    
+    if(any(is.na(ModuleList[[i]]$Weigths))){
+      print(paste("Warning:", sum(is.na(ModuleList[[i]]$Weigths)), "gene(s) not found in the expression matrix"))
+    }
+    
+  }
+  
+  return(ModuleList)
+  
+}
+
