@@ -22,7 +22,7 @@ A Java implementation developed by Andrei Zynovyev and is also [available](https
 The rRoma package relies on the `scater` package, which is available only on BioConductor. This package can be installed with the following command
 
 ```{r, eval=TRUE}
-if(!require("scater")){
+if(!requireNamespace("scater")){
   source("https://bioconductor.org/biocLite.R")
   biocLite("scater")
 }
@@ -31,7 +31,7 @@ if(!require("scater")){
 rRoma can then be installed using `devtools`
 
 ```{r, eval=FALSE}
-if(!require("devtools")){
+if(!requireNamespace("devtools")){
   install.packages("devtools")
 }
 devtools::install_github("Albluca/rROMA")
@@ -46,7 +46,7 @@ install.packages("tictoc")
 Finally, rRoma allow projecting the results of the analysis on [ACSN maps](https://acsn.curie.fr). To use this functionality it is necessary to install the `RNaviCell` package:
 
 ```{r, eval=FALSE}
-if(!require("devtools")){
+if(!requireNamespace("devtools")){
   install.packages("devtools")
 }
 devtools::install_github("sysbio-curie/RNaviCell")
@@ -55,16 +55,16 @@ devtools::install_github("sysbio-curie/RNaviCell")
 The packages `GEOquery`, `tictoc`, and `readr` are not required to run rRoma, but are used in the following example and need to be installed to reproduce the analysis 
 
 ```{r, eval=TRUE}
-if(!require("GEOquery")){
+if(!requireNamespace("GEOquery")){
   source("https://bioconductor.org/biocLite.R")
   biocLite("GEOquery")
 }
 
-if(!require("readr")){
+if(!requireNamespace("readr")){
   install.packages("readr")
 }
 
-if(!require("tictoc")){
+if(!requireNamespace("tictoc")){
   install.packages("tictoc")
 }
 ```
@@ -357,8 +357,7 @@ PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "normal"]),
            AggScoreFun = "median", FilterByWei = 30, 
            DispMode = c("Module", "Gene"), DataName = "Normal", 
            QTop = .99, QBottom = .1, Steps = 5, 
-           Selected = SelectGeneSets(RomaData = Data.NFC.CS, VarThr = 5e-2,
-                                        VarMode = "Wil", VarType = "Over"),
+           Selected = NULL,
            MapURL = 'https://acsn.curie.fr/navicell/maps/survival/master/index.php',
            AggGeneFun = "median")
 ```
@@ -370,8 +369,7 @@ PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "metastasized
            AggScoreFun = "median", FilterByWei = 30, 
            DispMode = "Module", DataName = "Metastasized", 
            QTop = .99, QBottom = .1, Steps = 5, 
-           Selected = SelectGeneSets(RomaData = Data.NFC.CS, VarThr = 5e-2,
-                                        VarMode = "Wil", VarType = "Over"),
+           Selected = NULL,
            MapURL = 'https://acsn.curie.fr/navicell/maps/survival/master/index.php',
            AggGeneFun = "median")
 ```
