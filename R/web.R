@@ -62,7 +62,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   }
   
   
-  AllGenesWei <- lapply(RomaData$ModuleSummary, "[[", "PC1Weight.SignFixed")
+  AllGenesWei <- lapply(RomaData$ModuleSummary[Selected], "[[", "PC1Weight.SignFixed")
   AllGenesWei <- unlist(AllGenesWei, use.names = TRUE)
   AllGenesWei.Split <- split(AllGenesWei, f = names(AllGenesWei))
   
@@ -70,15 +70,19 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   
   ToPlot <- unique(names(AllGenesWei))
   
-  B <- boxplot(x = AllGenesWei.Var, at = 1, ylab = "Variance of gene weight")
-  
-  if(!is.null(FilterByWei)){
-    Outliers <- scater::isOutlier(AllGenesWei.Var[!is.na(AllGenesWei.Var)], nmads = FilterByWei)
-    print("The following genes will be ignored:")
-    print(names(which(Outliers)))
-    ToPlot <- setdiff(ToPlot, names(which(Outliers)))
-    points(x = rep(1, length(which(Outliers))), y = AllGenesWei.Var[names(which(Outliers))], col="red", pch=20)
-    legend("topright", legend = "Outliers", pch=20, col="red")
+  if(any(!is.na(AllGenesWei.Var))){
+    
+    B <- boxplot(x = AllGenesWei.Var, at = 1, ylab = "Variance of gene weight")
+    
+    if(!is.null(FilterByWei)){
+      Outliers <- scater::isOutlier(AllGenesWei.Var[!is.na(AllGenesWei.Var)], nmads = FilterByWei)
+      print("The following genes will be ignored:")
+      print(names(which(Outliers)))
+      ToPlot <- setdiff(ToPlot, names(which(Outliers)))
+      points(x = rep(1, length(which(Outliers))), y = AllGenesWei.Var[names(which(Outliers))], col="red", pch=20)
+      legend("topright", legend = "Outliers", pch=20, col="red")
+    }
+    
   }
 
   if(any(DispMode == "Module")){
@@ -86,7 +90,12 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     ModuleScore <- RomaData$ProjMatrix[Selected, SelSampleNames]
     
     if(length(SelSampleNames)>1){
-      FilteredScores <- apply(ModuleScore, 1, get(AggScoreFun))
+      if(length(Selected)>1){
+        FilteredScores <- apply(ModuleScore, 1, get(AggScoreFun))
+      } else {
+        FilteredScores <- do.call(AggScoreFun, list(ModuleScore))
+        names(FilteredScores) <- RomaData$ModuleSummary[[Selected]]$ModuleName
+      }
     } else {
       print("Single sampled selected. Aggregating function will not be applied.")
       FilteredScores <- ModuleScore
@@ -105,9 +114,13 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     AllGeneScores.Split <- split(AllGeneScores, names(AllGeneScores))
     AllGeneScores.Var <- sapply(AllGeneScores.Split, var)
     
-    barplot(table(is.na(AllGeneScores.Var)), names.arg = c("Multi", "Mono"),
-            ylab = "Number of genes")
-    boxplot(AllGeneScores.Var, ylab = "Variance of module score (per gene)")
+    barplot(c(sum(!is.na(AllGeneScores.Var)), sum(is.na(AllGeneScores.Var))),
+            names.arg = c("Multi", "Mono"), ylab = "Number of genes")
+    
+    if(any(!is.na(AllGeneScores.Var))){
+      boxplot(AllGeneScores.Var, ylab = "Variance of module score (per gene)")
+    }
+    
     
     DataToPlot <- sapply(AllGeneScores.Split, get(AggGeneFun))
     

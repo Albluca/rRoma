@@ -337,14 +337,15 @@ DashboardB(RomaData = Data.FC, Groups = Type)
 
 It is possible to project the results of rRoma analysis on a map. This functionality is currently experimental. ACSN maps needs gene lists. Therefore it is necessary to map the module activity to a gene specific value. Since a gene can be associated with multiple modules, it is possible to filter genes with a large variation in the gene weigths, as this is associated with a larger variation, and hence uncertainlty, on the contribution of the gene. The function takes several parameters: `SampleName`, which indicates the name of the sample(s) to consider, `AggScoreFun`, which describes the function used to group the module scores when different samples are present, `FilterByWei`, which is a parameters used to filter genes based on the variance of the gene weight across modules, and `AggGeneFun`, which describes the function used to obtain the value associated to a gene when the multiples weigths and scores are present. The parameters `QTop`, `QBottom`, and `Steps` control the heatmap of the plot. Finally, `DispMode` indicates which quantities should be projected on the maps, the module score ("Module"), or the gene weigths ("Gene").
 
-In this example we will use the cell cycle map and therefore we will recompute ROMA on genesets that are cell cycle related.
+In this example we will use the cell survival map and therefore we will recompute ROMA using the associated GMT.
 
 ```{r, eval=TRUE}
 tictoc::tic()
-Data.NFC.CC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = SelectFromMSIGdb("cell_cycle"),
-                   FixedCenter = FALSE, MaxGenes = 200,
-                   UseParallel = TRUE, nCores = 8, ClusType = "FORK",
-                   PCSignMode="CorrelateAllWeightsByGene")
+Data.NFC.CS <- rRoma.R(ExpressionMatrix = MatData,
+                       ModuleList = ReadGMTFile("http://acsn.curie.fr/files/survival_v1.1.gmt"),
+                       FixedCenter = FALSE, MaxGenes = 500,
+                       UseParallel = TRUE, nCores = 8, ClusType = "FORK",
+                       PCSignMode="CorrelateAllWeightsByGene")
 tictoc::toc()
 
 ```
@@ -352,26 +353,26 @@ tictoc::toc()
 We can now project the information obtained by using the following commands, which will open a windows in the default browser to visualize the map.
 
 ```{r}
-PlotOnACSN(RomaData = Data.NFC.CC, SampleName = names(Type[Type == "normal"]),
+PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "normal"]),
            AggScoreFun = "median", FilterByWei = 30, 
            DispMode = c("Module", "Gene"), DataName = "Normal", 
            QTop = .99, QBottom = .1, Steps = 5, 
-           Selected = SelectGeneSets(RomaData = Data.NFC.CC, VarThr = 5e-3,
+           Selected = SelectGeneSets(RomaData = Data.NFC.CS, VarThr = 5e-2,
                                         VarMode = "Wil", VarType = "Over"),
-           MapURL = 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php',
+           MapURL = 'https://acsn.curie.fr/navicell/maps/survival/master/index.php',
            AggGeneFun = "median")
 ```
 
 
 
 ```{r}
-PlotOnACSN(RomaData = Data.NFC.CC, SampleName = names(Type[Type == "metastasized"]),
+PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "metastasized"]),
            AggScoreFun = "median", FilterByWei = 30, 
            DispMode = "Module", DataName = "Metastasized", 
            QTop = .99, QBottom = .1, Steps = 5, 
-           Selected = SelectGeneSets(RomaData = Data.NFC.CC, VarThr = 5e-3,
+           Selected = SelectGeneSets(RomaData = Data.NFC.CS, VarThr = 5e-2,
                                         VarMode = "Wil", VarType = "Over"),
-           MapURL = 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php',
+           MapURL = 'https://acsn.curie.fr/navicell/maps/survival/master/index.php',
            AggGeneFun = "median")
 ```
 
