@@ -26,4 +26,5 @@ Imports:
 Suggests:
       mice,
       RNaviCell,
-      plotly
+      plotly,
+      SigCheck
