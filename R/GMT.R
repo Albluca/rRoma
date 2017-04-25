@@ -165,9 +165,3 @@ SelectFromMSIGdb <- function(SearchString, Version = "6.0", Mode = "ANY") {
   return(InternalDB[SelGeneSets])
   
 }
-
-
-
-
-
-
