@@ -20,7 +20,9 @@ Imports:
       parallel,
       reshape,
       Rtsne,
-      shiny
+      shiny,
+      R.utils,
+      ggsignif
 Suggests:
       mice,
       RNaviCell,

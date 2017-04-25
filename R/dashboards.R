@@ -59,13 +59,13 @@ DashboardA <- function(RomaData, ExpMat, Groups = NULL, Interactive = FALSE) {
       selectInput("disp", "Dispersion filter:",
                   list("Overdispersed" = "Over", "Underdispersed" = "Under", "None" = "None")),
       sliderInput("pdisp", "Log 10 p-value threshold:",
-                  max = 0,  min = -10,  value = 0, step = .1),
+                  max = 0,  min = -5,  value = 0, step = .1),
       hr(),
       
       selectInput("exp", "Expression filter:",
                   list("Overexpressed" = "Over", "Underexpressed" = "Under", "None" = "None")),
       sliderInput("pexp", "Log 10 p-value threshold:",
-                  max = 0,  min = -10,  value = 0, step = .1),
+                  max = 0,  min = -5,  value = 0, step = .1),
       hr(),
       
       selectInput("gs", "GeneSet:",
@@ -305,13 +305,19 @@ DashboardB <- function(RomaData, Groups = NULL) {
       selectInput("disp", "Dispersion filter:",
                   list("Overdispersed" = "Over", "Underdispersed" = "Under", "None" = "None")),
       sliderInput("pdisp", "Log 10 p-value threshold:",
-                  max = 0,  min = -10,  value = 0, step = .1),
+                  max = 0,  min = -5,  value = 0, step = .1),
       hr(),
       
       selectInput("exp", "Expression filter:",
                   list("Overexpressed" = "Over", "Underexpressed" = "Under", "None" = "None")),
       sliderInput("pexp", "Log 10 p-value threshold:",
-                  max = 0,  min = -10,  value = 0, step = .1)
+                  max = 0,  min = -5,  value = 0, step = .1),
+      hr(),
+      
+      sliderInput("llim", "Lower limit",
+                  max = 0,  min = -5,  value = -5, step = .1),
+      sliderInput("ulim", "Upper limit",
+                  max = 5,  min = 0,  value = 5, step = .1)
       
     ),
     
@@ -346,20 +352,94 @@ DashboardB <- function(RomaData, Groups = NULL) {
     
     output$hmPlot <- renderPlot({
       
+      BaseCol <- colorRamps::blue2red(54)
+      
       SelectedGS <- SelGS()
       
       PlotMat <- RomaData$ProjMatrix[SelectedGS,]
       
       if(input$htype == "sample"){
         
+        MinMax <- range(PlotMat)
+        
+        # print(MinMax)
+        
+        if(input$llim < MinMax[1]){
+          updateSliderInput(session, "llim", value = ifelse(MinMax[1] < 0, floor(10*MinMax[1])/10, 0))
+        }
+        
+        updateSliderInput(session, "llim", min = ifelse(MinMax[1] < 0, floor(10*MinMax[1])/10, 0))
+
+
+        
+        if(input$ulim > MinMax[2]){
+          updateSliderInput(session, "ulim", value = ifelse(MinMax[2] > 0, ceiling(10*MinMax[2])/10, 0))
+        }
+                
+        updateSliderInput(session, "ulim", max = ifelse(MinMax[2] > 0, ceiling(10*MinMax[2])/10, 0))
+        
+        
+        if(MinMax[1] < 0){
+          DoLow <- TRUE
+          LowBrk <- c(MinMax[1], seq(from = input$llim*(26/27), to = 0, by = -input$llim/27))
+          if(LowBrk[1] != min(LowBrk)){
+            LowBrk[1] <- min(LowBrk) + input$llim/27
+          }
+        } else {
+          DoLow <- FALSE
+        }
+        
+        if(MinMax[2] > 0){
+          DoHigh <- TRUE
+          HighBrk <- c(seq(from = input$ulim/27, to = (26/27)*input$ulim, by = input$ulim/27), MinMax[2])
+          if(HighBrk[length(HighBrk)] != max(HighBrk)){
+            HighBrk[length(HighBrk)] <- max(HighBrk) + input$ulim/27
+          }
+          if(HighBrk[1] == 0){
+            HighBrk <- HighBrk[-1]
+          }
+        } else {
+          DoHigh <- FALSE
+        }
+        
+        if(DoLow){
+          MyBreaks <- LowBrk
+          if(input$llim < 0){
+            UseCol <- c(1:28)
+          } else {
+            UseCol <- c(1,28)
+          }
+        } else {
+          MyBreaks <- 0
+          UseCol <- 27
+        }
+        
+        if(DoHigh){
+          MyBreaks <- c(MyBreaks, HighBrk)
+          if(input$ulim > 0){
+            UseCol <- c(UseCol, 29:54)
+          } else {
+            UseCol <- c(UseCol, 29, 54)
+          }
+          
+        }
+        
+        # print(UseCol)
+        # print(MyBreaks)
+        # print(length(MyBreaks))
+        # print(length(UseCol))
+        # print(MinMax)
+        # print(input$llim)
+        # print(input$ulim)
+        
         if(length(SelectedGS)>1){
           
           if(Transpose()){
-            pheatmap::pheatmap(PlotMat, color = colorRamps::blue2red(50),
+            pheatmap::pheatmap(PlotMat, color = BaseCol[UseCol], breaks = MyBreaks,
                                cluster_rows = ClusterGS(), cluster_cols = ClusterSA(),
                                annotation_col = AddInfo)
           } else {
-            pheatmap::pheatmap(t(PlotMat), color = colorRamps::blue2red(50),
+            pheatmap::pheatmap(t(PlotMat), color = BaseCol[UseCol], breaks = MyBreaks,
                                cluster_rows = ClusterSA(), cluster_cols = ClusterGS(),
                                annotation_row = AddInfo)
           }
@@ -371,7 +451,7 @@ DashboardB <- function(RomaData, Groups = NULL) {
           
           names(PlotMat) <- colnames(RomaData$ProjMatrix)
           
-          pheatmap::pheatmap(t(PlotMat), color = colorRamps::blue2red(50),
+          pheatmap::pheatmap(t(PlotMat), BaseCol[UseCol], breaks = MyBreaks,
                              cluster_rows = FALSE, cluster_cols = FALSE,
                              main = rownames(RomaData$ProjMatrix)[SelectedGS])
           
@@ -388,11 +468,74 @@ DashboardB <- function(RomaData, Groups = NULL) {
             apply(x, 2, get(input$aggfun))
           })
           
+          MinMax <- range(Aggmat)
+          
+          if(input$llim < MinMax[1]){
+            updateSliderInput(session, "llim", value = ifelse(MinMax[1] < 0, floor(10*MinMax[1])/10, 0))
+          }
+          
+          updateSliderInput(session, "llim", min = ifelse(MinMax[1] < 0, floor(10*MinMax[1])/10, 0))
+          
+          
+          
+          if(input$ulim > MinMax[2]){
+            updateSliderInput(session, "ulim", value = ifelse(MinMax[2] > 0, ceiling(10*MinMax[2])/10, 0))
+          }
+          
+          updateSliderInput(session, "ulim", max = ifelse(MinMax[2] > 0, ceiling(10*MinMax[2])/10, 0))
+          
+          
+          
+          if(MinMax[1] < 0){
+            DoLow <- TRUE
+            LowBrk <- c(MinMax[1], seq(from = input$llim*(26/27), to = 0, by = -input$llim/27))
+            if(LowBrk[1] != min(LowBrk)){
+              LowBrk[1] <- min(LowBrk) + input$llim/27
+            }
+          } else {
+            DoLow <- FALSE
+          }
+          
+          if(MinMax[2] > 0){
+            DoHigh <- TRUE
+            HighBrk <- c(seq(from = input$ulim/27, to = (26/27)*input$ulim, by = input$ulim/27), MinMax[2])
+            if(HighBrk[length(HighBrk)] != max(HighBrk)){
+              HighBrk[length(HighBrk)] <- max(HighBrk) + input$ulim/27
+            }
+            if(HighBrk[1] == 0){
+              HighBrk <- HighBrk[-1]
+            }
+          } else {
+            DoHigh <- FALSE
+          }
+          
+          if(DoLow){
+            MyBreaks <- LowBrk
+            if(input$llim < 0){
+              UseCol <- c(1:28)
+            } else {
+              UseCol <- c(1,28)
+            }
+          } else {
+            MyBreaks <- 0
+            UseCol <- 27
+          }
+          
+          if(DoHigh){
+            MyBreaks <- c(MyBreaks, HighBrk)
+            if(input$ulim > 0){
+              UseCol <- c(UseCol, 29:54)
+            } else {
+              UseCol <- c(UseCol, 29, 54)
+            }
+            
+          }
+          
           if(Transpose()){
-            pheatmap::pheatmap(Aggmat, color = colorRamps::blue2red(50),
+            pheatmap::pheatmap(Aggmat, color = BaseCol[UseCol], breaks = MyBreaks,
                                cluster_rows = ClusterGS(), cluster_cols = ClusterSA())
           } else {
-            pheatmap::pheatmap(t(Aggmat), color = colorRamps::blue2red(50),
+            pheatmap::pheatmap(t(Aggmat), color = BaseCol[UseCol], breaks = MyBreaks,
                                cluster_rows = ClusterSA(), cluster_cols = ClusterGS())
           }
           
@@ -407,7 +550,69 @@ DashboardB <- function(RomaData, Groups = NULL) {
             do.call(input$aggfun, list(unlist(x)))
           })
           
-          pheatmap::pheatmap(t(Aggmat), color = colorRamps::blue2red(50),
+          MinMax <- range(Aggmat)
+          
+          if(input$llim < MinMax[1]){
+            updateSliderInput(session, "llim", value = ifelse(MinMax[1] < 0, floor(10*MinMax[1])/10, 0))
+          }
+          
+          updateSliderInput(session, "llim", min = ifelse(MinMax[1] < 0, floor(10*MinMax[1])/10, 0))
+          
+          
+          
+          if(input$ulim > MinMax[2]){
+            updateSliderInput(session, "ulim", value = ifelse(MinMax[2] > 0, ceiling(10*MinMax[2])/10, 0))
+          }
+          
+          updateSliderInput(session, "ulim", max = ifelse(MinMax[2] > 0, ceiling(10*MinMax[2])/10, 0))
+          
+          
+          if(MinMax[1] < 0){
+            DoLow <- TRUE
+            LowBrk <- c(MinMax[1], seq(from = input$llim*(26/27), to = 0, by = -input$llim/27))
+            if(LowBrk[1] != min(LowBrk)){
+              LowBrk[1] <- min(LowBrk) + input$llim/27
+            }
+          } else {
+            DoLow <- FALSE
+          }
+          
+          if(MinMax[2] > 0){
+            DoHigh <- TRUE
+            HighBrk <- c(seq(from = input$ulim/27, to = (26/27)*input$ulim, by = input$ulim/27), MinMax[2])
+            if(HighBrk[length(HighBrk)] != max(HighBrk)){
+              HighBrk[length(HighBrk)] <- max(HighBrk) + input$ulim/27
+            }
+            if(HighBrk[1] == 0){
+              HighBrk <- HighBrk[-1]
+            }
+          } else {
+            DoHigh <- FALSE
+          }
+          
+          if(DoLow){
+            MyBreaks <- LowBrk
+            if(input$llim < 0){
+              UseCol <- c(1:28)
+            } else {
+              UseCol <- c(1,28)
+            }
+          } else {
+            MyBreaks <- 0
+            UseCol <- 27
+          }
+          
+          if(DoHigh){
+            MyBreaks <- c(MyBreaks, HighBrk)
+            if(input$ulim > 0){
+              UseCol <- c(UseCol, 29:54)
+            } else {
+              UseCol <- c(UseCol, 29, 54)
+            }
+            
+          }
+          
+          pheatmap::pheatmap(t(Aggmat), color = BaseCol[UseCol], breaks = MyBreaks,
                              cluster_rows = FALSE, cluster_cols = FALSE,
                              main = rownames(RomaData$ProjMatrix)[SelectedGS])
         }
