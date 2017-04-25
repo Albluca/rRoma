@@ -4,14 +4,12 @@
 \alias{DashboardB}
 \title{Genesets dashboard}
 \usage{
-DashboardB(RomaData, Groups, Interactive = FALSE)
+DashboardB(RomaData, Groups = NULL)
 }
 \arguments{
 \item{RomaData}{}
 
 \item{Groups}{}
-
-\item{ExpMat}{}
 }
 \description{
 Genesets dashboard

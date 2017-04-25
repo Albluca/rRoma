@@ -4,14 +4,16 @@
 \alias{DashboardA}
 \title{Sample dashboard}
 \usage{
-DashboardA(RomaData, Groups, ExpMat, Interactive = FALSE)
+DashboardA(RomaData, ExpMat, Groups = NULL, Interactive = FALSE)
 }
 \arguments{
 \item{RomaData}{}
 
+\item{ExpMat}{}
+
 \item{Groups}{}
 
-\item{ExpMat}{}
+\item{Interactive}{}
 }
 \description{
 Sample dashboard
