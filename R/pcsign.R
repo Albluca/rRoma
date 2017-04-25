@@ -105,8 +105,12 @@ FixPCSign <-
         print("Computing correlations")
         Cor.Test.Vect <- sapply(GroupMedians, function(x){
           if(length(unique(x[,2])) > 2 & length(unique(MedianProj[,2])) > 2){
-            CT <- cor.test(x[,2], MedianProj[,2], method = CorMethod)
-            c(CT$p.value, CT$estimate)
+            if(!is.null(Thr)){
+              CT <- cor.test(x[,2], MedianProj[,2], method = CorMethod)
+              return(c(CT$p.value, CT$estimate))
+            } else {
+              return(c(NA, cor(x[,2], MedianProj[,2], method = CorMethod)))
+            }
           } else {
             c(NA, NA)
           }
@@ -134,8 +138,12 @@ FixPCSign <-
         print("Computing correlations")
         Cor.Test.Vect <- apply(ExpMat, 1, function(x){
           if(length(unique(x)) > 2 & length(unique(PCProj)) > 2){
-            CT <- cor.test(x, PCProj, method = CorMethod)
-            c(CT$p.value, CT$estimate)
+            if(!is.null(Thr)){
+              CT <- cor.test(x, PCProj, method = CorMethod)
+              return(c(CT$p.value, CT$estimate))
+            } else {
+              return(c(NA, cor(x, PCProj, method = CorMethod)))
+            }
           } else {
             c(NA, NA)
           }
@@ -200,8 +208,12 @@ FixPCSign <-
         print("Computing correlations")
         Cor.Test.Vect <- apply(MediansByGroups, 1, function(x){
           if(length(unique(x)) > 2 & length(unique(PCWeigth*Wei)) > 2){
-            CT <- cor.test(x, PCWeigth*Wei, method = CorMethod)
-            c(CT$p.value, CT$estimate)
+            if(!is.null(Thr)){
+              CT <- cor.test(x, PCWeigth*Wei, method = CorMethod)
+              return(c(CT$p.value, CT$estimate))
+            } else {
+              return(c(NA, cor(x, PCWeigth*Wei, method = CorMethod)))
+            }
           } else {
             c(NA, NA)
           }
@@ -227,8 +239,12 @@ FixPCSign <-
         print("Computing correlations")
         Cor.Test.Vect <- apply(ExpMat, 2, function(x){
           if(length(unique(x)) > 2 & length(unique(PCWeigth)) > 2){
-            CT <- cor.test(x, PCWeigth, method = CorMethod)
-            c(CT$p.value, CT$estimate)
+            if(!is.null(Thr)){
+              CT <- cor.test(x, PCWeigth, method = CorMethod)
+              return(c(CT$p.value, CT$estimate))
+            } else {
+              return(c(NA, cor(x, PCWeigth, method = CorMethod)))
+            }
           } else {
             c(NA, NA)
           }
