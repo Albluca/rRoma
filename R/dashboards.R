@@ -188,7 +188,6 @@ DashboardA <- function(RomaData, ExpMat, Groups = NULL, Interactive = FALSE) {
         print(ggplotly(p))
       })
     } else {
-      
       output$scatPlot <- renderPlot({
         
         Projs <- GetProj()
@@ -209,7 +208,6 @@ DashboardA <- function(RomaData, ExpMat, Groups = NULL, Interactive = FALSE) {
         
         print(p)
       })
-      
     }
     
   }
@@ -627,3 +625,7 @@ DashboardB <- function(RomaData, Groups = NULL) {
   shinyApp(ui = ui, server = server)
   
 }
+
+
+
+

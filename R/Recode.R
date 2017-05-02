@@ -881,31 +881,30 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   colnames(ProjMatrix) <- colnames(ExpressionMatrix)
   rownames(ProjMatrix) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
   
+  
+  InputParList <- list(centerData = centerData, ExpFilter = ExpFilter, ModuleList = ModuleList,
+                       UseWeigths = UseWeigths, DefaultWeight = DefaultWeight, MinGenes = MinGenes,
+                       MaxGenes = MaxGenes, ApproxSamples = ApproxSamples, nSamples = nSamples,
+                       OutGeneNumber = OutGeneNumber, Ncomp = Ncomp, OutGeneSpace = OutGeneSpace,
+                       FixedCenter = FixedCenter, GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr,
+                       GeneSelMode = GeneSelMode, SampleFilter = SampleFilter, MoreInfo = MoreInfo,
+                       PlotData = PlotData, PCADims = PCADims, PCSignMode = PCSignMode, PCSignThr = PCSignThr,
+                       UseParallel = UseParallel, nCores = nCores, ClusType = ClusType,
+                       SamplingGeneWeights = SamplingGeneWeights, FillNAMethod = FillNAMethod,
+                       Grouping = Grouping, FullSampleInfo = FullSampleInfo, GroupPCSign = GroupPCSign,
+                       CorMethod = CorMethod)
+  
   if(length(UsedModules)>1){
     ReorderIdxs <- order(ModuleOrder[UsedModules])
     
     return(list(ModuleMatrix = ModuleMatrix[ReorderIdxs,], ProjMatrix = ProjMatrix[ReorderIdxs,], ModuleSummary = ModuleSummary[ReorderIdxs],
                 WeigthList = WeigthList[ReorderIdxs], PVVectMat = PVVectMat[ReorderIdxs,], OutLiersList = OutLiersList[ReorderIdxs],
-                GeneCenters = GeneCenters, SampleCenters = SampleCenters))
+                GeneCenters = GeneCenters, SampleCenters = SampleCenters, InputPars = InputParList))
   } else {
     return(list(ModuleMatrix = ModuleMatrix, ProjMatrix = ProjMatrix, ModuleSummary = ModuleSummary,
                WeigthList = WeigthList, PVVectMat = PVVectMat, OutLiersList = OutLiersList,
-               GeneCenters = GeneCenters, SampleCenters = SampleCenters))
+               GeneCenters = GeneCenters, SampleCenters = SampleCenters, InputPars = InputParList))
   }
   
-  
-  
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
