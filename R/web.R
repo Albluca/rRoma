@@ -28,6 +28,7 @@
 #' \item 'https://navicell.curie.fr/navicell/maps/dendcells/master/index.php'
 #' } 
 #' @param PlotInfo boolean scalar. Should information plot be produced?
+#' @param ReturnInfo boolean scalar. Should information be returned?
 #'
 #' @return
 #' @export
@@ -37,7 +38,8 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
                        QTop = NULL, QBottom = NULL, Steps = 2,
                        MapURL = "", Selected = NULL, FilterByWei = NULL,
                        AggGeneFun = "mean", DispMode = "Module",
-                       DataName = "Sample", DefDispVal = 0, PlotInfo = TRUE) {
+                       DataName = "Sample", DefDispVal = 0, PlotInfo = TRUE,
+                       ReturnInfo = FALSE) {
   
   if(!requireNamespace("RNaviCell", quietly = TRUE)){
     stop("Unable to load RNaviCell Impossible to proceed")
@@ -77,6 +79,8 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
       B <- boxplot(x = AllGenesWei.Var, at = 1, ylab = "Variance of gene weight")
     }
     
+    Outliers <- NULL
+    
     if(!is.null(FilterByWei)){
       Outliers <- scater::isOutlier(AllGenesWei.Var[!is.na(AllGenesWei.Var)], nmads = FilterByWei)
       print("The following genes will be ignored:")
@@ -90,6 +94,9 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     
   }
 
+  AllGeneScores.Var <- NULL
+  AllGeneScores.Agg <- NULL
+  
   if(any(DispMode == "Module")){
     
     ModuleScore <- RomaData$ProjMatrix[Selected, SelSampleNames]
@@ -128,7 +135,6 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
       boxplot(AllGeneScores.Var, ylab = "Variance of module score (per gene)")
     }
     
-    
     DataToPlot <- sapply(AllGeneScores.Split, get(AggGeneFun))
     
     if(any(is.na(DataToPlot))){
@@ -137,6 +143,8 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
    
     DataToPlot <- data.matrix(DataToPlot)
     colnames(DataToPlot) <- "data"
+    
+    AllGeneScores.Agg <- DataToPlot
     
     if(PlotInfo){
       hist(DataToPlot, xlab="Score (per gene)", main = "Module score distribution across genes")
@@ -174,6 +182,8 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     
   }
   
+  AllGeneWei.Agg <- NULL
+  
   par(mfcol=c(1,1))
   
   if(any(DispMode == "Gene")){
@@ -182,6 +192,8 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     
     DataToPlot <- data.matrix(DataToPlot)
     colnames(DataToPlot) <- "data"
+    
+    AllGeneWei.Agg <- DataToPlot
     
     if(PlotInfo){
       hist(DataToPlot, xlab="Weight (per gene)", main = "Weight distribution across genes")
@@ -217,6 +229,13 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     Session.Navicell$mapStainingEditorSelectSample('data')
     Session.Navicell$mapStainingEditorApply()
     
+  }
+  
+  if(ReturnInfo){
+    return(list(GenesVar = AllGenesWei.Var, GeneOut = Outliers,
+                ScoreVar = AllGeneScores.Var, 
+                WeiDist = AllGeneWei.Agg, ScoreDist = AllGeneScores.Agg)
+           )
   }
   
 }
