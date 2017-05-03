@@ -96,6 +96,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       stop("Unable to load mice. Impossible to proceed")
     } else {
       print("Filling NA with mice")
+      library(mice)
     }
     
     imp <- do.call(what = mice, args = append(list(data = ExpressionMatrix), FillNAMethod))
@@ -261,15 +262,23 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   ToFilter <- (nGenes > MaxGenes | nGenes < MinGenes)
   ToUse <- !ToFilter
   
+  
   if(sum(ToFilter)>1){
     print("The following geneset(s) will be ignored due to the number of genes being outside the specified range")
     print(unlist(lapply(ModuleList[ToFilter], "[[", "Name")))
+    
+    if(sum(ToUse) == 0){
+      print("No geneset available for the analisis. The analysis cannot proceed.")
+      return(NULL)
+    }
+    
     ModuleList <- ModuleList[ToUse]
   } else {
     print("All the genesets will be used")
   }
   
 
+  
   
   if(UseParallel){
     
