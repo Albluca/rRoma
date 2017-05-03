@@ -7,7 +7,7 @@
 PlotOnACSN(RomaData, SampleName, AggScoreFun = "mean", QTop = NULL,
   QBottom = NULL, Steps = 2, MapURL = "", Selected = NULL,
   FilterByWei = NULL, AggGeneFun = "mean", DispMode = "Module",
-  DataName = "Sample", DefDispVal = 0)
+  DataName = "Sample", DefDispVal = 0, PlotInfo = TRUE)
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
@@ -49,6 +49,8 @@ It can be any combination of the following:
 \item{DataName}{string, scalar. The name of the dataset that will be reported in the web interface}
 
 \item{DefDispVal}{numeric, scalar. The value to be used when the fucntion defined by AggScoreFun produce NA (e.g., sd applied to genes that appear only in one geneset)}
+
+\item{PlotInfo}{boolean scalar. Should information plot be produced?}
 }
 \description{
 Project ROMA results onto ACSN maps
