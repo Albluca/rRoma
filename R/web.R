@@ -96,6 +96,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
 
   AllGeneScores.Var <- NULL
   AllGeneScores.Agg <- NULL
+  AllGene.Mult <- table(names(AllGenesWei))
   
   if(any(DispMode == "Module")){
     
@@ -233,7 +234,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   
   if(ReturnInfo){
     return(list(GenesVar = AllGenesWei.Var, GeneOut = Outliers,
-                ScoreVar = AllGeneScores.Var, 
+                ScoreVar = AllGeneScores.Var, GeneMult = AllGene.Mult,
                 WeiDist = AllGeneWei.Agg, ScoreDist = AllGeneScores.Agg)
            )
   }
