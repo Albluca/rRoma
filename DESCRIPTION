@@ -19,12 +19,10 @@ Imports:
       pheatmap,
       parallel,
       reshape,
-      Rtsne,
       shiny,
       R.utils,
-      ggsignif
+      readr
 Suggests:
       mice,
       RNaviCell,
-      plotly,
       SigCheck
