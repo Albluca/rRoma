@@ -1,4 +1,3 @@
----
 title: "rROMA"
 author: '[Luca Albergante](mailto:luca.albergante@gmail.com)'
 date: "April 2017"
@@ -319,19 +318,9 @@ PlotSampleProjections(RomaData = RedData.NFC, PlotSamples = 30,
 ```
 
 
-## Using the interactive dashboards
+## Using the interactive dashboard
 
-It is possible to explore interactivelly the results of the ananlysis via two interactive dashboards:
-
-```{r, eval=FALSE}
-DashboardA(RomaData = Data.FC, Groups = Type, ExpMat = MatData)
-```
-
-and 
-
-```{r, eval=FALSE}
-DashboardB(RomaData = Data.FC, Groups = Type)
-```
+An interactive dasboard that can be used to perform ROMA and visualize the results is available as a separate r package on [GitHub](https://github.com/Albluca/rRomaDash)
 
 ## Visualising on ACSN 
 
@@ -344,7 +333,7 @@ tictoc::tic()
 Data.NFC.CS <- rRoma.R(ExpressionMatrix = MatData,
                        ModuleList = ReadGMTFile("http://acsn.curie.fr/files/survival_v1.1.gmt"),
                        FixedCenter = FALSE, MaxGenes = 500,
-                       UseParallel = TRUE, nCores = 8, ClusType = "FORK",
+                       UseParallel = TRUE, nCores = 3, ClusType = "FORK",
                        PCSignMode="CorrelateAllWeightsByGene")
 tictoc::toc()
 
