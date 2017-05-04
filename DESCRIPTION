@@ -21,7 +21,8 @@ Imports:
       reshape,
       shiny,
       R.utils,
-      readr
+      readr,
+      colorRamps
 Suggests:
       mice,
       RNaviCell,
