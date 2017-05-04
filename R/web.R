@@ -193,6 +193,14 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
       
     }
     
+    if(Bottom >= 0){
+      Bottom <- -1
+    }
+    
+    if(Top <= 0){
+      Top <- 1
+    }
+    
     
     Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Bottom, -1)
     Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Top, 1)
@@ -244,7 +252,13 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
       Bottom <- quantile(DataToPlot, QBottom)
     }
     
+    if(Bottom >= 0){
+      Bottom <- -1
+    }
     
+    if(Top <= 0){
+      Top <- 1
+    }
     
     Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Bottom, -1)
     Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Top, 1)
