@@ -11,8 +11,6 @@
     -   [Sample projections](#sample-projections)
     -   [Recurrent genes](#recurrent-genes)
     -   [Looking at the details](#looking-at-the-details)
-    -   [Using the interactive
-        dashboards](#using-the-interactive-dashboards)
     -   [Visualising on ACSN](#visualising-on-acsn)
     -   [Session information](#session-information)
 
@@ -2738,18 +2736,6 @@ confim cetain choiches if R is run interactivelly.
     ## Warning: Removed 18 rows containing non-finite values (stat_bin2d).
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-26-4.png)
-
-Using the interactive dashboards
---------------------------------
-
-It is possible to explore interactivelly the results of the ananlysis
-via two interactive dashboards:
-
-    DashboardA(RomaData = Data.FC, Groups = Type, ExpMat = MatData)
-
-and
-
-    DashboardB(RomaData = Data.FC, Groups = Type)
 
 Visualising on ACSN
 -------------------
