@@ -257,6 +257,21 @@ SelectFromInternalDB <- function(SearchString, BDName = "MsigDB", Version = NULL
     }
   }
   
+  if(BDName == "InfoSig_Conserved"){
+    if(is.null(Version)){
+      print("Searching in InfoSig conserved")
+      InternalDB <- rRoma::InfoSig_Conserved
+    }
+  }
+  
+  if(BDName == "InfoSig_Informative"){
+    if(is.null(Version)){
+      print("Searching in InfoSig")
+      InternalDB <- rRoma::InfoSig_Informative
+    }
+  }
+  
+  
   SelGeneSets <- NULL
   for(i in 1:length(SearchString)){
     if(Mode == "ANY"){
