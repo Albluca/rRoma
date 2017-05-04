@@ -8,7 +8,7 @@ PlotOnACSN(RomaData, SampleName, AggScoreFun = "mean", QTop = NULL,
   QBottom = NULL, Steps = 2, MapURL = "", Selected = NULL,
   FilterByWei = NULL, AggGeneFun = "mean", DispMode = "Module",
   DataName = "Sample", DefDispVal = 0, PlotInfo = TRUE,
-  ReturnInfo = FALSE)
+  ReturnInfo = FALSE, LocalRange = FALSE)
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
@@ -18,9 +18,9 @@ PlotOnACSN(RomaData, SampleName, AggScoreFun = "mean", QTop = NULL,
 \item{AggScoreFun}{string, scalar. The name of the aggregating function used to compute the valus of the gene score.
 Note that this function will be applied even to genes appearin in one geneset. To consider only genes found in a single module use the 'GetSingle' function and set DefDispVal to 0}
 
-\item{QTop}{numeric, scalar. The quantile threshold associted with the top saturation color.}
+\item{QTop}{numeric, scalar. The quantile threshold associted with the top saturation color. If NULL, the max will be used.}
 
-\item{QBottom}{numeric, scalar. The quantile threshold associted with the lower saturation color.}
+\item{QBottom}{numeric, scalar. The quantile threshold associted with the lower saturation color.  If NULL, the min will be used.}
 
 \item{Steps}{numeric, scalar. The number of steps of the heatmap??}
 
@@ -54,6 +54,8 @@ It can be any combination of the following:
 \item{PlotInfo}{boolean scalar. Should information plot be produced?}
 
 \item{ReturnInfo}{boolean scalar. Should information be returned?}
+
+\item{LocalRange}{boolean scalar. Should color bounds be relative to the considered samples only?}
 }
 \description{
 Project ROMA results onto ACSN maps

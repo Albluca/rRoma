@@ -16,8 +16,8 @@
 #' @param AggScoreFun string, scalar. The name of the aggregating function used to compute the valus of the gene score.
 #' Note that this function will be applied even to genes appearin in one geneset. To consider only genes found in a single module use the 'GetSingle' function and set DefDispVal to 0
 #' @param DefDispVal numeric, scalar. The value to be used when the fucntion defined by AggScoreFun produce NA (e.g., sd applied to genes that appear only in one geneset)
-#' @param QTop numeric, scalar. The quantile threshold associted with the top saturation color. 
-#' @param QBottom numeric, scalar. The quantile threshold associted with the lower saturation color. 
+#' @param QTop numeric, scalar. The quantile threshold associted with the top saturation color. If NULL, the max will be used.
+#' @param QBottom numeric, scalar. The quantile threshold associted with the lower saturation color.  If NULL, the min will be used.
 #' @param Steps numeric, scalar. The number of steps of the heatmap?? 
 #' @param MapURL string, scalar. The url of the map to use. The available maps can be seen on acsn.curie.fr and navicell.curie.fr. Possible values include
 #' \itemize{
@@ -29,6 +29,8 @@
 #' } 
 #' @param PlotInfo boolean scalar. Should information plot be produced?
 #' @param ReturnInfo boolean scalar. Should information be returned?
+#' @param LocalRange boolean scalar. Should color bounds be relative to the considered samples only?
+#'
 #'
 #' @return
 #' @export
@@ -39,7 +41,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
                        MapURL = "", Selected = NULL, FilterByWei = NULL,
                        AggGeneFun = "mean", DispMode = "Module",
                        DataName = "Sample", DefDispVal = 0, PlotInfo = TRUE,
-                       ReturnInfo = FALSE) {
+                       ReturnInfo = FALSE, LocalRange = FALSE) {
   
   if(!requireNamespace("RNaviCell", quietly = TRUE)){
     stop("Unable to load RNaviCell Impossible to proceed")
@@ -61,7 +63,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     print("No Genset selected")
     return(NULL)
   } else {
-    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset(s) selected"))
   }
   
   
@@ -161,17 +163,36 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     Session.Navicell$continuousConfigSetStepCount("sample", 'color', DataName, Steps)
     Session.Navicell$continuousConfigSetColorAt(DataName, "sample", 0, 'FFFFFF')
     
-    if(is.null(QTop)){
-      Top <- quantile(DataToPlot, .95)
+    if(LocalRange){
+      
+      if(is.null(QTop)){
+        Top <- max(DataToPlot)
+      } else {
+        Top <- quantile(DataToPlot, QTop)
+      }
+      
+      if(is.null(QBottom)){
+        Bottom <- min(DataToPlot)
+      } else {
+        Bottom <- quantile(DataToPlot, QBottom)
+      }
+      
     } else {
-      Top <- quantile(DataToPlot, QTop)
+      
+      if(is.null(QTop)){
+        Top <- max(RomaData$ProjMatrix[Selected,])
+      } else {
+        Top <- quantile(RomaData$ProjMatrix[Selected,], QTop)
+      }
+      
+      if(is.null(QBottom)){
+        Bottom <- min(RomaData$ProjMatrix[Selected,])
+      } else {
+        Bottom <- quantile(RomaData$ProjMatrix[Selected,], QBottom)
+      }
+      
     }
     
-    if(is.null(QBottom)){
-      Bottom <- quantile(DataToPlot, .5)
-    } else {
-      Bottom <- quantile(DataToPlot, QBottom)
-    }
     
     Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Bottom, -1)
     Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Top, 1)
@@ -210,17 +231,20 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     Session.Navicell$continuousConfigSetStepCount("sample", 'color', DataName, Steps)
     Session.Navicell$continuousConfigSetColorAt(DataName, "sample", 0, 'FFFFFF')
     
+    
     if(is.null(QTop)){
-      Top <- quantile(DataToPlot, .95)
+      Top <- max(DataToPlot)
     } else {
       Top <- quantile(DataToPlot, QTop)
     }
     
     if(is.null(QBottom)){
-      Bottom <- quantile(DataToPlot, .5)
+      Bottom <- min(DataToPlot)
     } else {
       Bottom <- quantile(DataToPlot, QBottom)
     }
+    
+    
     
     Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Bottom, -1)
     Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Top, 1)
