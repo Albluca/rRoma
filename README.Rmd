@@ -370,6 +370,23 @@ PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "metastasized
 sessionInfo()
 ```
 
+# Using the docker image
+
+A docker image contains rRoma, the [rRomaDash package](https://github.com/Albluca/rRomaDash), and all the necessary dependencies is available. It can be installed by typing 
+
+```{r, engine='bash', eval=FALSE}
+docker pull albluca/rroma
+```
+
+After installation, the image can be started with the command
+
+```{r, engine='bash', eval=FALSE}
+docker run -p 8787:8787 albluca/rromadock
+```
+
+At this point the RStudio web interface containing rRoma will be availabe, in Unix-like systems, at the address [http://localhost:8787](http://localhost:8787). It is then possible to access the interface by using "rstudio" as the username and password.
+
+On windows, it may be necessary to replace localhost with the address of the machine. If any problem is encountered see the instruction [here](https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image).
 
 
 
