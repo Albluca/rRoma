@@ -318,7 +318,6 @@ PlotSampleProjections(RomaData = RedData.NFC, PlotSamples = 30,
                       PlotPCProj = c('Points', 'Density',  'Bins'))
 ```
 
-
 ## Using the interactive dashboard
 
 An interactive dasboard that can be used to perform ROMA and visualize the results is available as a separate r package on [GitHub](https://github.com/Albluca/rRomaDash)
@@ -371,7 +370,24 @@ sessionInfo()
 ```
 
 
+# Usind the docker container
 
+A docker image containing the RStusio web server and all the necessary packages  needed to run rRoma is also available. After installing [docker](http://www.docker.com), the image can be obtained using 
 
+```{r, engine='bash', eval=FALSE}
+docker pull albluca/rroma
+```
+
+After installation, the image can be started with the command
+
+```{r, engine='bash', eval=FALSE}
+docker run -p 8787:8787 albluca/rroma
+```
+
+At this point, the RStudio web interface containing rRoma and the [rRomaDash interface](https://github.com/Albluca/rRomaDash) will be availabe. In Unix-like systems, the interface will be available at the address http://localhost:8787. It is then possible to access the interface by using "rstudio" as the username and password.
+
+On windows, it may be necessary to replace localhost with the address of the machine. If any problem is encountered see the instruction [here](https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image).
+
+After starting the interface, it is possible to write r code as in the desktop version of RStudio.
 
 
