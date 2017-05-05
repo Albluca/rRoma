@@ -370,7 +370,7 @@ sessionInfo()
 ```
 
 
-# Usind the docker container
+# Using the docker container
 
 A docker image containing the RStusio web server and all the necessary packages  needed to run rRoma is also available. After installing [docker](http://www.docker.com), the image can be obtained using 
 
