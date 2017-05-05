@@ -333,7 +333,7 @@ tictoc::tic()
 Data.NFC.CS <- rRoma.R(ExpressionMatrix = MatData,
                        ModuleList = ReadGMTFile("http://acsn.curie.fr/files/survival_v1.1.gmt"),
                        FixedCenter = FALSE, MaxGenes = 500,
-                       UseParallel = TRUE, nCores = 3, ClusType = "FORK",
+                       UseParallel = TRUE, nCores = 8, ClusType = "FORK",
                        PCSignMode="CorrelateAllWeightsByGene")
 tictoc::toc()
 
