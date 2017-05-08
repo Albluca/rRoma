@@ -69,7 +69,7 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
   if(GeneOutDetection == "L1OutVarDC"){
     
     if(PrintInfo){
-      print("Detecting outliers using leave one out and percentage variation on variance explained by PC1")
+      print("Detecting outliers using leave one out and dendrogram analysis on variance explained by PC1")
     }
     
     # Computing all the PC1

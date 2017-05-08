@@ -707,8 +707,9 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           GenesToUse <- names(SplitGroups[as.character(SplitGroups) == GeneGroup])
           
           if(length(GenesToUse)>0){
-            p <- ggplot2::ggplot(MeltData[as.character(MeltData$Gene) %in% GenesToUse,], ggplot2::aes(y=Exp, x=Proj, shape = Wei, color = Group)) + ggplot2::geom_point() +
-              ggplot2::facet_wrap( ~ Gene) + ggplot2::labs(title = ModuleList[[i]]$Name, x = "PC1 projections", y = "Expression") +
+            p <- ggplot2::ggplot(MeltData[as.character(MeltData$Gene) %in% GenesToUse,],
+                                 ggplot2::aes(y=Exp, x=Proj, shape = Wei, color = Group)) + ggplot2::geom_point() +
+              ggplot2::facet_wrap( ~ Gene, scales = "free_y") + ggplot2::labs(title = ModuleList[[i]]$Name, x = "PC1 projections", y = "Expression") +
               ggplot2::scale_shape_discrete(name = "Weight") + ggplot2::scale_color_discrete(name = "Group")
             print(p)
           }
@@ -748,7 +749,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           # print(GenesToUse)
           
           if(length(GenesToUse)>0){
-            p <- ggplot2::ggplot(CorData[as.character(CorData$Gene) %in% GenesToUse,], ggplot2::aes(x =  Gene, y = Est, ymin = Low, ymax = High, color = Conc)) +
+            p <- ggplot2::ggplot(CorData[as.character(CorData$Gene) %in% GenesToUse,],
+                                 ggplot2::aes(x =  Gene, y = Est, ymin = Low, ymax = High, color = Conc)) +
               ggplot2::geom_hline(yintercept = 0, linetype = 2) + ggplot2::geom_errorbar() +
               ggplot2::geom_point() + ggplot2::coord_flip() + 
               ggplot2::labs(title = ModuleList[[i]]$Name, y = "Estimated correlation (Exp VS PC1 Proj - 95% CI)", x = "")
@@ -766,7 +768,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           
           if(sum(as.character(MeltData$Group) == GroupID, na.rm = TRUE)>0){
             p <- ggplot2::ggplot(MeltData[as.character(MeltData$Group) == GroupID & !is.na(MeltData$Group),], ggplot2::aes(y=Exp, x=Load, shape = Wei, color = Group)) + ggplot2::geom_point() +
-              ggplot2::facet_wrap( ~ Sample) + ggplot2::labs(title = ModuleList[[i]]$Name, x = "PC1 weights", y = "Expression") +
+              ggplot2::facet_wrap( ~ Sample, scales = "free_y") + ggplot2::labs(title = ModuleList[[i]]$Name, x = "PC1 weights", y = "Expression") +
               ggplot2::scale_shape_discrete(name = "Gene weight") + ggplot2::scale_color_discrete(name = "Group")
             print(p)
           }
