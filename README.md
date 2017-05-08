@@ -15,6 +15,7 @@
         dashboard](#using-the-interactive-dashboard)
     -   [Visualising on ACSN](#visualising-on-acsn)
     -   [Session information](#session-information)
+-   [Using the docker image](#using-the-docker-image)
 -   [Using the docker container](#using-the-docker-container)
 
 This package provides an R implementation of
@@ -151,7 +152,7 @@ Let us begin by getting the description of the dataset
     ##     'browseVignettes()'. To cite Bioconductor, see
     ##     'citation("Biobase")', and for packages 'citation("pkgname")'.
 
-    gse <- getGEO("GSE50760", GSEMatrix = TRUE)
+    gse <- getGEO("GSE50760", GSEMatrix = TRUE, destdir = getwd())
 
     ## https://ftp.ncbi.nlm.nih.gov/geo/series/GSE50nnn/GSE50760/matrix/
 
@@ -161,9 +162,10 @@ Let us begin by getting the description of the dataset
 
     ## GSE50760_series_matrix.txt.gz
 
-    ## File stored at:
+    ## Using locally cached version: /bioinfo/users/lalberga/R/rRoma/GSE50760_series_matrix.txt.gz
 
-    ## /tmp/RtmphMxbrY/GPL11154.soft
+    ## Using locally cached version of GPL11154 found here:
+    ## /bioinfo/users/lalberga/R/rRoma/GPL11154.soft
 
 Then we get the actual expression expression files
 
@@ -655,7 +657,7 @@ sufficient write:
     ## [1] "Centering gene expression over samples"
     ## [1] "Using global center (centering over genes)"
     ## [1] "All the genesets will be used"
-    ## [1] "2017-05-05 15:08:53 CEST"
+    ## [1] "2017-05-08 14:18:12 CEST"
     ## [1] "[1/50] Working on NOTCH_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_NOTCH_SIGNALING"
     ## [1] "32 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -663,18 +665,18 @@ sufficient write:
     ## [1] "WNT2"
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.7729627544363 L1/L2 = 20.4674907313449"
+    ## [1] "L1 = 0.7729627544363 L1/L2 = 20.4674907313448"
     ## [1] "Median expression (uncentered): 13.5150221827314"
     ## [1] "Median expression (centered/weighted): 0.0288003550423865"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.19780208002591 L1/L2 = 1.53191768525597"
+    ## [1] "L1 = 0.19780208002591 L1/L2 = 1.53191768525613"
     ## [1] "Median expression (uncentered): 13.5291252684908"
     ## [1] "Median expression (centered/weighted): 0.0230072380009256"
     ## [1] "Previous sample size: 0"
     ## [1] "Next sample size: 32"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.087   0.166   2.599 
+    ##   0.109   0.153   2.974 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -690,7 +692,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:08:56 CEST"
+    ## [1] "2017-05-08 14:18:16 CEST"
     ## [1] "[2/50] Working on HEDGEHOG_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_HEDGEHOG_SIGNALING"
     ## [1] "36 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -698,18 +700,18 @@ sufficient write:
     ## [1] "SCG2"   "SLIT1"  "PLG"    "NKX6-1" "CNTFR" 
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.368491187370065 L1/L2 = 1.79553927815686"
+    ## [1] "L1 = 0.368491187370065 L1/L2 = 1.7955392781633"
     ## [1] "Median expression (uncentered): 13.1529183587471"
     ## [1] "Median expression (centered/weighted): 0.00223034662800391"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.247256821908336 L1/L2 = 2.26610674514946"
+    ## [1] "L1 = 0.247256821908336 L1/L2 = 2.26610674514864"
     ## [1] "Median expression (uncentered): 13.2823644791553"
     ## [1] "Median expression (centered/weighted): 0.0064586698739066"
     ## [1] "Previous sample size: 32"
     ## [1] "Next sample size: 36"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.106   0.164   1.970 
+    ##   0.111   0.170   2.104 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -725,7 +727,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:08:58 CEST"
+    ## [1] "2017-05-08 14:18:18 CEST"
     ## [1] "[3/50] Working on ANGIOGENESIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ANGIOGENESIS"
     ## [1] "36 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -733,11 +735,11 @@ sufficient write:
     ## [1] "PF4"     "OLR1"    "PGLYRP1" "CXCL6"  
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.36493467797299 L1/L2 = 1.49553133747775"
+    ## [1] "L1 = 0.364934677972989 L1/L2 = 1.49553133747541"
     ## [1] "Median expression (uncentered): 13.211812247159"
     ## [1] "Median expression (centered/weighted): 0.0245384923834588"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.649945580328028 L1/L2 = 6.8423290278224"
+    ## [1] "L1 = 0.649945580328027 L1/L2 = 6.84232902819473"
     ## [1] "Median expression (uncentered): 13.3594749443633"
     ## [1] "Median expression (centered/weighted): -0.00271666625244847"
     ## [1] "Previous sample size: 36"
@@ -758,7 +760,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:08:59 CEST"
+    ## [1] "2017-05-08 14:18:18 CEST"
     ## [1] "[4/50] Working on PANCREAS_BETA_CELLS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_PANCREAS_BETA_CELLS"
     ## [1] "40 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -767,7 +769,7 @@ sufficient write:
     ## [8] "IAPP"    "G6PC2"  
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.414306587930286 L1/L2 = 4.0890516015617"
+    ## [1] "L1 = 0.414306587930285 L1/L2 = 4.08905160156136"
     ## [1] "Median expression (uncentered): 12.5489421629889"
     ## [1] "Median expression (centered/weighted): 0.109141826550011"
     ## [1] "Post-filter data"
@@ -778,7 +780,7 @@ sufficient write:
     ## [1] "Next sample size: 40"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.113   0.140   2.810 
+    ##   0.115   0.150   3.107 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -794,7 +796,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:02 CEST"
+    ## [1] "2017-05-08 14:18:21 CEST"
     ## [1] "[5/50] Working on WNT_BETA_CATENIN_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_WNT_BETA_CATENIN_SIGNALING"
     ## [1] "42 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -806,7 +808,7 @@ sufficient write:
     ## [1] "Median expression (uncentered): 13.3219279229047"
     ## [1] "Median expression (centered/weighted): 0.0252941445542472"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.235144742884089 L1/L2 = 2.15765414057685"
+    ## [1] "L1 = 0.235144742884089 L1/L2 = 2.15765414057558"
     ## [1] "Median expression (uncentered): 13.4160717745688"
     ## [1] "Median expression (centered/weighted): -0.00505501664700372"
     ## [1] "Previous sample size: 40"
@@ -827,7 +829,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:02 CEST"
+    ## [1] "2017-05-08 14:18:21 CEST"
     ## [1] "[6/50] Working on APICAL_SURFACE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_APICAL_SURFACE"
     ## [1] "44 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -840,14 +842,14 @@ sufficient write:
     ## [1] "Median expression (uncentered): 13.078317612573"
     ## [1] "Median expression (centered/weighted): 0.0615200797577556"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.312869371176746 L1/L2 = 3.02417262928814"
+    ## [1] "L1 = 0.312869371176746 L1/L2 = 3.0241726274257"
     ## [1] "Median expression (uncentered): 13.4014128725526"
     ## [1] "Median expression (centered/weighted): 0.0245102665025946"
     ## [1] "Previous sample size: 40"
     ## [1] "Next sample size: 44"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.118   0.166   2.197 
+    ##   0.105   0.193   2.398 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -863,7 +865,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:04 CEST"
+    ## [1] "2017-05-08 14:18:24 CEST"
     ## [1] "[7/50] Working on REACTIVE_OXIGEN_SPECIES_PATHWAY - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_REACTIVE_OXIGEN_SPECIES_PATHWAY"
     ## [1] "48 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -871,7 +873,7 @@ sufficient write:
     ## [1] "MPO"
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.54897536488735 L1/L2 = 7.97282092986275"
+    ## [1] "L1 = 0.54897536488735 L1/L2 = 7.97282092986274"
     ## [1] "Median expression (uncentered): 13.6307790036278"
     ## [1] "Median expression (centered/weighted): 0.0204939834579211"
     ## [1] "Post-filter data"
@@ -882,7 +884,7 @@ sufficient write:
     ## [1] "Next sample size: 48"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.122   0.160   3.178 
+    ##   0.119   0.170   3.625 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -898,7 +900,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:07 CEST"
+    ## [1] "2017-05-08 14:18:28 CEST"
     ## [1] "[8/50] Working on TGF_BETA_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_TGF_BETA_SIGNALING"
     ## [1] "54 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -906,18 +908,18 @@ sufficient write:
     ## [1] "LEFTY2" "NOG"   
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.543219309042768 L1/L2 = 5.94334567510846"
+    ## [1] "L1 = 0.543219309042768 L1/L2 = 5.94334567414201"
     ## [1] "Median expression (uncentered): 13.6414872140507"
     ## [1] "Median expression (centered/weighted): 0.0335821943623831"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.169890392493585 L1/L2 = 1.39205830779712"
+    ## [1] "L1 = 0.169890392493586 L1/L2 = 1.39205830779711"
     ## [1] "Median expression (uncentered): 13.6720935948085"
     ## [1] "Median expression (centered/weighted): 0.0286294392766931"
     ## [1] "Previous sample size: 48"
     ## [1] "Next sample size: 54"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.131   0.162   2.851 
+    ##   0.123   0.162   3.193 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -933,25 +935,25 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:10 CEST"
+    ## [1] "2017-05-08 14:18:31 CEST"
     ## [1] "[9/50] Working on MYC_TARGETS_V2 - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_MYC_TARGETS_V2"
     ## [1] "58 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
     ## [1] "No gene will be filtered"
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.277178834773448 L1/L2 = 2.10208475308523"
+    ## [1] "L1 = 0.277178834773449 L1/L2 = 2.10208475267861"
     ## [1] "Median expression (uncentered): 13.5235005936785"
     ## [1] "Median expression (centered/weighted): 0.0355963366138567"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.277178834773448 L1/L2 = 2.10208475276518"
+    ## [1] "L1 = 0.277178834773449 L1/L2 = 2.10208475267861"
     ## [1] "Median expression (uncentered): 13.5235005936785"
     ## [1] "Median expression (centered/weighted): 0.0355963366138567"
     ## [1] "Previous sample size: 54"
     ## [1] "Next sample size: 58"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.127   0.165   4.182 
+    ##   0.128   0.169   4.237 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -967,7 +969,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:15 CEST"
+    ## [1] "2017-05-08 14:18:36 CEST"
     ## [1] "[10/50] Working on CHOLESTEROL_HOMEOSTASIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_CHOLESTEROL_HOMEOSTASIS"
     ## [1] "74 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -986,7 +988,7 @@ sufficient write:
     ## [1] "Next sample size: 74"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.126   0.174   4.963 
+    ##   0.143   0.168   5.329 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -1002,7 +1004,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:20 CEST"
+    ## [1] "2017-05-08 14:18:41 CEST"
     ## [1] "[11/50] Working on IL6_JAK_STAT3_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_IL6_JAK_STAT3_SIGNALING"
     ## [1] "87 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1010,7 +1012,7 @@ sufficient write:
     ## [1] "IL6"   "REG1A" "INHBE" "CRLF2" "PF4"   "DNTT"  "CSF2"  "CNTFR" "CCL7" 
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.255165830617036 L1/L2 = 1.1675278861914"
+    ## [1] "L1 = 0.255165830617035 L1/L2 = 1.1675278861914"
     ## [1] "Median expression (uncentered): 13.4361909954814"
     ## [1] "Median expression (centered/weighted): 0.0218640317615592"
     ## [1] "Post-filter data"
@@ -1021,7 +1023,7 @@ sufficient write:
     ## [1] "Next sample size: 87"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.165   0.162   7.480 
+    ##   0.147   0.159   7.478 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -1037,7 +1039,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:28 CEST"
+    ## [1] "2017-05-08 14:18:49 CEST"
     ## [1] "[12/50] Working on PROTEIN_SECRETION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_PROTEIN_SECRETION"
     ## [1] "96 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1045,7 +1047,7 @@ sufficient write:
     ## [1] "SH3GL2"   "ATP6V1B1"
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.454001061572679 L1/L2 = 2.49256826457631"
+    ## [1] "L1 = 0.454001061572679 L1/L2 = 2.4925682645763"
     ## [1] "Median expression (uncentered): 13.52851515655"
     ## [1] "Median expression (centered/weighted): -0.0081114967003805"
     ## [1] "Post-filter data"
@@ -1056,7 +1058,7 @@ sufficient write:
     ## [1] "Next sample size: 96"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.162   0.175   8.035 
+    ##   0.149   0.182   8.055 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -1072,7 +1074,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:36 CEST"
+    ## [1] "2017-05-08 14:18:58 CEST"
     ## [1] "[13/50] Working on INTERFERON_ALPHA_RESPONSE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_INTERFERON_ALPHA_RESPONSE"
     ## [1] "97 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1080,11 +1082,11 @@ sufficient write:
     ## [1] "SAMD9"   "TMEM140" "IL7"    
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.124548239305664 L1/L2 = 1.09571729826165"
+    ## [1] "L1 = 0.124548239305664 L1/L2 = 1.09571729826167"
     ## [1] "Median expression (uncentered): 13.5266826196238"
     ## [1] "Median expression (centered/weighted): 0.0263565592174932"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.119095347645235 L1/L2 = 1.16509980698346"
+    ## [1] "L1 = 0.119095347645235 L1/L2 = 1.1650998069809"
     ## [1] "Median expression (uncentered): 13.5263769664826"
     ## [1] "Median expression (centered/weighted): 0.025869481899564"
     ## [1] "Previous sample size: 96"
@@ -1105,7 +1107,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:37 CEST"
+    ## [1] "2017-05-08 14:18:58 CEST"
     ## [1] "[14/50] Working on ANDROGEN_RESPONSE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ANDROGEN_RESPONSE"
     ## [1] "101 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1113,7 +1115,7 @@ sufficient write:
     ## [1] "KLK3"   "KLK2"   "BMPR1B" "MAK"   
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.338120066940927 L1/L2 = 1.44483482563183"
+    ## [1] "L1 = 0.338120066940927 L1/L2 = 1.44483482564911"
     ## [1] "Median expression (uncentered): 13.5126787432295"
     ## [1] "Median expression (centered/weighted): 0.0161008043790264"
     ## [1] "Post-filter data"
@@ -1138,7 +1140,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:38 CEST"
+    ## [1] "2017-05-08 14:18:59 CEST"
     ## [1] "[15/50] Working on PEROXISOME - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_PEROXISOME"
     ## [1] "103 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1147,18 +1149,18 @@ sufficient write:
     ##  [7] "UGT2B17"  "SERPINA6" "CRABP1"   "FABP6"    "CACNA1B" 
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.36323721917504 L1/L2 = 2.11695878905139"
+    ## [1] "L1 = 0.363237219174976 L1/L2 = 2.11695878910456"
     ## [1] "Median expression (uncentered): 13.4885931973324"
     ## [1] "Median expression (centered/weighted): 0.0435682700069628"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.199225330240566 L1/L2 = 2.2615008046837"
+    ## [1] "L1 = 0.199225330240566 L1/L2 = 2.2615008046869"
     ## [1] "Median expression (uncentered): 13.5633750472982"
     ## [1] "Median expression (centered/weighted): 0.0225902487278652"
     ## [1] "Previous sample size: 96"
     ## [1] "Next sample size: 103"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.183   0.164  10.070 
+    ##   0.181   0.164  10.071 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -1174,7 +1176,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:48 CEST"
+    ## [1] "2017-05-08 14:19:09 CEST"
     ## [1] "[16/50] Working on PI3K_AKT_MTOR_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_PI3K_AKT_MTOR_SIGNALING"
     ## [1] "105 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1182,11 +1184,11 @@ sufficient write:
     ## [1] "GNGT1" "ADCY2" "FGF6"  "FGF17" "FGF22" "IL4"   "PITX2" "FASLG" "NGF"  
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.278264298470123 L1/L2 = 1.46969988940532"
+    ## [1] "L1 = 0.278264298470123 L1/L2 = 1.46969988940531"
     ## [1] "Median expression (uncentered): 13.4811687232326"
     ## [1] "Median expression (centered/weighted): 0.0120686361460057"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.185667863757477 L1/L2 = 1.52615255643652"
+    ## [1] "L1 = 0.185667863757477 L1/L2 = 1.52615255643653"
     ## [1] "Median expression (uncentered): 13.5280877688783"
     ## [1] "Median expression (centered/weighted): 0.0146540320966415"
     ## [1] "Previous sample size: 103"
@@ -1207,7 +1209,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:09:49 CEST"
+    ## [1] "2017-05-08 14:19:10 CEST"
     ## [1] "[17/50] Working on UNFOLDED_PROTEIN_RESPONSE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_UNFOLDED_PROTEIN_RESPONSE"
     ## [1] "112 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1215,7 +1217,7 @@ sufficient write:
     ## [1] "IGFBP1" "STC2"  
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.239386323116368 L1/L2 = 1.43036782781862"
+    ## [1] "L1 = 0.239386323116417 L1/L2 = 1.43036782795375"
     ## [1] "Median expression (uncentered): 13.5550683863539"
     ## [1] "Median expression (centered/weighted): -0.00431731167247401"
     ## [1] "Post-filter data"
@@ -1226,7 +1228,7 @@ sufficient write:
     ## [1] "Next sample size: 112"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.202   0.153  11.312 
+    ##   0.193   0.163  11.896 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -1242,7 +1244,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:10:01 CEST"
+    ## [1] "2017-05-08 14:19:23 CEST"
     ## [1] "[18/50] Working on BILE_ACID_METABOLISM - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_BILE_ACID_METABOLISM"
     ## [1] "112 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1253,11 +1255,11 @@ sufficient write:
     ## [22] "NR0B2"  
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.337501748834406 L1/L2 = 2.96115713031048"
+    ## [1] "L1 = 0.337501748834406 L1/L2 = 2.96115713031046"
     ## [1] "Median expression (uncentered): 13.3039947238114"
     ## [1] "Median expression (centered/weighted): 0.0628334546694925"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.31380628027142 L1/L2 = 2.01376447522518"
+    ## [1] "L1 = 0.313806280271421 L1/L2 = 2.01376447522518"
     ## [1] "Median expression (uncentered): 13.5042603675207"
     ## [1] "Median expression (centered/weighted): 0.0336177113650119"
     ## [1] "Previous sample size: 112"
@@ -1278,7 +1280,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:10:01 CEST"
+    ## [1] "2017-05-08 14:19:23 CEST"
     ## [1] "[19/50] Working on SPERMATOGENESIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_SPERMATOGENESIS"
     ## [1] "133 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1293,7 +1295,7 @@ sufficient write:
     ## [43] "GAD1"     "HOXB1"   
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.161899009884753 L1/L2 = 1.98544871134273"
+    ## [1] "L1 = 0.161899009884753 L1/L2 = 1.98544871134362"
     ## [1] "Median expression (uncentered): 12.3032098359823"
     ## [1] "Median expression (centered/weighted): 0.00316725566488098"
     ## [1] "Post-filter data"
@@ -1304,7 +1306,7 @@ sufficient write:
     ## [1] "Next sample size: 133"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.203   0.161  14.450 
+    ##   0.204   0.178  15.274 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -1320,7 +1322,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:10:17 CEST"
+    ## [1] "2017-05-08 14:19:39 CEST"
     ## [1] "[20/50] Working on COAGULATION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_COAGULATION"
     ## [1] "137 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1333,11 +1335,11 @@ sufficient write:
     ## [31] "CPB2"     "DCT"      "APOC3"   
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.361319108402517 L1/L2 = 2.62610374026381"
+    ## [1] "L1 = 0.361319108402516 L1/L2 = 2.6261037402638"
     ## [1] "Median expression (uncentered): 13.3824889301197"
     ## [1] "Median expression (centered/weighted): 0.0394884730726891"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.249409066531518 L1/L2 = 2.83368866893342"
+    ## [1] "L1 = 0.249409066531518 L1/L2 = 2.8336886689334"
     ## [1] "Median expression (uncentered): 13.5316251384226"
     ## [1] "Median expression (centered/weighted): 0.0227827182813579"
     ## [1] "Previous sample size: 133"
@@ -1358,7 +1360,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:10:17 CEST"
+    ## [1] "2017-05-08 14:19:40 CEST"
     ## [1] "[21/50] Working on UV_RESPONSE_DN - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_UV_RESPONSE_DN"
     ## [1] "144 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1367,18 +1369,18 @@ sufficient write:
     ##  [7] "COL11A1"  "KCNMA1"   "SCHIP1"   "PTGFR"    "KIT"     
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.214760028792224 L1/L2 = 1.68937913401953"
+    ## [1] "L1 = 0.214760028792223 L1/L2 = 1.68937913401952"
     ## [1] "Median expression (uncentered): 13.5051292259532"
     ## [1] "Median expression (centered/weighted): 0.034281438313519"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.126338726131126 L1/L2 = 1.25211993682919"
+    ## [1] "L1 = 0.126338726131126 L1/L2 = 1.25211993682928"
     ## [1] "Median expression (uncentered): 13.5444211458705"
     ## [1] "Median expression (centered/weighted): 0.0297874779990328"
     ## [1] "Previous sample size: 133"
     ## [1] "Next sample size: 144"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.238   0.162  17.306 
+    ##   0.240   0.176  17.817 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -1394,7 +1396,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:10:36 CEST"
+    ## [1] "2017-05-08 14:19:59 CEST"
     ## [1] "[22/50] Working on DNA_REPAIR - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_DNA_REPAIR"
     ## [1] "149 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1427,7 +1429,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:10:37 CEST"
+    ## [1] "2017-05-08 14:20:00 CEST"
     ## [1] "[23/50] Working on FATTY_ACID_METABOLISM - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_FATTY_ACID_METABOLISM"
     ## [1] "158 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1441,14 +1443,14 @@ sufficient write:
     ## [1] "Median expression (uncentered): 13.5139742684693"
     ## [1] "Median expression (centered/weighted): 0.0292705282678304"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.167794141297789 L1/L2 = 1.53190256710099"
+    ## [1] "L1 = 0.167794141297789 L1/L2 = 1.53190256710098"
     ## [1] "Median expression (uncentered): 13.5784316514737"
     ## [1] "Median expression (centered/weighted): 0.0298610784664905"
     ## [1] "Previous sample size: 144"
     ## [1] "Next sample size: 158"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.246   0.172  20.717 
+    ##   0.243   0.199  21.869 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -1464,7 +1466,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:10:59 CEST"
+    ## [1] "2017-05-08 14:20:23 CEST"
     ## [1] "[24/50] Working on UV_RESPONSE_UP - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_UV_RESPONSE_UP"
     ## [1] "158 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1473,11 +1475,11 @@ sufficient write:
     ##  [8] "COL2A1"  "NTRK3"   "FGF18"   "SLC6A12" "ONECUT1" "TACR3"   "CCK"    
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.285175326811779 L1/L2 = 1.94590392794633"
+    ## [1] "L1 = 0.285175326811778 L1/L2 = 1.94590392794632"
     ## [1] "Median expression (uncentered): 13.5058115485883"
     ## [1] "Median expression (centered/weighted): 0.0272850948434725"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.188558360012701 L1/L2 = 1.61601772968146"
+    ## [1] "L1 = 0.188558360012701 L1/L2 = 1.61601772968145"
     ## [1] "Median expression (uncentered): 13.5559670975513"
     ## [1] "Median expression (centered/weighted): 0.0261316596015102"
     ## [1] "Previous sample size: 158"
@@ -1498,7 +1500,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:00 CEST"
+    ## [1] "2017-05-08 14:20:25 CEST"
     ## [1] "[25/50] Working on APOPTOSIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_APOPTOSIS"
     ## [1] "161 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1532,7 +1534,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:01 CEST"
+    ## [1] "2017-05-08 14:20:26 CEST"
     ## [1] "[26/50] Working on ADIPOGENESIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ADIPOGENESIS"
     ## [1] "197 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1540,18 +1542,18 @@ sufficient write:
     ## [1] "FABP4"  "ADIPOQ" "ACADL"  "LEP"    "RETN"   "CYP4B1" "OMD"    "CIDEA" 
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.3576956519624 L1/L2 = 2.48799890983763"
+    ## [1] "L1 = 0.357695651962399 L1/L2 = 2.48799890984549"
     ## [1] "Median expression (uncentered): 13.5298575391099"
     ## [1] "Median expression (centered/weighted): 0.0203073654865543"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.164050747781133 L1/L2 = 1.24158076610863"
+    ## [1] "L1 = 0.164050747781357 L1/L2 = 1.24158076607384"
     ## [1] "Median expression (uncentered): 13.5554878565741"
     ## [1] "Median expression (centered/weighted): 0.0143227569092484"
     ## [1] "Previous sample size: 158"
     ## [1] "Next sample size: 197"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.300   0.167  30.533 
+    ##   0.297   0.208  32.665 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -1567,7 +1569,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:34 CEST"
+    ## [1] "2017-05-08 14:21:00 CEST"
     ## [1] "[27/50] Working on COMPLEMENT - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_COMPLEMENT"
     ## [1] "198 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1603,7 +1605,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:35 CEST"
+    ## [1] "2017-05-08 14:21:02 CEST"
     ## [1] "[28/50] Working on HEME_METABOLISM - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_HEME_METABOLISM"
     ## [1] "198 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1615,11 +1617,11 @@ sufficient write:
     ## [25] "HBBP1"    "TRIM58"   "ABCG2"   
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.149390754163708 L1/L2 = 1.22768898585663"
+    ## [1] "L1 = 0.149390754163709 L1/L2 = 1.22768898583301"
     ## [1] "Median expression (uncentered): 13.4131651120199"
     ## [1] "Median expression (centered/weighted): 0.0151387491201863"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.389443674320605 L1/L2 = 3.54611136936338"
+    ## [1] "L1 = 0.389443674320605 L1/L2 = 3.54611137076283"
     ## [1] "Median expression (uncentered): 13.5200047416386"
     ## [1] "Median expression (centered/weighted): 0.0133070818761943"
     ## [1] "Previous sample size: 197"
@@ -1640,7 +1642,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:37 CEST"
+    ## [1] "2017-05-08 14:21:04 CEST"
     ## [1] "[29/50] Working on MITOTIC_SPINDLE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_MITOTIC_SPINDLE"
     ## [1] "199 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1650,11 +1652,11 @@ sufficient write:
     ## [15] "CEP72" 
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.21560878289067 L1/L2 = 1.89479112538957"
+    ## [1] "L1 = 0.21560878289067 L1/L2 = 1.89479112538958"
     ## [1] "Median expression (uncentered): 13.4697053692697"
     ## [1] "Median expression (centered/weighted): 0.0127229257979371"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.145468346636305 L1/L2 = 1.24295800802548"
+    ## [1] "L1 = 0.145468346636305 L1/L2 = 1.24295800802538"
     ## [1] "Median expression (uncentered): 13.4924791247733"
     ## [1] "Median expression (centered/weighted): 0.0131507548579675"
     ## [1] "Previous sample size: 197"
@@ -1675,7 +1677,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:39 CEST"
+    ## [1] "2017-05-08 14:21:06 CEST"
     ## [1] "[30/50] Working on INTERFERON_GAMMA_RESPONSE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_INTERFERON_GAMMA_RESPONSE"
     ## [1] "199 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1683,11 +1685,11 @@ sufficient write:
     ## [1] "CXCL11" "CCL7"   "GBP6"   "HLA-G"  "IRF4"   "P2RY14" "IL6"    "XCL1"  
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.221406815910893 L1/L2 = 1.47544589876628"
+    ## [1] "L1 = 0.221406815910893 L1/L2 = 1.47544589876629"
     ## [1] "Median expression (uncentered): 13.500032686712"
     ## [1] "Median expression (centered/weighted): 0.0368830038740008"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.148131583879507 L1/L2 = 1.5268953763227"
+    ## [1] "L1 = 0.148131583879507 L1/L2 = 1.52689537632274"
     ## [1] "Median expression (uncentered): 13.5214777563578"
     ## [1] "Median expression (centered/weighted): 0.0317045114897241"
     ## [1] "Previous sample size: 197"
@@ -1708,7 +1710,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:41 CEST"
+    ## [1] "2017-05-08 14:21:08 CEST"
     ## [1] "[31/50] Working on E2F_TARGETS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_E2F_TARGETS"
     ## [1] "199 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1716,11 +1718,11 @@ sufficient write:
     ## [1] "ORC6"   "KIF4A"  "HELLS"  "KIF18B" "DSCC1"  "DIAPH3"
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.350924213891192 L1/L2 = 3.6484319011987"
+    ## [1] "L1 = 0.350924213891193 L1/L2 = 3.64843190119869"
     ## [1] "Median expression (uncentered): 13.580670763685"
     ## [1] "Median expression (centered/weighted): 0.0198028466949971"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.304381272796105 L1/L2 = 2.92204448712194"
+    ## [1] "L1 = 0.304381272796105 L1/L2 = 2.92204448712193"
     ## [1] "Median expression (uncentered): 13.5894170710207"
     ## [1] "Median expression (centered/weighted): 0.0199134089188142"
     ## [1] "Previous sample size: 197"
@@ -1741,18 +1743,18 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:43 CEST"
+    ## [1] "2017-05-08 14:21:10 CEST"
     ## [1] "[32/50] Working on MYC_TARGETS_V1 - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_MYC_TARGETS_V1"
     ## [1] "199 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
     ## [1] "No gene will be filtered"
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.253502033269943 L1/L2 = 1.90646751087291"
+    ## [1] "L1 = 0.253502033269943 L1/L2 = 1.90646751074839"
     ## [1] "Median expression (uncentered): 13.6681093715379"
     ## [1] "Median expression (centered/weighted): -0.00250012916938683"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.253502033269943 L1/L2 = 1.90646751074717"
+    ## [1] "L1 = 0.253502033269943 L1/L2 = 1.90646751076737"
     ## [1] "Median expression (uncentered): 13.6681093715379"
     ## [1] "Median expression (centered/weighted): -0.00250012916938683"
     ## [1] "Previous sample size: 197"
@@ -1773,7 +1775,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:45 CEST"
+    ## [1] "2017-05-08 14:21:12 CEST"
     ## [1] "[33/50] Working on INFLAMMATORY_RESPONSE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_INFLAMMATORY_RESPONSE"
     ## [1] "199 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1789,7 +1791,7 @@ sufficient write:
     ## [1] "Median expression (uncentered): 13.263782678381"
     ## [1] "Median expression (centered/weighted): 0.051926496798465"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.164299689983162 L1/L2 = 1.31014946513074"
+    ## [1] "L1 = 0.164299689983161 L1/L2 = 1.31014946513074"
     ## [1] "Median expression (uncentered): 13.3935245244494"
     ## [1] "Median expression (centered/weighted): 0.0313498631447268"
     ## [1] "Previous sample size: 197"
@@ -1810,7 +1812,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:47 CEST"
+    ## [1] "2017-05-08 14:21:14 CEST"
     ## [1] "[34/50] Working on XENOBIOTIC_METABOLISM - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_XENOBIOTIC_METABOLISM"
     ## [1] "199 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1822,7 +1824,7 @@ sufficient write:
     ## [29] "TAT"     "MBL2"    "ANGPTL3" "CYP2E1"  "ITIH1"  
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.349357632349227 L1/L2 = 3.50341844236491"
+    ## [1] "L1 = 0.349357632349227 L1/L2 = 3.50341844237077"
     ## [1] "Median expression (uncentered): 13.450824618143"
     ## [1] "Median expression (centered/weighted): 0.0288680949904655"
     ## [1] "Post-filter data"
@@ -1847,7 +1849,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:48 CEST"
+    ## [1] "2017-05-08 14:21:16 CEST"
     ## [1] "[35/50] Working on GLYCOLYSIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_GLYCOLYSIS"
     ## [1] "199 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1857,11 +1859,11 @@ sufficient write:
     ## [15] "CHST4" 
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.203202106002462 L1/L2 = 1.75814950477545"
+    ## [1] "L1 = 0.203202106002461 L1/L2 = 1.75814950477538"
     ## [1] "Median expression (uncentered): 13.4970409648082"
     ## [1] "Median expression (centered/weighted): 0.0198028466949971"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.207520272543673 L1/L2 = 2.08476479143322"
+    ## [1] "L1 = 0.207520272543673 L1/L2 = 2.08476479143323"
     ## [1] "Median expression (uncentered): 13.542850503762"
     ## [1] "Median expression (centered/weighted): 0.0134731298840469"
     ## [1] "Previous sample size: 197"
@@ -1882,7 +1884,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:50 CEST"
+    ## [1] "2017-05-08 14:21:17 CEST"
     ## [1] "[36/50] Working on KRAS_SIGNALING_DN - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_KRAS_SIGNALING_DN"
     ## [1] "199 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1898,11 +1900,11 @@ sufficient write:
     ## [49] "SERPINB2" "P2RY4"   
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.171836674751782 L1/L2 = 2.78355779453218"
+    ## [1] "L1 = 0.171836674751782 L1/L2 = 2.78355779495394"
     ## [1] "Median expression (uncentered): 11.801304186049"
     ## [1] "Median expression (centered/weighted): 0.0607116512246847"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.169516656201461 L1/L2 = 1.97965844218368"
+    ## [1] "L1 = 0.169516656201461 L1/L2 = 1.97965844202893"
     ## [1] "Median expression (uncentered): 12.3062041215584"
     ## [1] "Median expression (centered/weighted): 0.0199165924906458"
     ## [1] "Previous sample size: 197"
@@ -1923,7 +1925,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:52 CEST"
+    ## [1] "2017-05-08 14:21:19 CEST"
     ## [1] "[37/50] Working on TNFA_SIGNALING_VIA_NFKB - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_TNFA_SIGNALING_VIA_NFKB"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1936,7 +1938,7 @@ sufficient write:
     ## [1] "Median expression (uncentered): 13.4979141914068"
     ## [1] "Median expression (centered/weighted): 0.0437216417722608"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.208166533754724 L1/L2 = 2.5324928028598"
+    ## [1] "L1 = 0.208166533754724 L1/L2 = 2.5324928028596"
     ## [1] "Median expression (uncentered): 13.516684944058"
     ## [1] "Median expression (centered/weighted): 0.0381322112776709"
     ## [1] "Previous sample size: 197"
@@ -1957,7 +1959,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:53 CEST"
+    ## [1] "2017-05-08 14:21:21 CEST"
     ## [1] "[38/50] Working on HYPOXIA - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_HYPOXIA"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1966,11 +1968,11 @@ sufficient write:
     ##  [8] "TKTL1"  "PKP1"   "HAS1"   "INHA"   "IL6"    "LALBA"  "NCAN"  
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.226621356042959 L1/L2 = 1.68497677296706"
+    ## [1] "L1 = 0.226621356042958 L1/L2 = 1.68497677296707"
     ## [1] "Median expression (uncentered): 13.459175435552"
     ## [1] "Median expression (centered/weighted): 0.0218696250297438"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.35608633110885 L1/L2 = 2.17293869871507"
+    ## [1] "L1 = 0.35608633110885 L1/L2 = 2.17293869871253"
     ## [1] "Median expression (uncentered): 13.4943556035328"
     ## [1] "Median expression (centered/weighted): 0.0165295748389246"
     ## [1] "Previous sample size: 197"
@@ -1991,7 +1993,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:55 CEST"
+    ## [1] "2017-05-08 14:21:23 CEST"
     ## [1] "[39/50] Working on G2M_CHECKPOINT - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_G2M_CHECKPOINT"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -1999,11 +2001,11 @@ sufficient write:
     ## [1] "HOXC10" "EGF"   
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.305877054260107 L1/L2 = 1.43079797937371"
+    ## [1] "L1 = 0.3058770542601 L1/L2 = 1.43079797937289"
     ## [1] "Median expression (uncentered): 13.5330863421676"
     ## [1] "Median expression (centered/weighted): 0.00635705370274554"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.357487480193691 L1/L2 = 3.79226169683809"
+    ## [1] "L1 = 0.357487480193691 L1/L2 = 3.79226169683808"
     ## [1] "Median expression (uncentered): 13.53885578248"
     ## [1] "Median expression (centered/weighted): 0.00580154063130126"
     ## [1] "Previous sample size: 197"
@@ -2024,7 +2026,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:57 CEST"
+    ## [1] "2017-05-08 14:21:25 CEST"
     ## [1] "[40/50] Working on ESTROGEN_RESPONSE_EARLY - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ESTROGEN_RESPONSE_EARLY"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2059,7 +2061,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:11:59 CEST"
+    ## [1] "2017-05-08 14:21:26 CEST"
     ## [1] "[41/50] Working on ESTROGEN_RESPONSE_LATE - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ESTROGEN_RESPONSE_LATE"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2070,7 +2072,7 @@ sufficient write:
     ## [22] "TH"      "CHST8"  
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.205214452445594 L1/L2 = 1.37185589006439"
+    ## [1] "L1 = 0.205214452445594 L1/L2 = 1.37185589006438"
     ## [1] "Median expression (uncentered): 13.4437206006566"
     ## [1] "Median expression (centered/weighted): 0.0527148989889785"
     ## [1] "Post-filter data"
@@ -2095,7 +2097,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:12:01 CEST"
+    ## [1] "2017-05-08 14:21:28 CEST"
     ## [1] "[42/50] Working on MYOGENESIS - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_MYOGENESIS"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2109,11 +2111,11 @@ sufficient write:
     ## [43] "CAV3"   "MYBPC3" "STC2"   "SLN"   
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.164523800694042 L1/L2 = 1.7148233279771"
+    ## [1] "L1 = 0.164523800694042 L1/L2 = 1.71482332800906"
     ## [1] "Median expression (uncentered): 13.0835624270981"
     ## [1] "Median expression (centered/weighted): 0.0308616989387473"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.163346840098699 L1/L2 = 1.78334424087533"
+    ## [1] "L1 = 0.163346840098699 L1/L2 = 1.78334424087796"
     ## [1] "Median expression (uncentered): 13.4065372001286"
     ## [1] "Median expression (centered/weighted): 0.0244011868414699"
     ## [1] "Previous sample size: 197"
@@ -2134,7 +2136,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:12:02 CEST"
+    ## [1] "2017-05-08 14:21:30 CEST"
     ## [1] "[43/50] Working on APICAL_JUNCTION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_APICAL_JUNCTION"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2145,11 +2147,11 @@ sufficient write:
     ## [22] "SLC30A3" "CD209"   "NEGR1"   "PPP2R2C" "ACTA1"   "MADCAM1"
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.213569869556236 L1/L2 = 1.91362650961225"
+    ## [1] "L1 = 0.213569869556236 L1/L2 = 1.91362650962239"
     ## [1] "Median expression (uncentered): 13.2903068962579"
     ## [1] "Median expression (centered/weighted): 0.0285629984124942"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.218055002765523 L1/L2 = 1.54817118220202"
+    ## [1] "L1 = 0.218055002765522 L1/L2 = 1.54817118220201"
     ## [1] "Median expression (uncentered): 13.4258715247789"
     ## [1] "Median expression (centered/weighted): 0.0142795349449701"
     ## [1] "Previous sample size: 197"
@@ -2170,7 +2172,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:12:04 CEST"
+    ## [1] "2017-05-08 14:21:32 CEST"
     ## [1] "[44/50] Working on MTORC1_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_MTORC1_SIGNALING"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2178,11 +2180,11 @@ sufficient write:
     ## [1] "SLC7A11" "CCNF"    "STC1"    "NUFIP1" 
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.20396706554691 L1/L2 = 1.68805907408651"
+    ## [1] "L1 = 0.203967065546908 L1/L2 = 1.68805907409167"
     ## [1] "Median expression (uncentered): 13.5665892384264"
     ## [1] "Median expression (centered/weighted): 0.0119298909355557"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.176745672500835 L1/L2 = 1.39561657660958"
+    ## [1] "L1 = 0.176745672500423 L1/L2 = 1.39561657663758"
     ## [1] "Median expression (uncentered): 13.573292145097"
     ## [1] "Median expression (centered/weighted): 0.0123385754241434"
     ## [1] "Previous sample size: 197"
@@ -2203,7 +2205,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:12:06 CEST"
+    ## [1] "2017-05-08 14:21:33 CEST"
     ## [1] "[45/50] Working on EPITHELIAL_MESENCHYMAL_TRANSITION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2213,7 +2215,7 @@ sufficient write:
     ## [15] "SCG2"    "CXCL6"   "FOXC2"   "ADAM12" 
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.361582725735916 L1/L2 = 2.44824727116697"
+    ## [1] "L1 = 0.361582725735916 L1/L2 = 2.4482472704519"
     ## [1] "Median expression (uncentered): 13.4324114047036"
     ## [1] "Median expression (centered/weighted): 0.036947695210285"
     ## [1] "Post-filter data"
@@ -2238,18 +2240,18 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:12:08 CEST"
+    ## [1] "2017-05-08 14:21:35 CEST"
     ## [1] "[46/50] Working on OXIDATIVE_PHOSPHORYLATION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_OXIDATIVE_PHOSPHORYLATION"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
     ## [1] "No gene will be filtered"
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.182180987249415 L1/L2 = 1.47594212936065"
+    ## [1] "L1 = 0.182180987249416 L1/L2 = 1.47594212936065"
     ## [1] "Median expression (uncentered): 13.6974563074403"
     ## [1] "Median expression (centered/weighted): 0.0213985847817505"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.182180987249415 L1/L2 = 1.47594212936065"
+    ## [1] "L1 = 0.182180987249416 L1/L2 = 1.47594212936065"
     ## [1] "Median expression (uncentered): 13.6974563074403"
     ## [1] "Median expression (centered/weighted): 0.0213985847817505"
     ## [1] "Previous sample size: 197"
@@ -2270,7 +2272,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:12:09 CEST"
+    ## [1] "2017-05-08 14:21:37 CEST"
     ## [1] "[47/50] Working on P53_PATHWAY - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_P53_PATHWAY"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2279,11 +2281,11 @@ sufficient write:
     ## [7] "KRT17"    "ZBTB16"   "NHLH2"   
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.430033039712537 L1/L2 = 2.71526720581767"
+    ## [1] "L1 = 0.430033039712537 L1/L2 = 2.71526720581776"
     ## [1] "Median expression (uncentered): 13.5261324004452"
     ## [1] "Median expression (centered/weighted): 0.0187677972996269"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.166988263951546 L1/L2 = 1.61582600399963"
+    ## [1] "L1 = 0.166988263951546 L1/L2 = 1.61582600399962"
     ## [1] "Median expression (uncentered): 13.5554878565741"
     ## [1] "Median expression (centered/weighted): 0.0169469305809222"
     ## [1] "Previous sample size: 197"
@@ -2304,7 +2306,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:12:11 CEST"
+    ## [1] "2017-05-08 14:21:39 CEST"
     ## [1] "[48/50] Working on IL2_STAT5_SIGNALING - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_IL2_STAT5_SIGNALING"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2317,7 +2319,7 @@ sufficient write:
     ## [1] "Median expression (uncentered): 13.4083297407674"
     ## [1] "Median expression (centered/weighted): 0.0295619856208624"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.186298198027508 L1/L2 = 2.11788331974783"
+    ## [1] "L1 = 0.186298198027508 L1/L2 = 2.11788331969578"
     ## [1] "Median expression (uncentered): 13.4524986519525"
     ## [1] "Median expression (centered/weighted): 0.0231916517741595"
     ## [1] "Previous sample size: 197"
@@ -2338,7 +2340,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:12:13 CEST"
+    ## [1] "2017-05-08 14:21:40 CEST"
     ## [1] "[49/50] Working on ALLOGRAFT_REJECTION - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_ALLOGRAFT_REJECTION"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2349,7 +2351,7 @@ sufficient write:
     ## [22] "IL13"   "MBL2"   "CCL7"   "RPL3L"  "IL9"   
     ## [1] "Not using weigths for PCA computation"
     ## [1] "Pre-filter data"
-    ## [1] "L1 = 0.219209912164707 L1/L2 = 1.6048245525523"
+    ## [1] "L1 = 0.219209912164707 L1/L2 = 1.60482455255231"
     ## [1] "Median expression (uncentered): 13.3192487328175"
     ## [1] "Median expression (centered/weighted): 0.0411734727607429"
     ## [1] "Post-filter data"
@@ -2374,7 +2376,7 @@ sufficient write:
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:12:15 CEST"
+    ## [1] "2017-05-08 14:21:42 CEST"
     ## [1] "[50/50] Working on KRAS_SIGNALING_UP - http://www.broadinstitute.org/gsea/msigdb/cards/HALLMARK_KRAS_SIGNALING_UP"
     ## [1] "200 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2390,7 +2392,7 @@ sufficient write:
     ## [1] "Median expression (uncentered): 13.3939266694146"
     ## [1] "Median expression (centered/weighted): 0.0532926016956236"
     ## [1] "Post-filter data"
-    ## [1] "L1 = 0.338572405035907 L1/L2 = 1.97568150191183"
+    ## [1] "L1 = 0.338572405035906 L1/L2 = 1.97568150191182"
     ## [1] "Median expression (uncentered): 13.4715482054085"
     ## [1] "Median expression (centered/weighted): 0.0406110378165206"
     ## [1] "Previous sample size: 197"
@@ -2414,7 +2416,7 @@ sufficient write:
 
     tictoc::toc()
 
-    ## 204.618 sec elapsed
+    ## 213.261 sec elapsed
 
 Module activity
 ---------------
@@ -2483,7 +2485,7 @@ significantly overexpressed (`MedType = "Over"`).
     ## [1] "Using genestes underdispersed according to Wilcoxon test. VarThr = 0.05"
     ## [1] "No coordinatedness filter selected"
     ## [1] "Using genestes overexpressed according to Wilcoxon test. MedThr = 0.005"
-    ## [1] "39 geneset selected"
+    ## [1] "38 geneset selected"
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-18-1.png)![](README_files/figure-markdown_strict/unnamed-chunk-18-2.png)
 
@@ -2506,29 +2508,29 @@ testing:
     ## [1] "Using genestes overdispersed according to Wilcoxon test. VarThr = 0.05"
     ## [1] "No coordinatedness filter selected"
     ## [1] "No expression filter selected"
-    ## [1] "9 geneset selected"
+    ## [1] "8 geneset selected"
     ## [1] "Performing Type III AOV (R default)"
     ##              Df Sum Sq Mean Sq F value Pr(>F)
-    ## Group         2      9   4.676   0.322  0.725
-    ## Residuals   483   7007  14.508
+    ## Group         2      4   2.062   0.128   0.88
+    ## Residuals   429   6919  16.128
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-19-1.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-2.png)
 
     ## [1] "Performing Type III AOV (R default)"
     ##                Df Sum Sq Mean Sq F value Pr(>F)    
-    ## Group           2      9    4.68   0.492  0.612    
-    ## Group:GeneSet  24   2645  110.21  11.597 <2e-16 ***
-    ## Residuals     459   4362    9.50                   
+    ## Group           2      4    2.06   0.195  0.823    
+    ## Group:GeneSet  21   2593  123.46  11.644 <2e-16 ***
+    ## Residuals     408   4326   10.60                   
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-![](README_files/figure-markdown_strict/unnamed-chunk-19-3.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-4.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-5.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-19-3.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-4.png)
 
     ## [1] "A significant difference is observed across groups and metagenes"
     ## [1] "Calculating Tukey Honest Significant Differences"
-    ## [1] "87 significant differences found"
+    ## [1] "69 significant differences found"
 
-![](README_files/figure-markdown_strict/unnamed-chunk-19-6.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-7.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-8.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-9.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-10.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-11.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-19-5.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-6.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-7.png)![](README_files/figure-markdown_strict/unnamed-chunk-19-8.png)
 
 Top contributing genes
 ----------------------
@@ -2563,9 +2565,9 @@ We can also explore the gene weigths with the fixed center
     ## [1] "Using genestes overdispersed according to Wilcoxon test. VarThr = 0.05"
     ## [1] "No coordinatedness filter selected"
     ## [1] "No expression filter selected"
-    ## [1] "9 geneset selected"
+    ## [1] "8 geneset selected"
 
-![](README_files/figure-markdown_strict/unnamed-chunk-21-1.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-2.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-3.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-4.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-5.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-6.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-7.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-8.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-9.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-21-1.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-2.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-3.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-4.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-5.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-6.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-7.png)![](README_files/figure-markdown_strict/unnamed-chunk-21-8.png)
 
 Sample projections
 ------------------
@@ -2637,7 +2639,7 @@ confim cetain choiches if R is run interactivelly.
     ## [1] "Centering gene expression over samples"
     ## [1] "Using local center (NOT centering over genes)"
     ## [1] "All the genesets will be used"
-    ## [1] "2017-05-05 15:12:49 CEST"
+    ## [1] "2017-05-08 14:22:15 CEST"
     ## [1] "[1/1] Working on KEGG_METABOLISM_OF_XENOBIOTICS_BY_CYTOCHROME_P450 - http://www.broadinstitute.org/gsea/msigdb/cards/KEGG_METABOLISM_OF_XENOBIOTICS_BY_CYTOCHROME_P450"
     ## [1] "70 genes available for analysis"
     ## [1] "The following genes will be used:"
@@ -2672,7 +2674,7 @@ confim cetain choiches if R is run interactivelly.
     ## [1] "Next sample size: 70"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.097   0.169  13.180
+    ##   0.086   0.155   9.820
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-25-2.png)![](README_files/figure-markdown_strict/unnamed-chunk-25-3.png)![](README_files/figure-markdown_strict/unnamed-chunk-25-4.png)
 
@@ -2720,7 +2722,7 @@ confim cetain choiches if R is run interactivelly.
 
     tictoc::toc()
 
-    ## 29.291 sec elapsed
+    ## 28.401 sec elapsed
 
     PlotSampleProjections(RomaData = RedData.NFC, PlotSamples = 30,
                           ExpressionMatrix = MatData, LogExpression = FALSE,
@@ -2828,7 +2830,7 @@ recompute ROMA using the associated GMT.
     ## [1] "Centering gene expression over samples"
     ## [1] "Using local center (NOT centering over genes)"
     ## [1] "All the genesets will be used"
-    ## [1] "2017-05-05 15:13:31 CEST"
+    ## [1] "2017-05-08 14:22:57 CEST"
     ## [1] "[1/5] Working on MAPK - na"
     ## [1] "207 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2849,7 +2851,7 @@ recompute ROMA using the associated GMT.
     ## [1] "Next sample size: 207"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.107   0.174  36.540 
+    ##   0.127   0.173  37.617 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -2865,7 +2867,7 @@ recompute ROMA using the associated GMT.
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:14:09 CEST"
+    ## [1] "2017-05-08 14:23:37 CEST"
     ## [1] "[2/5] Working on HEDGEHOG - na"
     ## [1] "275 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2887,7 +2889,7 @@ recompute ROMA using the associated GMT.
     ## [1] "Next sample size: 275"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.124   0.172  60.384 
+    ##   0.135   0.159  60.392 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -2903,7 +2905,7 @@ recompute ROMA using the associated GMT.
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:15:13 CEST"
+    ## [1] "2017-05-08 14:24:41 CEST"
     ## [1] "[3/5] Working on PI3K_AKT_MTOR - na"
     ## [1] "293 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2922,7 +2924,7 @@ recompute ROMA using the associated GMT.
     ## [1] "Next sample size: 293"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.164   0.158  69.137 
+    ##   0.137   0.165  67.943 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -2938,7 +2940,7 @@ recompute ROMA using the associated GMT.
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:16:26 CEST"
+    ## [1] "2017-05-08 14:25:52 CEST"
     ## [1] "[4/5] Working on WNT_NON_CANONICAL - na"
     ## [1] "412 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -2968,7 +2970,7 @@ recompute ROMA using the associated GMT.
     ## [1] "Next sample size: 412"
     ## [1] "Computing samples"
     ##    user  system elapsed 
-    ##   0.190   0.156 129.703 
+    ##   0.190   0.169 127.827 
     ## [1] "Missing gene weights will be replaced by 1"
     ## [1] "Orienting PC by correlating gene expression and PC projections (pearson)"
     ## [1] "Not using groups"
@@ -2984,7 +2986,7 @@ recompute ROMA using the associated GMT.
     ## [1] "Not using groups"
     ## [1] "Computing correlations"
     ## [1] "Correcting using weights"
-    ## [1] "2017-05-05 15:18:43 CEST"
+    ## [1] "2017-05-08 14:28:07 CEST"
     ## [1] "[5/5] Working on WNT_CANONICAL - na"
     ## [1] "420 genes available for analysis"
     ## [1] "Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)"
@@ -3029,7 +3031,7 @@ recompute ROMA using the associated GMT.
 
     tictoc::toc()
 
-    ## 321.277 sec elapsed
+    ## 319.215 sec elapsed
 
 We can now project the information obtained by using the following
 commands, which will open a windows in the default browser to visualize
@@ -3056,6 +3058,8 @@ the map.
 ![](README_files/figure-markdown_strict/unnamed-chunk-28-2.png)![](README_files/figure-markdown_strict/unnamed-chunk-28-3.png)
 
     ## [1] "User-defined url"
+
+    ## waiting for data to be imported...
 
     ## data imported.
 
@@ -3123,12 +3127,12 @@ Session information
     ## 
     ## loaded via a namespace (and not attached):
     ##  [1] viridis_0.4.0        httr_1.2.1           edgeR_3.16.5        
-    ##  [4] viridisLite_0.2.0    shiny_1.0.2          assertthat_0.2.0    
+    ##  [4] viridisLite_0.2.0    shiny_1.0.3          assertthat_0.2.0    
     ##  [7] stats4_3.3.3         vipor_0.4.5          yaml_2.1.14         
     ## [10] RSQLite_1.1-2        backports_1.0.5      lattice_0.20-35     
     ## [13] limma_3.30.13        digest_0.6.12        RColorBrewer_1.1-2  
-    ## [16] colorspace_1.3-2     htmltools_0.3.5      httpuv_1.3.3        
-    ## [19] Matrix_1.2-8         plyr_1.8.4           XML_3.98-1.6        
+    ## [16] colorspace_1.3-2     htmltools_0.3.6      httpuv_1.3.3        
+    ## [19] Matrix_1.2-10        plyr_1.8.4           XML_3.98-1.7        
     ## [22] pheatmap_1.0.8       biomaRt_2.30.0       zlibbioc_1.20.0     
     ## [25] xtable_1.8-2         scales_0.4.1         tibble_1.3.0        
     ## [28] IRanges_2.8.2        tictoc_1.0           ggplot2_2.2.1       
@@ -3141,12 +3145,34 @@ Session information
     ## [49] irlba_2.1.2          AnnotationDbi_1.36.2 colorRamps_2.3      
     ## [52] rhdf5_2.18.0         grid_3.3.3           RCurl_1.95-4.8      
     ## [55] tximport_1.2.0       rjson_0.2.15         bitops_1.0-6        
-    ## [58] labeling_0.3         rmarkdown_1.4        gtable_0.2.0        
-    ## [61] DBI_0.6-1            reshape_0.8.6        curl_2.5            
+    ## [58] labeling_0.3         rmarkdown_1.5        gtable_0.2.0        
+    ## [61] DBI_0.6-1            reshape_0.8.6        curl_2.6            
     ## [64] reshape2_1.4.2       R6_2.2.0             gridExtra_2.2.1     
     ## [67] knitr_1.15.1         dplyr_0.5.0          rprojroot_1.2       
     ## [70] RNaviCell_0.2.1      stringi_1.1.5        ggbeeswarm_0.5.3    
     ## [73] Rcpp_0.12.10
+
+Using the docker image
+======================
+
+A docker image contains rRoma, the [rRomaDash
+package](https://github.com/Albluca/rRomaDash), and all the necessary
+dependencies is available. It can be installed by typing
+
+    docker pull albluca/rroma
+
+After installation, the image can be started with the command
+
+    docker run -p 8787:8787 albluca/rromadock
+
+At this point the RStudio web interface containing rRoma will be
+availabe, in Unix-like systems, at the address <http://localhost:8787>.
+It is then possible to access the interface by using "rstudio" as the
+username and password.
+
+On windows, it may be necessary to replace localhost with the address of
+the machine. If any problem is encountered see the instruction
+[here](https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image).
 
 Using the docker container
 ==========================

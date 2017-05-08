@@ -91,7 +91,7 @@ Let us begin by getting the description of the dataset
 
 ```{r, eval=TRUE}
 library(GEOquery)
-gse <- getGEO("GSE50760", GSEMatrix = TRUE)
+gse <- getGEO("GSE50760", GSEMatrix = TRUE, destdir = getwd())
 ```
 
 Then we get the actual expression expression files
