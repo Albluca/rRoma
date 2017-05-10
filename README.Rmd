@@ -232,7 +232,7 @@ AggData2.FC <- Plot.Genesets(RomaData = Data.FC,
 
 Visual inspection already stresses the difference between the groups. It is possible to quantify theses differnces performing statistical testing:
 
-```{r, eval=TRUE}
+```{r, eval=TRUE, fig.height=10}
 CompareAcrossSamples(RomaData = Data.FC,
                      Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-2,
                                                VarMode = "Wil", VarType = "Over"),
@@ -244,7 +244,7 @@ CompareAcrossSamples(RomaData = Data.FC,
 
 We can also explore the top contributing genes, i.e., the genes with the largers weights in the selected modules:
 
-```{r, fig.height=6, fig.width=12,}
+```{r, fig.height=6, fig.width=12}
 GeneMat <- GetTopContrib(Data.FC, Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-5,
                                         VarMode = "Wil", VarType = "Over"), nGenes = 6, OrderType = "Abs")
 ```
