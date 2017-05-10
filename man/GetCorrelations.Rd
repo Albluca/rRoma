@@ -8,14 +8,6 @@ GetCorrelations(RomaData, Selected = NULL, MatData, Methods = "pearson",
   ConfLevel = 0.95, Construct.Net = FALSE, Construct.Net.PVThr = 0.01)
 }
 \arguments{
-\item{RomaData}{}
-
-\item{Selected}{}
-
-\item{MatData}{}
-
-\item{Methods}{}
-
 \item{ConfLevel}{}
 }
 \description{

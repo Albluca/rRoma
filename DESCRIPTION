@@ -22,7 +22,8 @@ Imports:
       shiny,
       R.utils,
       readr,
-      colorRamps
+      colorRamps,
+      ggsignif
 Suggests:
       mice,
       RNaviCell,

@@ -55,6 +55,8 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
     
     p <- ggplot2::ggplot(MeltData, ggplot2::aes(y=Value, x=Group, fill=Group)) +
       ggplot2::geom_boxplot() + ggplot2::guides(fill = "none") +
+      ggsignif::geom_signif(comparisons = GetComb(unique(MeltData$Group)),
+                            map_signif_level=TRUE, test = "wilcox.test", step_increase = .1) +
       ggplot2::labs(y="PC1 projection", x="Groups", title = "Groups")
     
     print(p)
@@ -130,6 +132,8 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
       
       p <- ggplot2::ggplot(MeltData[as.integer(MeltData$GeneSet) %in% Sep[i-1]:(Sep[i]-1),],
                            ggplot2::aes(y=Value, x=Group, fill=Group)) + ggplot2::geom_boxplot() +
+        ggsignif::geom_signif(comparisons = GetComb(unique(MeltData$Group)),
+                              map_signif_level=TRUE, test = "wilcox.test", step_increase = .1) +
         ggplot2::labs(y="PC1 projection", x="Groups", title = paste("Geneset VS Groups - Part", i-1)) +
         ggplot2::facet_wrap( ~ GeneSet, ncol = 2) + ggplot2::theme(strip.text.x = ggplot2::element_text(size=6, face = "bold")) +
         ggplot2::guides(fill = "none")
