@@ -389,7 +389,7 @@ On windows, it may be necessary to replace localhost with the address of the mac
 
 # Using the docker container
 
-A docker image containing the RStusio web server and all the necessary packages  needed to run rRoma is also available. After installing [docker](http://www.docker.com), the image can be obtained using 
+A docker image containing the RStusio web server and all the packages needed to run rRoma is also available. After installing [docker](http://www.docker.com), the image can be obtained using 
 
 ```{r, engine='bash', eval=FALSE}
 docker pull albluca/rroma
@@ -401,9 +401,13 @@ After installation, the image can be started with the command
 docker run -p 8787:8787 albluca/rroma
 ```
 
-At this point, the RStudio web interface containing rRoma and the [rRomaDash interface](https://github.com/Albluca/rRomaDash) will be availabe. In Unix-like systems, the interface will be available at the address http://localhost:8787. It is then possible to access the interface by using "rstudio" as the username and password.
+At this point, the RStudio web interface containing rRoma and the [rRomaDash interface](https://github.com/Albluca/rRomaDash) will be availabe.
 
-On windows, it may be necessary to replace localhost with the address of the machine. If any problem is encountered see the instruction [here](https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image).
+In Unix-like systems, the interface will be available at the address http://localhost:8787. It is then possible to access the interface by using "rstudio" as the username and password.
+
+On windows systems, it may be necessary to replace localhost with a different address. On windows 10 professional, the docker image will be accessuible at the address http://127.0.0.1:8787.
+
+Further instructions to troubleshoot any difficulty related to accessing the rstudio interface can be found [here](https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image). 
 
 After starting the interface, it is possible to write r code as in the desktop version of RStudio.
 

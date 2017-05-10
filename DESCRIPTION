@@ -20,6 +20,7 @@ Imports:
       parallel,
       reshape,
       shiny,
+      plotly,
       R.utils,
       readr,
       colorRamps,
