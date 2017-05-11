@@ -1,16 +1,16 @@
 ---
 title: "rROMA"
-author: "[Luca Albergante](mailto:luca.albergante@gmail.com)"
+author: '[Luca Albergante](mailto:luca.albergante@gmail.com)'
 date: "April 2017"
 output:
-      md_document:
-            toc: true
-            toc_depth: 2
-      html_document:
-        toc: true # table of content true
-        depth: 3  # upto three depths of headings (specified by #, ## and ###)
-        number_sections: true  ## if you want number sections at each table header
-        keep_md: true
+  md_document:
+    toc: yes
+    toc_depth: 2
+  html_document:
+    depth: 3
+    keep_md: yes
+    number_sections: yes
+    toc: yes
 ---
 
 This package provides an R implementation of [ROMA](http://journal.frontiersin.org/article/10.3389/fgene.2016.00018/full). The package is under active development and is currently being tested.
@@ -22,7 +22,7 @@ A Java implementation developed by Andrei Zynovyev and is also [available](https
 The rRoma package relies on the `scater` package, which is available only on BioConductor. This package can be installed with the following command
 
 ```{r, eval=TRUE}
-if(!require("devtools")){
+if(!requireNamespace("scater")){
   source("https://bioconductor.org/biocLite.R")
   biocLite("scater")
 }
@@ -31,7 +31,7 @@ if(!require("devtools")){
 rRoma can then be installed using `devtools`
 
 ```{r, eval=FALSE}
-if(!require("devtools")){
+if(!requireNamespace("devtools")){
   install.packages("devtools")
 }
 devtools::install_github("Albluca/rROMA")
@@ -46,7 +46,7 @@ install.packages("tictoc")
 Finally, rRoma allow projecting the results of the analysis on [ACSN maps](https://acsn.curie.fr). To use this functionality it is necessary to install the `RNaviCell` package:
 
 ```{r, eval=FALSE}
-if(!require("devtools")){
+if(!requireNamespace("devtools")){
   install.packages("devtools")
 }
 devtools::install_github("sysbio-curie/RNaviCell")
@@ -55,16 +55,16 @@ devtools::install_github("sysbio-curie/RNaviCell")
 The packages `GEOquery`, `tictoc`, and `readr` are not required to run rRoma, but are used in the following example and need to be installed to reproduce the analysis 
 
 ```{r, eval=TRUE}
-if(!require("GEOquery")){
+if(!requireNamespace("GEOquery")){
   source("https://bioconductor.org/biocLite.R")
   biocLite("GEOquery")
 }
 
-if(!require("readr")){
+if(!requireNamespace("readr")){
   install.packages("readr")
 }
 
-if(!require("tictoc")){
+if(!requireNamespace("tictoc")){
   install.packages("tictoc")
 }
 ```
@@ -91,7 +91,7 @@ Let us begin by getting the description of the dataset
 
 ```{r, eval=TRUE}
 library(GEOquery)
-gse <- getGEO("GSE50760", GSEMatrix = TRUE)
+gse <- getGEO("GSE50760", GSEMatrix = TRUE, destdir = getwd())
 ```
 
 Then we get the actual expression expression files
@@ -232,7 +232,7 @@ AggData2.FC <- Plot.Genesets(RomaData = Data.FC,
 
 Visual inspection already stresses the difference between the groups. It is possible to quantify theses differnces performing statistical testing:
 
-```{r, eval=TRUE}
+```{r, eval=TRUE, fig.height=10}
 CompareAcrossSamples(RomaData = Data.FC,
                      Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-2,
                                                VarMode = "Wil", VarType = "Over"),
@@ -244,7 +244,7 @@ CompareAcrossSamples(RomaData = Data.FC,
 
 We can also explore the top contributing genes, i.e., the genes with the largers weights in the selected modules:
 
-```{r, fig.height=6, fig.width=12,}
+```{r, fig.height=6, fig.width=12}
 GeneMat <- GetTopContrib(Data.FC, Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-5,
                                         VarMode = "Wil", VarType = "Over"), nGenes = 6, OrderType = "Abs")
 ```
@@ -318,37 +318,97 @@ PlotSampleProjections(RomaData = RedData.NFC, PlotSamples = 30,
                       PlotPCProj = c('Points', 'Density',  'Bins'))
 ```
 
+## Using the interactive dashboard
+
+An interactive dasboard that can be used to perform ROMA and visualize the results is available as a separate r package on [GitHub](https://github.com/Albluca/rRomaDash)
+
 ## Visualising on ACSN 
 
 It is possible to project the results of rRoma analysis on a map. This functionality is currently experimental. ACSN maps needs gene lists. Therefore it is necessary to map the module activity to a gene specific value. Since a gene can be associated with multiple modules, it is possible to filter genes with a large variation in the gene weigths, as this is associated with a larger variation, and hence uncertainlty, on the contribution of the gene. The function takes several parameters: `SampleName`, which indicates the name of the sample(s) to consider, `AggScoreFun`, which describes the function used to group the module scores when different samples are present, `FilterByWei`, which is a parameters used to filter genes based on the variance of the gene weight across modules, and `AggGeneFun`, which describes the function used to obtain the value associated to a gene when the multiples weigths and scores are present. The parameters `QTop`, `QBottom`, and `Steps` control the heatmap of the plot. Finally, `DispMode` indicates which quantities should be projected on the maps, the module score ("Module"), or the gene weigths ("Gene").
 
-The following commands will open a windows in the default browser to visualize the map.
+In this example we will use the cell survival map and therefore we will recompute ROMA using the associated GMT.
+
+```{r, eval=TRUE}
+tictoc::tic()
+Data.NFC.CS <- rRoma.R(ExpressionMatrix = MatData,
+                       ModuleList = ReadGMTFile("http://acsn.curie.fr/files/survival_v1.1.gmt"),
+                       FixedCenter = FALSE, MaxGenes = 500,
+                       UseParallel = TRUE, nCores = 8, ClusType = "FORK",
+                       PCSignMode="CorrelateAllWeightsByGene")
+tictoc::toc()
+
+```
+
+We can now project the information obtained by using the following commands, which will open a windows in the default browser to visualize the map.
 
 ```{r}
-PlotOnACSN(RomaData = Data.FC, SampleName = names(Type[Type == "normal"]),
+PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "normal"]),
            AggScoreFun = "median", FilterByWei = 30, 
            DispMode = c("Module", "Gene"), DataName = "Normal", 
            QTop = .99, QBottom = .1, Steps = 5, 
            Selected = NULL,
+           MapURL = 'https://acsn.curie.fr/navicell/maps/survival/master/index.php',
            AggGeneFun = "median")
 ```
 
 
 
 ```{r}
-PlotOnACSN(RomaData = Data.FC, SampleName = names(Type[Type == "metastasized"]),
+PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "metastasized"]),
            AggScoreFun = "median", FilterByWei = 30, 
-           DispMode = c("Module", "Gene"), DataName = "Metastasized", 
+           DispMode = "Module", DataName = "Metastasized", 
            QTop = .99, QBottom = .1, Steps = 5, 
            Selected = NULL,
+           MapURL = 'https://acsn.curie.fr/navicell/maps/survival/master/index.php',
            AggGeneFun = "median")
 ```
 
+## Session information
 
+```{r}
+sessionInfo()
+```
 
+# Using the docker image
 
+A docker image contains rRoma, the [rRomaDash package](https://github.com/Albluca/rRomaDash), and all the necessary dependencies is available. It can be installed by typing 
 
+```{r, engine='bash', eval=FALSE}
+docker pull albluca/rroma
+```
 
+After installation, the image can be started with the command
 
+```{r, engine='bash', eval=FALSE}
+docker run -p 8787:8787 albluca/rromadock
+```
+
+At this point the RStudio web interface containing rRoma will be availabe, in Unix-like systems, at the address [http://localhost:8787](http://localhost:8787). It is then possible to access the interface by using "rstudio" as the username and password.
+
+On windows, it may be necessary to replace localhost with the address of the machine. If any problem is encountered see the instruction [here](https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image).
+
+# Using the docker container
+
+A docker image containing the RStusio web server and all the packages needed to run rRoma is also available. After installing [docker](http://www.docker.com), the image can be obtained using 
+
+```{r, engine='bash', eval=FALSE}
+docker pull albluca/rroma
+```
+
+After installation, the image can be started with the command
+
+```{r, engine='bash', eval=FALSE}
+docker run -p 8787:8787 albluca/rroma
+```
+
+At this point, the RStudio web interface containing rRoma and the [rRomaDash interface](https://github.com/Albluca/rRomaDash) will be availabe.
+
+In Unix-like systems, the interface will be available at the address http://localhost:8787. It is then possible to access the interface by using "rstudio" as the username and password.
+
+On windows systems, it may be necessary to replace localhost with a different address. On windows 10 professional, the docker image will be accessuible at the address http://127.0.0.1:8787.
+
+Further instructions to troubleshoot any difficulty related to accessing the rstudio interface can be found [here](https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image). 
+
+After starting the interface, it is possible to write r code as in the desktop version of RStudio.
 
 

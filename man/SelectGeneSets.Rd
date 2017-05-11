@@ -5,7 +5,8 @@
 \title{Select genesets accoding to specific conditions}
 \usage{
 SelectGeneSets(RomaData, VarThr = 0.001, VarMode = "Wil",
-  VarType = "Over", MedThr = NULL, MedMode = "Wil", MedType = "Over")
+  VarType = "Over", RatThr = NULL, RatMode = "Wil", RatType = "Over",
+  MedThr = NULL, MedMode = "Wil", MedType = "Over")
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}

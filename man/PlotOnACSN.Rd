@@ -2,29 +2,61 @@
 % Please edit documentation in R/web.R
 \name{PlotOnACSN}
 \alias{PlotOnACSN}
-\title{Title}
+\title{Project ROMA results onto ACSN maps}
 \usage{
-PlotOnACSN(RomaData, SampleName, AggSampFun = "mean", MapURL = "",
-  Selected = NULL, FilterByWei = NULL, AggGeneFun = "mean",
-  DispMode = "Module", DataName = "Sample")
+PlotOnACSN(RomaData, SampleName, AggScoreFun = "mean", QTop = NULL,
+  QBottom = NULL, Steps = 2, MapURL = "", Selected = NULL,
+  FilterByWei = NULL, AggGeneFun = "mean", DispMode = "Module",
+  DataName = "Sample", DefDispVal = 0, PlotInfo = TRUE,
+  ReturnInfo = FALSE, LocalRange = FALSE)
 }
 \arguments{
-\item{RomaData}{}
+\item{RomaData}{list, the analysis returned by rRoma}
 
-\item{SampleName}{}
+\item{SampleName}{vector, string. The name(s) of the sample to consider}
 
-\item{AggSampFun}{}
+\item{AggScoreFun}{string, scalar. The name of the aggregating function used to compute the valus of the gene score.
+Note that this function will be applied even to genes appearin in one geneset. To consider only genes found in a single module use the 'GetSingle' function and set DefDispVal to 0}
 
-\item{Selected}{}
+\item{QTop}{numeric, scalar. The quantile threshold associted with the top saturation color. If NULL, the max will be used.}
 
-\item{FilterByWei}{}
+\item{QBottom}{numeric, scalar. The quantile threshold associted with the lower saturation color.  If NULL, the min will be used.}
 
-\item{AggGeneFun}{}
+\item{Steps}{numeric, scalar. The number of steps of the heatmap??}
 
-\item{DispMode}{}
+\item{MapURL}{string, scalar. The url of the map to use. The available maps can be seen on acsn.curie.fr and navicell.curie.fr. Possible values include
+\itemize{
+\item 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php'
+\item 'https://acsn.curie.fr/navicell/maps/dnarepair/master/index.php'
+\item 'https://acsn.curie.fr/navicell/maps/emtcellmotility/master/index.php'
+\item 'https://navicell.curie.fr/navicell/maps/ewing/master/index.php'
+\item 'https://navicell.curie.fr/navicell/maps/dendcells/master/index.php'
+}}
 
-\item{DataName}{}
+\item{Selected}{vector, integer. The position of the genesets to plot}
+
+\item{FilterByWei}{scalar, number of median-absolute-deviations away from median variace of gene weights
+required for a value to be called an outlier and filtered. If NULL genes are not filtered.}
+
+\item{AggGeneFun}{string, scalar. The name of the function used to combine scored if multiple samples are considered}
+
+\item{DispMode}{string, vector. The quantity to be projected on the maps (in the form of an heatmap).
+It can be any combination of the following:
+\itemize{
+\item 'Module': gene score is obtained by aggregating the score of selected modules containing that gene. The aggregating function is specified by the AggGeneFun parameter. 
+\item 'Gene': gene score is obtained by aggregating the weigth of the genes across the selected modules. The aggregating function is specified by the AggGeneFun parameter. 
+}}
+
+\item{DataName}{string, scalar. The name of the dataset that will be reported in the web interface}
+
+\item{DefDispVal}{numeric, scalar. The value to be used when the fucntion defined by AggScoreFun produce NA (e.g., sd applied to genes that appear only in one geneset)}
+
+\item{PlotInfo}{boolean scalar. Should information plot be produced?}
+
+\item{ReturnInfo}{boolean scalar. Should information be returned?}
+
+\item{LocalRange}{boolean scalar. Should color bounds be relative to the considered samples only?}
 }
 \description{
-Title
+Project ROMA results onto ACSN maps
 }

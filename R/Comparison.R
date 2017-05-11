@@ -1,4 +1,4 @@
-#' Title
+#' Compare ROMA scores across samples from different populations
 #'
 #' @param RomaData list, the analysis returned by rRoma
 #' @param Groups string vector, a vector of group identifier described by strings
@@ -55,6 +55,8 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
     
     p <- ggplot2::ggplot(MeltData, ggplot2::aes(y=Value, x=Group, fill=Group)) +
       ggplot2::geom_boxplot() + ggplot2::guides(fill = "none") +
+      ggsignif::geom_signif(comparisons = GetComb(unique(MeltData$Group)),
+                            map_signif_level=TRUE, test = "wilcox.test", step_increase = .1) +
       ggplot2::labs(y="PC1 projection", x="Groups", title = "Groups")
     
     print(p)
@@ -130,6 +132,8 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
       
       p <- ggplot2::ggplot(MeltData[as.integer(MeltData$GeneSet) %in% Sep[i-1]:(Sep[i]-1),],
                            ggplot2::aes(y=Value, x=Group, fill=Group)) + ggplot2::geom_boxplot() +
+        ggsignif::geom_signif(comparisons = GetComb(unique(MeltData$Group)),
+                              map_signif_level=TRUE, test = "wilcox.test", step_increase = .1) +
         ggplot2::labs(y="PC1 projection", x="Groups", title = paste("Geneset VS Groups - Part", i-1)) +
         ggplot2::facet_wrap( ~ GeneSet, ncol = 2) + ggplot2::theme(strip.text.x = ggplot2::element_text(size=6, face = "bold")) +
         ggplot2::guides(fill = "none")
@@ -264,70 +268,104 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
 #' @export
 #'
 #' @examples
-SelectGeneSets <- function(RomaData, VarThr = 1e-3, VarMode = "Wil", VarType = "Over",
+SelectGeneSets <- function(RomaData,
+                           VarThr = 1e-3, VarMode = "Wil", VarType = "Over",
+                           RatThr = NULL, RatMode = "Wil", RatType = "Over",
                            MedThr = NULL, MedMode = "Wil", MedType = "Over") {
   
-  while(1){ 
+  
+  if(VarType %in% c("Over", "Under") & !is.null(VarThr) & VarMode %in% c("Wil", "PPV")){ 
     
     if(VarMode == 'Wil' & VarType == "Over"){
       print(paste("Using genestes overdispersed according to Wilcoxon test. VarThr =", VarThr))
-      Selected <- which(RomaData$PVVectMat[,1]<VarThr)
-      break
+      SelectedVar <- which(RomaData$PVVectMat[,1]<VarThr)
     }
     
     if(VarMode == 'Wil' & VarType == "Under"){
       print(paste("Using genestes underdispersed according to Wilcoxon test. VarThr =", VarThr))
-      Selected <- which(RomaData$PVVectMat[,2]<VarThr)
-      break
+      SelectedVar <- which(RomaData$PVVectMat[,2]<VarThr)
     }
     
     if(VarMode == 'PPV' & VarType == "Over"){
       print(paste("Using genestes overdispersed according to pseudo pv. VarThr =", VarThr))
-      Selected <- which(RomaData$ModuleMatrix[,2]<VarThr)
-      break
+      SelectedVar <- which(RomaData$ModuleMatrix[,2]<VarThr)
     }
     
     if(VarMode == 'PPV' & VarType == "Under"){
       print(paste("Using genestes underdispersed according to pseudo pv. VarThr =", VarThr))
-      Selected <- which(RomaData$ModuleMatrix[,2]<1-VarThr)
-      break
+      SelectedVar <- which(RomaData$ModuleMatrix[,2]<1-VarThr)
     }
     
-    Selected <- NULL
-    break
+  } else {
+    print("No dispersion filter selected")
+    SelectedVar <- 1:nrow(RomaData$ModuleMatrix)
   }
   
-  while(!is.null(Selected) & !is.null(MedThr)){
+  
+  
+  
+  if(!is.null(RatThr) & RatType %in% c("Over", "Under") & RatMode %in% c("Wil", "PPV")){
+    
+    if(RatMode == 'Wil' & RatType == "Over"){
+      print(paste("Using genestes overcoordinated according to Wilcoxon test. RatThr =", RatThr))
+      SelectedRat <- which(RomaData$PVVectMat[,3]<RatThr)
+    }
+    
+    if(RatMode == 'Wil' & RatType == "Under"){
+      print(paste("Using genestes undecoordinated according to Wilcoxon test. RatThr =", RatThr))
+      SelectedRat <- which(RomaData$PVVectMat[,4]<RatThr)
+    }
+    
+    if(RatMode == 'PPV' & RatType == "Over"){
+      print(paste("Using genestes overcoordinated according to pseudo pv. RatThr =", RatThr))
+      SelectedRat <- which(RomaData$ModuleMatrix[,4]<RatThr)
+    }
+    
+    if(RatMode == 'PPV' & RatType == "Under"){
+      print(paste("Using genestes undecoordinated according to pseudo pv. RatThr =", RatThr))
+      SelectedRat <- which(RomaData$ModuleMatrix[,4]<1-RatThr)
+    }
+
+  } else {
+    print("No coordinatedness filter selected")
+    SelectedRat <- 1:nrow(RomaData$ModuleMatrix)
+  }
+  
+  
+  
+  if(!is.null(MedThr) & MedType %in% c("Over", "Under") & VarMode %in% c("Wil", "PPV")){
     
     if(MedMode == 'Wil' & MedType == "Over"){
       print(paste("Using genestes overexpressed according to Wilcoxon test. MedThr =", MedThr))
-      Selected <- intersect(which(RomaData$PVVectMat[,5]<MedThr), Selected)
-      break
+      SelectedMed <- which(RomaData$PVVectMat[,5]<MedThr)
     }
     
     if(MedMode == 'Wil' & MedType == "Under"){
       print(paste("Using genestes underexpressed according to Wilcoxon test. MedThr =", MedThr))
-      Selected <- intersect(which(RomaData$PVVectMat[,6]<MedThr), Selected)
-      break
+      SelectedMed <- which(RomaData$PVVectMat[,6]<MedThr)
     }
     
     if(MedMode == 'PPV' & MedType == "Over"){
       print(paste("Using genestes overexpressed according to pseudo pv. MedThr =", MedThr))
-      Selected <- intersect(which(RomaData$ModuleMatrix[,6]<MedThr), Selected)
-      break
+      SelectedMed <- which(RomaData$ModuleMatrix[,6]<MedThr)
     }
     
     if(MedMode == 'PPV' & MedType == "Under"){
       print(paste("Using genestes underexpressed according to pseudo pv. MedThr =", MedThr))
-      Selected <- intersect(which(RomaData$ModuleMatrix[,6]<1-MedThr), Selected)
-      break
+      SelectedMed <- which(RomaData$ModuleMatrix[,6]<1-MedThr)
     }
     
-    Selected <- NULL
-    break
-    
+  } else {
+    print("No expression filter selected")
+    SelectedMed <- 1:nrow(RomaData$ModuleMatrix)
   }
   
-  return(Selected)
+  Select <- intersect(intersect(SelectedMed, SelectedRat), SelectedVar)
   
+  if(length(Select) > 0){
+    return(Select)
+  } else {
+    return(NULL)
+  }
+
 }

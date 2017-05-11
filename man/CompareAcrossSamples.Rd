@@ -2,7 +2,7 @@
 % Please edit documentation in R/Comparison.R
 \name{CompareAcrossSamples}
 \alias{CompareAcrossSamples}
-\title{Title}
+\title{Compare ROMA scores across samples from different populations}
 \usage{
 CompareAcrossSamples(RomaData, Groups, Selected = NULL,
   TestMode = "Aov+Tuk", TestPV1 = 0.05, TestPV2 = 0.05,
@@ -26,5 +26,5 @@ CompareAcrossSamples(RomaData, Groups, Selected = NULL,
 \item{PlotXGSDiff}{boolean, should all the significant differences by considered?}
 }
 \description{
-Title
+Compare ROMA scores across samples from different populations
 }

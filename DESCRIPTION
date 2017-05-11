@@ -1,12 +1,12 @@
 Package: rRoma
 Title: An r implementation of ROMA
-Version: 0.0.4.0000
+Version: 0.0.4.2000
 Authors@R: person("Luca", "Albergante", email = "luca.albergante@gmail.com", role = c("aut", "cre"))
 Description: An R implementation of ROMA
 URL: https://github.com/Albluca/rRoma
 BugReports: https://github.com/Albluca/rRoma/issues
 Depends:
-    R (>= 3.1.1)
+    R (>= 3.0)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -18,7 +18,14 @@ Imports:
       gridExtra,
       pheatmap,
       parallel,
-      reshape
+      reshape,
+      shiny,
+      plotly,
+      R.utils,
+      readr,
+      colorRamps,
+      ggsignif
 Suggests:
       mice,
-      RNaviCell
+      RNaviCell,
+      SigCheck

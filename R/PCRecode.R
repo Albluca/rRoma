@@ -1,6 +1,4 @@
-
-
-#' Perform ROMA on a datasets
+#' Perform PcROMA on a datasets
 #'
 #' @param ExpressionMatrix matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.
 #' @param ModuleList list, gene module list

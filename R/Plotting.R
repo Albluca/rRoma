@@ -105,8 +105,7 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
   
   
   if(length(AggByGroupsFL)>0 & !is.null(AddInfo)){
-    
-    
+
     SplitData <- split(data.frame(t(PlotMat[,FoundSamp])), f=AddInfo$Groups)
     
     RetData <- list()

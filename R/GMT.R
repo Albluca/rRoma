@@ -114,22 +114,164 @@ ReadGMTFile <- function(FileLocation, SearchString = NULL, Mode = "ANY") {
 #' @examples
 SelectFromMSIGdb <- function(SearchString, Version = "6.0", Mode = "ANY") {
   
+  return(SelectFromInternalDB(SearchString, BDName = "MsigDB", Version = Version, Mode = Mode))
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#' Return a an internal DB using the provided search string
+#'
+#' @param SearchString string vector, the keywords to search 
+#' @param Version string scalar, the version of the internal DB to use. If NULL, the most recent version availble in the package will be used 
+#' @param Mode string scalar, the search mode for the keywords.
+#' It can be "ALL" (genesets with all the keywords will be returned) or
+#' "ANY" (genesets with at at least one keyword will be returned)
+#' @param BDName string, scalar. The internal DB to use, can be one of the following
+#' \itemize{
+#' \item 'MsigDB': Molecular signature database (http://software.broadinstitute.org/gsea/msigdb)
+#' \item 'ACSN_Global': ACSN global map (https://acsn.curie.fr)
+#' \item 'ACSN_Apoptosis': ACSN Apoptosis map (https://acsn.curie.fr)
+#' \item 'ACSN_CellCycle': ACSN Cell Cycle map (https://acsn.curie.fr)
+#' \item 'ACSN_DNARepair': ACSN DNA repair map (https://acsn.curie.fr)
+#' \item 'ACSN_EMT': ACSN EMT map (https://acsn.curie.fr)
+#' \item 'ACSN_Survival': ACSN Survival map (https://acsn.curie.fr)
+#' }
+#' 
+#' @return
+#' @export
+#'
+#' @examples
+SelectFromInternalDB <- function(SearchString, BDName = "MsigDB", Version = NULL, Mode = "ANY") {
+  
   InternalDB <- list()
   
-  if(Version == "6.0"){
+  if(BDName == "MsigDB"){
     
-    print("Searching in MsigDB v6.0")
-    InternalDB <- rRoma::Msigdb.v6.0.symbols.all
+    if(is.null(Version)){
+      
+      print("Searching in MsigDB v6.0")
+      InternalDB <- rRoma::Msigdb.v6.0.symbols.all
+      
+    } else {
+      
+      if(Version == "5.2"){
+        print("Searching in MsigDB v5.2")
+        InternalDB <- rRoma::Msigdb.v5.2.symbols.all
+      }
+      
+      if(Version == "6.0"){
+        print("Searching in MsigDB v5.2")
+        InternalDB <- rRoma::Msigdb.v6.0.symbols.all
+      }
+      
+    }
     
   }
   
-  if(Version == "5.2"){
-    
-    print("Searching in MsigDB v5.2")
-    InternalDB <- rRoma::Msigdb.v5.2.symbols.all
-    
+  if(BDName == "ACSN_Global"){
+    if(is.null(Version)){
+      print("Searching in ACSN Global map v1.1")
+      InternalDB <- rRoma::ACSN_Global.v1.1
+    } else {
+      if(Version == "1.1"){
+        print("Searching in ACSN Global map v1.1")
+        InternalDB <- rRoma::ACSN_Global.v1.1
+      }
+    }
   }
-
+  
+  if(BDName == "ACSN_Apoptosis"){
+    if(is.null(Version)){
+      print("Searching in ACSN Apoptosis map v1.1")
+      InternalDB <- rRoma::ACSN_Apoptosis.v1.1
+    } else {
+      if(Version == "1.1"){
+        print("Searching in ACSN Apoptosis map v1.1")
+        InternalDB <- rRoma::ACSN_Apoptosis.v1.1
+      }
+    }
+  }
+  
+  if(BDName == "ACSN_CellCycle"){
+    if(is.null(Version)){
+      print("Searching in ACSN Cell Cycle map v1.1")
+      InternalDB <- rRoma::ACSN_Apoptosis.v1.1
+    } else {
+      if(Version == "1.1"){
+        print("Searching in ACSN Apoptosis map v1.1")
+        InternalDB <- rRoma::ACSN_Apoptosis.v1.1
+      }
+    }
+  }
+  
+  if(BDName == "ACSN_DNARepair"){
+    if(is.null(Version)){
+      print("Searching in ACSN DNA repair map v1.1")
+      InternalDB <- rRoma::ACSN_DNARepair.v1.1
+    } else {
+      if(Version == "1.1"){
+        print("Searching in ACSN DNA repair map v1.1")
+        InternalDB <- rRoma::ACSN_DNARepair.v1.1
+      }
+    }
+  }
+  
+  if(BDName == "ACSN_EMT"){
+    if(is.null(Version)){
+      print("Searching in ACSN EMT map v1.1")
+      InternalDB <- rRoma::ACSN_EMT.v1.1
+    } else {
+      if(Version == "1.1"){
+        print("Searching in ACSN EMT map v1.1")
+        InternalDB <- rRoma::ACSN_EMT.v1.1
+      }
+    }
+  }
+  
+  if(BDName == "ACSN_Survival"){
+    if(is.null(Version)){
+      print("Searching in ACSN Survival map v1.1")
+      InternalDB <- rRoma::ACSN_Survival.v1.1
+    } else {
+      if(Version == "1.1"){
+        print("Searching in ACSN Survival map v1.1")
+        InternalDB <- rRoma::ACSN_Survival.v1.1
+      }
+    }
+  }
+  
+  if(BDName == "InfoSig_Conserved"){
+    if(is.null(Version)){
+      print("Searching in InfoSig conserved")
+      InternalDB <- rRoma::InfoSig_Conserved
+    }
+  }
+  
+  if(BDName == "InfoSig_Informative"){
+    if(is.null(Version)){
+      print("Searching in InfoSig")
+      InternalDB <- rRoma::InfoSig_Informative
+    }
+  }
+  
+  
   SelGeneSets <- NULL
   for(i in 1:length(SearchString)){
     if(Mode == "ANY"){
@@ -158,9 +300,9 @@ SelectFromMSIGdb <- function(SearchString, Version = "6.0", Mode = "ANY") {
   
   print("The following genesets have been selected:")
   print(paste(unlist(lapply(InternalDB[SelGeneSets], "[[", "Name")),
-        " (",
-        unlist(lapply(lapply(InternalDB[SelGeneSets], "[[", "Genes"), length)),
-        " genes)",sep=''))
+              " (",
+              unlist(lapply(lapply(InternalDB[SelGeneSets], "[[", "Genes"), length)),
+              " genes)",sep=''))
   
   return(InternalDB[SelGeneSets])
   
@@ -170,4 +312,54 @@ SelectFromMSIGdb <- function(SearchString, Version = "6.0", Mode = "ANY") {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#' Infer weigths from expression data
+#'
+#' @param ExpressionMatrix 
+#' @param ModuleList 
+#' @param FillAllNA 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+InferBinaryWeigth <- function(ExpressionMatrix, ModuleList, FillAllNA = TRUE) {
+  
+  MedianExpr <- apply(ExpressionMatrix, 1, median, na.rm=TRUE)
+  GeneWei <- as.integer(MedianExpr >= median(ExpressionMatrix))
+  GeneWei[GeneWei == 0] <- -1
+  names(GeneWei) <- names(MedianExpr)
+  
+  for(i in 1:length(ModuleList)){
+    
+    if(!FillAllNA & any(!is.na(ModuleList[[i]]$Weigths))){
+      next
+    }
+    
+    ModuleList[[i]]$Weigths[is.na(ModuleList[[i]]$Weigths)] <-
+      GeneWei[ModuleList[[i]]$Genes[is.na(ModuleList[[i]]$Weigths)]]
+    
+    if(any(is.na(ModuleList[[i]]$Weigths))){
+      print(paste("Warning:", sum(is.na(ModuleList[[i]]$Weigths)), "gene(s) not found in the expression matrix"))
+    }
+    
+  }
+  
+  return(ModuleList)
+  
+}
 
