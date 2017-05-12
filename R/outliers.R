@@ -33,8 +33,11 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     
     # Computing all the PC1
     AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- t(ExpressionData[-i, ])
-      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
+      tData <- ExpressionData[-i, ]
+      PC1Var <- var(
+        irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter,
+                            scale. = FALSE, retx = TRUE)$x
+        )
       return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
     })
     
@@ -74,8 +77,11 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     
     # Computing all the PC1
     AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- t(ExpressionData[-i, ])
-      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
+      tData <- ExpressionData[-i, ]
+      PC1Var <- var(
+        irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter,
+                            scale. = FALSE, retx = TRUE)$x
+      )
       return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
     })
     
@@ -126,8 +132,11 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     
     # Computing all the PC1
     AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- t(ExpressionData[-i, ])
-      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
+      tData <- ExpressionData[-i, ]
+      PC1Var <- var(
+        irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter,
+                            scale. = FALSE, retx = TRUE)$x
+      )
       return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
     })
     
@@ -169,8 +178,11 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     
     # Computing all the PC1
     AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- t(ExpressionData[-i, ])
-      PC1Var <- irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter, scale. = FALSE)$sdev^2
+      tData <- ExpressionData[-i, ]
+      PC1Var <- var(
+        irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter,
+                            scale. = FALSE, retx = TRUE)$x
+      )
       return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
     })
     

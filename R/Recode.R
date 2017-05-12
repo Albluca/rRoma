@@ -202,7 +202,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     FoundSampNames <- which((colnames(ExpressionMatrix) %in% names(Grouping)))
     
     if(length(NotFoundSampNames)>1){
-      print(paste("The following samples don't have an associated group:"))
+      print(paste("The following samples do not have an associated group:"))
       print(colnames(ExpressionMatrix)[NotFoundSampNames])
       print("They will NOT be considered for group associated analysis")
     }
@@ -216,12 +216,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
   OrgExpMatrix = ExpressionMatrix
   
   if(centerData){
-    print("Centering gene expression over samples")
+    print("Centering gene expression over samples (genes will have 0 mean)")
     ExpressionMatrix <- t(scale(t(ExpressionMatrix), center = TRUE, scale = FALSE))
     GeneCenters <- attr(ExpressionMatrix, "scaled:center")
     attr(ExpressionMatrix, "scaled:center") <- NULL
   } else {
-    warning("Skipping centering of gene expression over samples. This will generate inconsistencies if the data are not centered.")
+    warning("Skipping centering of gene expression over samples. This can generate inconsistencies if the data are not centered.")
     GeneCenters = rep(0, nrow(ExpressionMatrix))
   }
   
@@ -354,12 +354,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     BaseMatrix <- t(Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ])
     
     if(PCADims > min(dim(ExpressionMatrix[CompatibleGenes, ])/3)){
-      PCBase <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE)
+      PCBase <- prcomp(x = t(BaseMatrix), center = ModulePCACenter, scale. = FALSE, retx = TRUE)
     } else {
-      PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000)
+      PCBase <- irlba::prcomp_irlba(x = t(BaseMatrix), n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000, retx = TRUE)
     }
     
-    ExpVar <- (PCBase$sdev^2)/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var))
+    ExpVar <- apply(PCBase$x[,1:2], 2, var)/sum(apply(scale(t(BaseMatrix), center = ModulePCACenter, scale = FALSE), 2, var))
     
     PCBaseUnf <- PCBase
     ExpVarUnf <- ExpVar
@@ -376,12 +376,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     BaseMatrix <- t(Correction[SelGenes]*ExpressionMatrix[SelGenes, ])
     
     if(PCADims > min(dim(ExpressionMatrix[SelGenes, ])/3)){
-      PCBase <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE)
+      PCBase <- prcomp(x = t(BaseMatrix), center = ModulePCACenter, scale. = FALSE, retx = TRUE)
     } else {
-      PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000)
+      PCBase <- irlba::prcomp_irlba(x = t(BaseMatrix), n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000, retx = TRUE)
     }
     
-    ExpVar <- (PCBase$sdev^2)/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var))
+    ExpVar <- apply(PCBase$x[,1:2], 2, var)/sum(apply(scale(t(BaseMatrix), center = ModulePCACenter, scale = FALSE), 2, var))
     
     # ExpVar <- c(
     #   1/sum(apply(scale(Correction[CompatibleGenes]*ExpressionMatrix[CompatibleGenes, ], center = ModulePCACenter, scale = FALSE), 2, var)/PCBase$sdev[1]^2),
@@ -437,36 +437,39 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
           BaseMatrix <- t(ExpressionMatrix[SampleSelGenes, ])
           SampMedian <- median(OrgExpMatrix[SampleSelGenes, ])
           
+          
+          if(length(SampleSelGenes) >= 3*PCADims){
+            PCSamp <- irlba::prcomp_irlba(x = t(BaseMatrix), n = PCADims, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
+          } else {
+            PCSamp <- prcomp(x = t(BaseMatrix), center = ModulePCACenter, scale. = FALSE, retx = TRUE)
+          }
+          
+          VarVect <- apply(PCSamp$x[,1:2], 2, var)
+          
+          if(length(VarVect)>PCADims){
+            VarVect <- VarVect[1:PCADims]
+          }
+          
+          if(length(VarVect)<PCADims){
+            VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
+          }
+          
+          
           if(FullSampleInfo){
             
-            if(length(SampleSelGenes) >= 3*PCADims){
-              PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
-            } else {
-              PCSamp <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
-            }
-            
-            VarVect <- PCSamp$sdev^2
-            
-            if(length(VarVect)>PCADims){
-              VarVect <- VarVect[1:PCADims]
-            }
-            
-            if(length(VarVect)<PCADims){
-              VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
-            }
-            
             ExpMat <- NULL
+            
             if(PCSignMode %in% c("CorrelateAllWeightsByGene", "CorrelateKnownWeightsByGene",
                                  "CorrelateAllWeightsBySample", "CorrelateKnownWeightsBySample")){
               ExpMat <- OrgExpMatrix[SampleSelGenes, ]
             }
             
-            CorrectSign1 <- FixPCSign(PCWeigth = PCSamp$rotation[,1], PCProj = PCSamp$x[,1],
+            CorrectSign1 <- FixPCSign(PCWeigth = PCSamp$x[,1], PCProj = PCSamp$rotation[,1],
                                       Wei = SamplingGeneWeights[SampleSelGenes],
                                       Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
                                       Grouping = Grouping, ExpMat = ExpMat, CorMethod = CorMethod)
             if(PCADims > 1){
-              CorrectSign2 <- FixPCSign(PCWeigth = PCSamp$rotation[,2], PCProj = PCSamp$x[,2],
+              CorrectSign2 <- FixPCSign(PCWeigth = PCSamp$x[,2], PCProj = PCSamp$rotation[,2],
                                         Wei = SamplingGeneWeights[SampleSelGenes],
                                         Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
                                         Grouping = Grouping, ExpMat = ExpMat, CorMethod = CorMethod)
@@ -475,30 +478,14 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             }
             
             
-            return(list("ExpVar"=VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)),
+            return(list("ExpVar"=VarVect/sum(apply(scale(t(BaseMatrix), center = ModulePCACenter, scale = FALSE), 2, var)),
                         "MedianExp"= SampMedian,
                         "PCProj"=cbind(CorrectSign1*PCSamp$x[,1], CorrectSign2*PCSamp$x[,2]))
             )
             
           } else {
             
-            if(length(SampleSelGenes) >= 3*PCADims){
-              PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, retx = FALSE)
-            } else {
-              PCSamp <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE, retx = FALSE)
-            }
-            
-            VarVect <- PCSamp$sdev^2
-            
-            if(length(VarVect)>PCADims){
-              VarVect <- VarVect[1:PCADims]
-            }
-            
-            if(length(VarVect)<PCADims){
-              VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
-            }
-            
-            return(list("ExpVar"=VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)),
+            return(list("ExpVar"=VarVect/sum(apply(scale(t(BaseMatrix), center = ModulePCACenter, scale = FALSE), 2, var)),
                         "MedianExp"= SampMedian, "PCProj"=NULL)
             )
             
@@ -620,7 +607,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       ExpMat <- OrgExpMatrix[CompatibleGenes, ]
     }
     
-    CorrectSignUnf <- FixPCSign(PCWeigth = PCBaseUnf$rotation[,1], PCProj = PCBaseUnf$x[,1],
+    CorrectSignUnf <- FixPCSign(PCWeigth = PCBaseUnf$x[,1], PCProj = PCBaseUnf$rotation[,1],
                                 Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
                              Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
                              Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
@@ -633,14 +620,14 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       ExpMat <- OrgExpMatrix[SelGenes, ]
     }
     
-    CorrectSign1 <- FixPCSign(PCWeigth = PCBase$rotation[,1], PCProj = PCBase$x[,1],
+    CorrectSign1 <- FixPCSign(PCWeigth = PCBase$x[,1], PCProj = PCBase$rotation[,1],
                               Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
                              Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
                              Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
     
     
     if(PCADims >= 2){
-      CorrectSign2 <- FixPCSign(PCWeigth = PCBase$rotation[,2], PCProj = PCBase$x[,2],
+      CorrectSign2 <- FixPCSign(PCWeigth = PCBase$x[,2], PCProj = PCBase$rotation[,2],
                                 Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes],
                                 Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
                                 Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
@@ -652,7 +639,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     if(PlotData){
       
       if(PCADims >= 2){
-        DF <- data.frame(PC1 = CorrectSign1*PCBase$x[,1], PC2 = CorrectSign2*PCBase$x[,2], Group = Grouping[colnames(OrgExpMatrix[SelGenes, ])])
+        DF <- data.frame(PC1 = CorrectSign1*PCBase$rotation[,1], PC2 = CorrectSign2*PCBase$rotation[,2], Group = Grouping[colnames(OrgExpMatrix[SelGenes, ])])
         
         p <- ggplot2::ggplot(DF, ggplot2::aes(x=PC1, y=PC2, color = Group)) + ggplot2::geom_point() +
           ggplot2::labs(title = ModuleList[[i]]$Name)
@@ -837,16 +824,16 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
      }
     
     # Correct the sign of the first PC projections
-    ModProjSamples <- CorrectSign1*PCBase$x[,1]
+    ModProjSamples <- CorrectSign1*PCBase$rotation[,1]
     names(ModProjSamples) <- colnames(ExpressionMatrix)
     
     ProjMatrix <- rbind(ProjMatrix, ModProjSamples)
     
     # Correct the sign of the first PC weigths (Filtered and unfiltered)
-    tWeigths <- CorrectSign1*PCBase$rotation[,1]
+    tWeigths <- CorrectSign1*PCBase$x[,1]
     names(tWeigths) <- SelGenes
     
-    tWeigthsUnf <- CorrectSignUnf*PCBaseUnf$rotation[,1]
+    tWeigthsUnf <- CorrectSignUnf*PCBaseUnf$x[,1]
     names(tWeigthsUnf) <- CompatibleGenes
     
     WeigthList[[length(WeigthList)+1]] <- tWeigths
@@ -854,7 +841,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     ModuleSummary[[length(ModuleSummary)+1]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
                                OriginalGenes = CompatibleGenes, UsedGenes = SelGenes, SampledGenes = SampledsGeneList,
                                PCABase = PCBase, PCBaseUnf = PCBaseUnf,
-                               CorrectSign1 = CorrectSign1, CorrectSign2 = CorrectSign2, ExpVarBase = ExpVar, ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
+                               CorrectSign1 = CorrectSign1, CorrectSign2 = CorrectSign2, ExpVarBase = ExpVar,
+                               ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
                                PC1Weight.SignFixed = tWeigths, PC1WeightUnf.SignFixed = tWeigthsUnf,
                                GMTWei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes])
   
