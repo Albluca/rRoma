@@ -4,15 +4,15 @@
 \alias{FixPCSign}
 \title{Correct the sign of the principal component}
 \usage{
-FixPCSign(PCWeigth, PCProj, Wei = NULL, Mode = "none", DefWei = 1,
+FixPCSign(GeneScore, SampleScore, Wei = NULL, Mode = "none", DefWei = 1,
   Thr = NULL, Grouping = NULL, ExpMat = NULL, CorMethod = "pearson")
 }
 \arguments{
-\item{PCWeigth}{}
+\item{GeneScore}{}
 
-\item{PCProj}{}
+\item{SampleScore}{}
 
-\item{Wei}{vector, numeric optional vector of weigths}
+\item{Wei}{vector, numeric optional vector of gene weigths}
 
 \item{Mode}{scalar, character. Mode to correct the sign}
 
@@ -25,6 +25,8 @@ FixPCSign(PCWeigth, PCProj, Wei = NULL, Mode = "none", DefWei = 1,
 \item{ExpMat}{}
 
 \item{CorMethod}{c("pearson", "kendall", "spearman")}
+
+\item{PCAType}{character string, the type of PCA to perform. It can be "DimensionsAreGenes" or "DimensionsAreSamples"}
 }
 \description{
 Correct the sign of the principal component

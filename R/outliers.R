@@ -15,32 +15,49 @@
 #' @param ExpressionData 
 #' @param PlotData 
 #' @param ModuleName
+#' @param PCAType character string, the type of PCA to perform. It can be "DimensionsAreGenes" or "DimensionsAreSamples"
 #'
 #' @return
 #' @export
 #'
 #' @examples
-DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, CompatibleGenes, ExpressionData,
+DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter,
+                           CompatibleGenes, ExpressionData, PCAType = PCAType,
                            PlotData = FALSE, ModuleName = '', PrintInfo = TRUE) {
   
+  if(!(PCAType %in% c("DimensionsAreGenes", "DimensionsAreSamples"))){
+    print("Incompatible PCAType, no outlier filtering will be performed")
+    return(CompatibleGenes)
+  }
+  
   SelGenes <- CompatibleGenes
+  
+  GetAllPC1Var <- function(i){
+    
+    if(PCAType == "DimensionsAreGenes"){
+      tData <- t(ExpressionData[-i, ])
+    }
+    
+    if(PCAType == "DimensionsAreSamples"){
+      tData <- ExpressionData[-i, ]
+    }
+    
+    PC1Var <- var(
+      irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter,
+                          scale. = FALSE, retx = TRUE)$x
+    )
+    return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
+    
+  }
+  
+  # Computing all the PC1
+  AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), GetAllPC1Var)
   
   if(GeneOutDetection == "L1OutVarPerc"){
     
     if(PrintInfo){
       print("Detecting outliers using leave one out and percentage variation on variance explained by PC1")
     }
-    
-    # Computing all the PC1
-    AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- ExpressionData[-i, ]
-      PC1Var <- var(
-        irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter,
-                            scale. = FALSE, retx = TRUE)$x
-        )
-      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
-    })
-    
     
     # Getting the distance from the median PC1
     GenesOut <- abs(AllPCA1-median(AllPCA1)) > GeneOutThr/100
@@ -74,17 +91,6 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     if(PrintInfo){
       print("Detecting outliers using leave one out and dendrogram analysis on variance explained by PC1")
     }
-    
-    # Computing all the PC1
-    AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- ExpressionData[-i, ]
-      PC1Var <- var(
-        irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter,
-                            scale. = FALSE, retx = TRUE)$x
-      )
-      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
-    })
-    
     
     AllPCA1ABS <- abs(AllPCA1 - median(AllPCA1))
     names(AllPCA1ABS) <- CompatibleGenes
@@ -130,17 +136,6 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
       print("Detecting outliers using leave one out and median-absolute-deviations away from median (scater package)")
     }
     
-    # Computing all the PC1
-    AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- ExpressionData[-i, ]
-      PC1Var <- var(
-        irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter,
-                            scale. = FALSE, retx = TRUE)$x
-      )
-      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
-    })
-    
-    
     # Getting the distance from the median PC1
     GenesOut <- scater::isOutlier(AllPCA1, nmads = GeneOutThr)
     
@@ -175,17 +170,6 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter, Compat
     if(PrintInfo){
       print("Detecting outliers using leave one out and standards deviation away from the mean")
     }
-    
-    # Computing all the PC1
-    AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), function(i){
-      tData <- ExpressionData[-i, ]
-      PC1Var <- var(
-        irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter,
-                            scale. = FALSE, retx = TRUE)$x
-      )
-      return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))
-    })
-    
     
     # Getting the distance from the median PC1
     ZScore <- (AllPCA1 - mean(AllPCA1))/sd(AllPCA1)
