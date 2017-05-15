@@ -67,7 +67,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   }
   
   
-  AllGenesWei <- lapply(RomaData$ModuleSummary[Selected], "[[", "PC1Weight.SignFixed")
+  AllGenesWei <- lapply(RomaData$ModuleSummary[Selected], "[[", "GeneWeight.SignFixed")
   AllGenesWei <- unlist(AllGenesWei, use.names = TRUE)
   AllGenesWei.Split <- split(AllGenesWei, f = names(AllGenesWei))
   
