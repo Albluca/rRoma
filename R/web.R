@@ -48,22 +48,22 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   }
   
   if(is.null(Selected)){
-    Selected <- 1:nrow(RomaData$ProjMatrix)
+    Selected <- 1:nrow(RomaData$SampleMatrix)
   }
   
-  if(sum(SampleName %in% colnames(RomaData$ProjMatrix))<0){
+  if(sum(SampleName %in% colnames(RomaData$SampleMatrix))<0){
     print("Sample(s) not found")
     return()
   } else {
-    SelSampleNames <- intersect(SampleName, colnames(RomaData$ProjMatrix))
+    SelSampleNames <- intersect(SampleName, colnames(RomaData$SampleMatrix))
     print(paste(length(SelSampleNames), "sample(s) selected"))
   }
   
-  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+  if(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix)))<1){
     print("No Genset selected")
     return(NULL)
   } else {
-    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset(s) selected"))
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix))), "geneset(s) selected"))
   }
   
   
@@ -102,7 +102,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   
   if(any(DispMode == "Module")){
     
-    ModuleScore <- RomaData$ProjMatrix[Selected, SelSampleNames]
+    ModuleScore <- RomaData$SampleMatrix[Selected, SelSampleNames]
     
     if(length(SelSampleNames)>1){
       if(length(Selected)>1){
@@ -180,15 +180,15 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     } else {
       
       if(is.null(QTop)){
-        Top <- max(RomaData$ProjMatrix[Selected,])
+        Top <- max(RomaData$SampleMatrix[Selected,])
       } else {
-        Top <- quantile(RomaData$ProjMatrix[Selected,], QTop)
+        Top <- quantile(RomaData$SampleMatrix[Selected,], QTop)
       }
       
       if(is.null(QBottom)){
-        Bottom <- min(RomaData$ProjMatrix[Selected,])
+        Bottom <- min(RomaData$SampleMatrix[Selected,])
       } else {
-        Bottom <- quantile(RomaData$ProjMatrix[Selected,], QBottom)
+        Bottom <- quantile(RomaData$SampleMatrix[Selected,], QBottom)
       }
       
     }
@@ -295,3 +295,4 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
 GetSingle <- function(x) {
   ifelse(length(x)==1, x, NA)
 }
+

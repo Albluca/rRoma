@@ -25,14 +25,14 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
                           Normalize = FALSE, Transpose = FALSE){
   
   if(is.null(Selected)){
-    Selected <- 1:nrow(RomaData$ProjMatrix)
+    Selected <- 1:nrow(RomaData$SampleMatrix)
   }
   
-  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+  if(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix)))<1){
     print("No Genset selected")
     return(NULL)
   } else {
-    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix))), "geneset selected"))
   }
   
   op <- par(mar=c(GenesetMargin, 5, 4, 2))
@@ -62,7 +62,7 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
   
   if(!is.null(GroupInfo)){
     
-    FoundSamp <- intersect(colnames(RomaData$ProjMatrix), names(GroupInfo))
+    FoundSamp <- intersect(colnames(RomaData$SampleMatrix), names(GroupInfo))
     print(paste(length(FoundSamp), "samples have an associated group"))
     
     GroupInfo <- GroupInfo[FoundSamp]
@@ -80,7 +80,7 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
     AddInfo = NULL
   }
   
-  PlotMat <- RomaData$ProjMatrix[Selected,]
+  PlotMat <- RomaData$SampleMatrix[Selected,]
   
   if(Normalize){
     
@@ -164,20 +164,20 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
                            Selected = NULL, PlotWeigthSign = FALSE){
   
   if(is.null(Selected)){
-    Selected <- 1:nrow(RomaData$ProjMatrix)
+    Selected <- 1:nrow(RomaData$SampleMatrix)
   }
   
-  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+  if(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix)))<1){
     print("No Genset selected")
     return(NULL)
   } else {
-    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix))), "geneset selected"))
   }
   
   
   for(i in Selected){
     
-    FiltGenes <- RomaData$ModuleSummary[[i]]$PC1Weight.SignFixed
+    FiltGenes <- RomaData$ModuleSummary[[i]]$GeneWeight.SignFixed
     names(FiltGenes) <- RomaData$ModuleSummary[[i]]$UsedGenes
     
     GeneNames <- RomaData$ModuleSummary[[i]]$UsedGenes
@@ -217,7 +217,7 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
      p <- p + ggplot2::geom_point() +
       # ggplot2::scale_y_continuous(breaks = DF$Position[1:nGenes], labels = DF$Gene[1:nGenes]) +
       # ggplot2::scale_y_discrete(breaks=levels(DF$Gene)) +
-      ggplot2::labs(x = "PC1 weight", y = "Gene") +
+      ggplot2::labs(x = "Gene weight", y = "Gene") +
       ggplot2::theme(panel.grid.minor = ggplot2::element_line(colour = NA))
     
     if(is.null(ExpressionMatrix)){
@@ -282,15 +282,13 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
 
 
 
-#' Plot gene weigth across selected samples
+#' Plot sample score across selected samples
 #'
 #' @param RomaData list, the analysis returned by rRoma
 #' @param PlotSamples scalar, numeric. The number of samples to plot
 #' @param ExpressionMatrix matrix, numeric. The expression matrix used to produce gene expression boxplot. If NULL (default), no gene expression information is reported
 #' @param LogExpression boolean, should gene expression be logtransformed?
 #' @param Selected vector, integer. The position of the genesets to plot
-#' @param PlotPCProj vector, string. The plotting modality of projections. It can containing any combination of the following strings: 'Points', 'Density', or 'Bins'.
-#' Any other value will result in projections not being plotted
 #'
 #' @return
 #' @export
@@ -298,23 +296,23 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
 #' @examples
 PlotSampleProjections <- function(RomaData, PlotSamples = 40,
                                 ExpressionMatrix = NULL, LogExpression = TRUE,
-                                Selected = NULL, PlotPCProj = 'none'){
+                                Selected = NULL){
   
   if(is.null(Selected)){
-    Selected <- 1:nrow(RomaData$ProjMatrix)
+    Selected <- 1:nrow(RomaData$SampleMatrix)
   }
   
-  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+  if(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix)))<1){
     print("No Genset selected")
     return(NULL)
   } else {
-    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix))), "geneset selected"))
   } 
   
   for(i in Selected){
     
-    FiltSamp <- RomaData$ModuleSummary[[i]]$PCABase$x[,"PC1"]
-    names(FiltSamp) <- colnames(RomaData$ProjMatrix)
+    FiltSamp <- RomaData$ModuleSummary[[i]]$SampleScore.SignFixed
+    # names(FiltSamp) <- colnames(RomaData$SampleMatrix)
     
     GeneNames <- RomaData$ModuleSummary[[i]]$UsedGenes
     
@@ -334,7 +332,7 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
     p <- ggplot2::ggplot(data = DF, ggplot2::aes(y = Samples, x = Value)) + ggplot2::geom_point() +
       # ggplot2::scale_y_continuous(breaks = DF$Position[1:nGenes], labels = DF$Gene[1:nGenes]) +
       # ggplot2::scale_y_discrete(breaks=levels(DF$Gene)) +
-      ggplot2::labs(x = "PC1 projection", y = "Sample") +
+      ggplot2::labs(x = "Sample Score", y = "Sample") +
       ggplot2::theme(panel.grid.minor = ggplot2::element_line(colour = NA))
     
     if(is.null(ExpressionMatrix)){
@@ -365,82 +363,119 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
       
     }
     
-    PrjList <- lapply(RomaData$ModuleSummary[[i]]$SampledExp, "[[", "PCProj")
-    
-    if(any(sapply(PrjList, is.null)) | !all(PlotPCProj != "none")){
-      next()
-    }
-    
-    PC1Sample <- unlist(lapply(PrjList, function(x){if(all(!is.na(x))) x[,1]}), use.names = FALSE)
-    PC2Sample <- unlist(lapply(PrjList, function(x){if(all(!is.na(x))) x[,2]}), use.names = FALSE)
-    
-    PC1Data <- RomaData$ModuleSummary[[i]]$PCABase$x[,1]*RomaData$ModuleSummary[[i]]$CorrectSign1
-    PC2Data <- RomaData$ModuleSummary[[i]]$PCABase$x[,2]*RomaData$ModuleSummary[[i]]$CorrectSign2
-    
-    DF <- data.frame(PC1 = c(PC1Sample, PC1Data), PC2 = c(PC2Sample, PC2Data),
-                     Source = c(rep("Sampling", length(PC1Sample)),
-                                    rep("Data", length(PC1Data))
-                                )
-                     )
-    
-    XLims <- quantile(PC1Sample, c(.01, .99))
-    XLims[1] <- min(XLims[1], min(PC1Data))
-    XLims[2] <- max(XLims[2], max(PC1Data))
-    
-    YLims <- quantile(PC2Sample, c(.01, .99))
-    YLims[1] <- min(YLims[1], min(PC2Data))
-    YLims[2] <- max(YLims[2], max(PC2Data))
-    
-    if(any(PlotPCProj == 'Points')){
-      p <- ggplot2::ggplot(DF, ggplot2::aes(x = PC1, y = PC2, colour = Source, alpha=Source)) + ggplot2::geom_point() +
-        ggplot2::scale_alpha_manual(values=c(Data=1, Sampling=.2), guide=FALSE) +
-        ggplot2::scale_x_continuous(limits = XLims) +
-        ggplot2::scale_y_continuous(limits = YLims) +
-        ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
-                               "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
-                               "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
-        ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0)
-      
-      print(p)
-    }
-    
-    
-    if(any(PlotPCProj == 'Density')){
-      p <- ggplot2::ggplot(DF[DF$Source=="Sampling",], ggplot2::aes(x = PC1, y = PC2)) +
-        ggplot2::stat_density_2d(ggplot2::aes(fill = ..density..), geom="raster", contour = FALSE, n = 250) +
-        ggplot2::scale_x_continuous(limits = XLims) +
-        ggplot2::scale_y_continuous(limits = YLims) +
-        ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
-                               "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
-                               "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
-        ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0) +
-        ggplot2::geom_point(data = DF[DF$Source=="Data",], mapping = ggplot2::aes(x = PC1, y = PC2), color="red")
-      
-      print(p)
-    }
-    
-    
-    
-    if(any(PlotPCProj == 'Bins')){
-      p <- ggplot2::ggplot(DF[DF$Source=="Sampling",], ggplot2::aes(x = PC1, y = PC2)) +
-        ggplot2::geom_bin2d(bins=75) +
-        ggplot2::scale_x_continuous(limits = XLims) +
-        ggplot2::scale_y_continuous(limits = YLims) +
-        ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
-                               "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
-                               "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
-        ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0) +
-        ggplot2::geom_point(data = DF[DF$Source=="Data",], mapping = ggplot2::aes(x = PC1, y = PC2), color="red")
-      
-      print(p)
-    }
-    
   }
-  
+    
 }
 
 
 
+  
+#' Plot PC projections score across selected samples
+#'
+#' @param RomaData list, the analysis returned by rRoma
+#' @param Selected vector, integer. The position of the genesets to plot
+#' @param PlotPCProj vector, string. The plotting modality of projections. It can containing any combination of the following strings: 'Points', 'Density', or 'Bins'.
+#' Any other value will result in projections not being plotted
+#'
+#' @return
+#' @export
+#'
+#' @examples
+PlotPCProjections <- function(RomaData, Selected = NULL, PlotPCProj = 'none'){
+    
+    if(is.null(Selected)){
+      Selected <- 1:nrow(RomaData$SampleMatrix)
+    }
+    
+    if(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix)))<1){
+      print("No Genset selected")
+      return(NULL)
+    } else {
+      print(paste(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix))), "geneset selected"))
+    } 
+    
+    for(i in Selected){
+      
+      if(RomaData$InputPars$PCAType == "DimensionsAreSamples"){
+        PrjList <- lapply(RomaData$ModuleSummary[[i]]$SampledExp, "[[", "GenesWei")
+      }
+      
+      if(RomaData$InputPars$PCAType == "DimensionsAreGenes"){
+        PrjList <- lapply(RomaData$ModuleSummary[[i]]$SampledExp, "[[", "SampleScore")
+      }
+      
+      
+      if(any(sapply(PrjList, is.null)) | !all(PlotPCProj != "none")){
+        next()
+      }
+      
+      PC1Sample <- unlist(lapply(PrjList, function(x){if(all(!is.na(x))) x[,1]}), use.names = FALSE)
+      PC2Sample <- unlist(lapply(PrjList, function(x){if(all(!is.na(x))) x[,2]}), use.names = FALSE)
+      
+      PC1Data <- RomaData$ModuleSummary[[i]]$PCABase$x[,1]*RomaData$ModuleSummary[[i]]$CorrectSign1
+      PC2Data <- RomaData$ModuleSummary[[i]]$PCABase$x[,2]*RomaData$ModuleSummary[[i]]$CorrectSign2
+      
+      DF <- data.frame(PC1 = c(PC1Sample, PC1Data), PC2 = c(PC2Sample, PC2Data),
+                       Source = c(rep("Sampling", length(PC1Sample)),
+                                  rep("Data", length(PC1Data))
+                       )
+      )
+      
+      XLims <- quantile(PC1Sample, c(.01, .99))
+      XLims[1] <- min(XLims[1], min(PC1Data))
+      XLims[2] <- max(XLims[2], max(PC1Data))
+      
+      YLims <- quantile(PC2Sample, c(.01, .99))
+      YLims[1] <- min(YLims[1], min(PC2Data))
+      YLims[2] <- max(YLims[2], max(PC2Data))
+      
+      if(any(PlotPCProj == 'Points')){
+        p <- ggplot2::ggplot(DF, ggplot2::aes(x = PC1, y = PC2, colour = Source, alpha=Source)) + ggplot2::geom_point() +
+          ggplot2::scale_alpha_manual(values=c(Data=1, Sampling=.2), guide=FALSE) +
+          ggplot2::scale_x_continuous(limits = XLims) +
+          ggplot2::scale_y_continuous(limits = YLims) +
+          ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+                                 "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
+                                 "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
+          ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0)
+        
+        print(p)
+      }
+      
+      
+      if(any(PlotPCProj == 'Density')){
+        p <- ggplot2::ggplot(DF[DF$Source=="Sampling",], ggplot2::aes(x = PC1, y = PC2)) +
+          ggplot2::stat_density_2d(ggplot2::aes(fill = ..density..), geom="raster", contour = FALSE, n = 250) +
+          ggplot2::scale_x_continuous(limits = XLims) +
+          ggplot2::scale_y_continuous(limits = YLims) +
+          ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+                                 "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
+                                 "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
+          ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0) +
+          ggplot2::geom_point(data = DF[DF$Source=="Data",], mapping = ggplot2::aes(x = PC1, y = PC2), color="red")
+        
+        print(p)
+      }
+      
+      
+      
+      if(any(PlotPCProj == 'Bins')){
+        p <- ggplot2::ggplot(DF[DF$Source=="Sampling",], ggplot2::aes(x = PC1, y = PC2)) +
+          ggplot2::geom_bin2d(bins=75) +
+          ggplot2::scale_x_continuous(limits = XLims) +
+          ggplot2::scale_y_continuous(limits = YLims) +
+          ggplot2::ggtitle(paste(RomaData$ModuleSummary[[i]]$ModuleName,
+                                 "L1=", signif(RomaData$ModuleMatrix[i,1], 3),
+                                 "L1/L2=", signif(RomaData$ModuleMatrix[i,3], 3))) +
+          ggplot2::geom_hline(yintercept=0) + ggplot2::geom_vline(xintercept=0) +
+          ggplot2::geom_point(data = DF[DF$Source=="Data",], mapping = ggplot2::aes(x = PC1, y = PC2), color="red")
+        
+        print(p)
+      }
+      
+    }
+  
+}
 
 
 
@@ -459,14 +494,14 @@ PlotRecurringGenes  <- function(RomaData, Selected = NULL,
                                 GenesByGroup = 20, MinMult = 2){
   
   if(is.null(Selected)){
-    Selected <- 1:nrow(RomaData$ProjMatrix)
+    Selected <- 1:nrow(RomaData$SampleMatrix)
   }
   
-  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+  if(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix)))<1){
     print("No Genset selected")
     return(NULL)
   } else {
-    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix))), "geneset selected"))
   }
   
   AllGenes <- lapply(RomaData$ModuleSummary, "[[", "UsedGenes")
@@ -477,7 +512,7 @@ PlotRecurringGenes  <- function(RomaData, Selected = NULL,
     return(NULL)
   }
   
-  AllGenesWei <- lapply(RomaData$ModuleSummary, "[[", "PC1Weight.SignFixed")
+  AllGenesWei <- lapply(RomaData$ModuleSummary, "[[", "GeneWeight.SignFixed")
   
   GenesModuleMat <- sapply(AllGenesWei, function(x){x[names(GeneMult)]})
 
@@ -508,7 +543,7 @@ PlotRecurringGenes  <- function(RomaData, Selected = NULL,
     boxplot(apply(ToPlotData, 2, var, na.rm=TRUE)/
               abs(apply(ToPlotData, 2, mean, na.rm=TRUE)), las=2, log='y',
             main = paste("Genes with multiplicity", names(GenesByMult)[i]),
-            ylab = "Coefficient of variance")
+            ylab = "Coefficient of variation")
     
     par(mfcol=c(1,1))
     
@@ -575,7 +610,7 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = 4,
                           OrderType = "Abs", Transpose = FALSE) {
   
   if(is.null(Selected)){
-    Selected <- 1:nrow(RomaData$ProjMatrix)
+    Selected <- 1:nrow(RomaData$SampleMatrix)
   }
   
   if(OrderType == "Abs"){

@@ -300,7 +300,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
     parallel::clusterExport(cl=cl, varlist=c("SampleFilter", "GeneOutDetection", "GeneOutThr",
                                    "ModulePCACenter", "ExpressionMatrix", "DetectOutliers",
                                    "PCADims", "OrgExpMatrix", "FullSampleInfo", "FoundSampNames",
-                                   "PCAType"), 
+                                   "PCAType", "GroupPCSign"), 
                           envir = environment())
   }
   
@@ -367,7 +367,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000, retx = TRUE)
     }
     
-    ExpVar <- apply(PCBase$x[,1:2], 2, var)/sum(apply(scale(t(BaseMatrix), center = ModulePCACenter, scale = FALSE), 2, var))
+    ExpVar <- apply(PCBase$x[,1:2], 2, var)/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var))
     
     PCBaseUnf <- PCBase
     ExpVarUnf <- ExpVar
@@ -395,7 +395,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000, retx = TRUE)
     }
     
-    ExpVar <- apply(PCBase$x[,1:2], 2, var)/sum(apply(scale(t(BaseMatrix), center = ModulePCACenter, scale = FALSE), 2, var))
+    ExpVar <- apply(PCBase$x[,1:2], 2, var)/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var))
     
     MedianExp <- median(OrgExpMatrix[SelGenes, ])
     
@@ -474,8 +474,13 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
           }
           
-          
           if(FullSampleInfo){
+            
+            if(GroupPCSign){
+              GroupPCsVect <- Grouping
+            } else {
+              GroupPCsVect <- NULL
+            }
             
             ExpMat <- NULL
             
@@ -497,7 +502,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             CorrectSign1 <- FixPCSign(GeneScore = GeneScore1, SampleScore = SampleScore1,
                                       Wei = SamplingGeneWeights[SampleSelGenes],
                                       Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
-                                      Grouping = Grouping, ExpMat = ExpMat, CorMethod = CorMethod)
+                                      Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
             if(PCADims > 1){
               
               if(PCAType == "DimensionsAreGenes"){
@@ -513,13 +518,12 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
               CorrectSign2 <- FixPCSign(GeneScore = GeneScore2, SampleScore = SampleScore2,
                                         Wei = SamplingGeneWeights[SampleSelGenes],
                                         Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
-                                        Grouping = Grouping, ExpMat = ExpMat, CorMethod = CorMethod)
+                                        Grouping = GroupPCsVect, ExpMat = ExpMat, CorMethod = CorMethod)
             } else {
               GeneScore2 = NULL
               SampleScore2 = NULL
               CorrectSign2 = NULL
             }
-            
             
             return(list("ExpVar" = VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)),
                         "MedianExp"= SampMedian,
@@ -529,8 +533,8 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
             
           } else {
             
-            return(list("ExpVar"=VarVect/sum(apply(scale(t(BaseMatrix), center = ModulePCACenter, scale = FALSE), 2, var)),
-                        "MedianExp"=SampMedian, "GenesWei"=NULL, "SampleScore"=NULL)
+            return(list("ExpVar"=VarVect/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var)),
+                        "MedianExp"=SampMedian, "GenesWei" = NULL, "SampleScore" = NULL)
             )
             
           }
@@ -660,6 +664,9 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
       SampleScore1 = PCBaseUnf$rotation[,1]
     }
    
+    GeneScore1Unf <- GeneScore1
+    SampleScore1Unf <- SampleScore1
+    
     CorrectSignUnf <- FixPCSign(GeneScore = GeneScore1, SampleScore = SampleScore1,
                                 Wei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% CompatibleGenes],
                              Mode = PCSignMode, DefWei = DefaultWeight, Thr = PCSignThr,
@@ -931,9 +938,10 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
                                PCABase = PCBase, PCBaseUnf = PCBaseUnf,
                                CorrectSign1 = CorrectSign1, CorrectSign2 = CorrectSign2, ExpVarBase = ExpVar,
                                ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
-                               GeneWeight.SignFixed = GeneScore1, GeneWeightUnf.SignFixed = GeneScore1,
+                               SampleScore.SignFixed = SampleScore1, SampleScoreUnf.SignFixed = SampleScore1Unf,
+                               GeneWeight.SignFixed = GeneScore1, GeneWeightUnf.SignFixed = GeneScore1Unf,
                                GMTWei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes])
-  
+    
   }
   
   if(UseParallel){
