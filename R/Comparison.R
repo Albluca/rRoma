@@ -18,17 +18,17 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
                                  PlotDiag = FALSE, PlotXGSDiff = FALSE) {
   
   if(is.null(Selected)){
-    Selected <- 1:nrow(RomaData$ProjMatrix)
+    Selected <- 1:nrow(RomaData$SampleMatrix)
   }
   
-  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+  if(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix)))<1){
     print("No Genset selected")
     return(NULL)
   } else {
-    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset selected"))
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix))), "geneset selected"))
   }
   
-  tMat <- RomaData$ProjMatrix[Selected,]
+  tMat <- RomaData$SampleMatrix[Selected,]
   names(Groups) <- colnames(tMat)
   
   MeltData <- reshape::melt(tMat)
@@ -57,13 +57,13 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
       ggplot2::geom_boxplot() + ggplot2::guides(fill = "none") +
       ggsignif::geom_signif(comparisons = GetComb(unique(MeltData$Group)),
                             map_signif_level=TRUE, test = "wilcox.test", step_increase = .1) +
-      ggplot2::labs(y="PC1 projection", x="Groups", title = "Groups")
+      ggplot2::labs(y="Sample score", x="Groups", title = "Groups")
     
     print(p)
     
     p <- ggplot2::ggplot(MeltData, ggplot2::aes(y=Value, x=Sample, fill=Group)) +
       ggplot2::geom_boxplot() + ggplot2::coord_flip() +
-      ggplot2::labs(y="PC1 projection", x="Samples", title = "Groups") +
+      ggplot2::labs(y="Sample score", x="Samples", title = "Groups") +
       ggplot2::theme(axis.text.y = ggplot2::element_blank())
         
     print(p)
@@ -134,7 +134,7 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
                            ggplot2::aes(y=Value, x=Group, fill=Group)) + ggplot2::geom_boxplot() +
         ggsignif::geom_signif(comparisons = GetComb(unique(MeltData$Group)),
                               map_signif_level=TRUE, test = "wilcox.test", step_increase = .1) +
-        ggplot2::labs(y="PC1 projection", x="Groups", title = paste("Geneset VS Groups - Part", i-1)) +
+        ggplot2::labs(y="Sample score", x="Groups", title = paste("Geneset VS Groups - Part", i-1)) +
         ggplot2::facet_wrap( ~ GeneSet, ncol = 2) + ggplot2::theme(strip.text.x = ggplot2::element_text(size=6, face = "bold")) +
         ggplot2::guides(fill = "none")
       
@@ -153,17 +153,29 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
       }
       
       Diffs <- TukTest$`Group:GeneSet`
-      Diffs <- data.frame(Diffs[Diffs[,4] < TestPV2,])
-      Diffs <- cbind(rownames(Diffs), Diffs)
-      colnames(Diffs)[1] <- "GGDiff"
       
-      GSPairs <- lapply(strsplit(gsub(":", "-", as.character(Diffs$GGDiff)), c("-")),"[", c(2,4))
-      SameGS <- unlist(lapply(lapply(GSPairs,duplicated),any))
-      GSVect <- unlist(lapply(GSPairs[SameGS], "[[", 1), use.names = FALSE)
+      DiffsIDs <- which(Diffs[,4] < TestPV2)
       
-      print(paste(nrow(Diffs), "significant differences found"))
+      print(paste(length(DiffsIDs), "significant differences found"))
       
-      if(nrow(Diffs)>0){
+      if(length(DiffsIDs) > 0){
+        
+        if(length(DiffsIDs)  == 1){
+          Diffs <- data.frame(t(c(rownames(Diffs)[DiffsIDs],
+                                  Diffs[DiffsIDs,])))
+        } else {
+          Diffs <- data.frame(cbind(rownames(Diffs)[DiffsIDs], Diffs[DiffsIDs,]))
+        }
+        colnames(Diffs)[1] <- "GGDiff"
+        
+        Diffs$diff <- as.numeric(as.character(Diffs$diff))
+        Diffs$lwr <- as.numeric(as.character(Diffs$lwr))
+        Diffs$upr <- as.numeric(as.character(Diffs$upr))
+        Diffs$p.adj <- as.numeric(as.character(Diffs$p.adj))
+        
+        GSPairs <- lapply(strsplit(gsub(":", "-", as.character(Diffs$GGDiff)), c("-")),"[", c(2,4))
+        SameGS <- unlist(lapply(lapply(GSPairs,duplicated),any))
+        GSVect <- unlist(lapply(GSPairs[SameGS], "[[", 1), use.names = FALSE)
         
         if(PlotXGSDiff){
           
@@ -188,28 +200,31 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
           
         }
         
-        SplitDiff <- split(Diffs[SameGS,], GSVect)
-        
-        for(i in 1:length(SplitDiff)){
+        if(any(SameGS)){
           
-          if(nrow(SplitDiff[[i]])<1){
-            next
+          SplitDiff <- split(Diffs[SameGS,], GSVect)
+          
+          for(i in 1:length(SplitDiff)){
+            
+            if(nrow(SplitDiff[[i]])<1){
+              next
+            }
+            
+            p <- ggplot2::ggplot(SplitDiff[[i]], ggplot2::aes(x = GGDiff, y = diff, ymin = lwr, ymax = upr)) +
+              ggplot2::geom_point() + ggplot2::geom_errorbar(width=0.25) + ggplot2::coord_flip() +
+              ggplot2::facet_wrap( ~ GGDiff, scales = "free_y", ncol = 1) +
+              ggplot2::labs(y="Mean difference", x="Categories",
+                            title = paste("Groups within", names(SplitDiff)[i])) +
+              ggplot2::theme(
+                # axis.text.x = element_blank(),
+                axis.text.y = ggplot2::element_blank(),
+                axis.ticks = ggplot2::element_blank(),
+                strip.text.x = ggplot2::element_text(size=6, face = "bold"))
+            
+            print(p)
           }
           
-          p <- ggplot2::ggplot(SplitDiff[[i]], ggplot2::aes(x = GGDiff, y = diff, ymin = lwr, ymax = upr)) +
-            ggplot2::geom_point() + ggplot2::geom_errorbar(width=0.25) + ggplot2::coord_flip() +
-            ggplot2::facet_wrap( ~ GGDiff, scales = "free_y", ncol = 1) +
-            ggplot2::labs(y="Mean difference", x="Categories",
-                          title = paste("Groups within", names(SplitDiff)[i])) +
-            ggplot2::theme(
-              # axis.text.x = element_blank(),
-              axis.text.y = ggplot2::element_blank(),
-              axis.ticks = ggplot2::element_blank(),
-              strip.text.x = ggplot2::element_text(size=6, face = "bold"))
-          
-          print(p)
         }
-        
         
         
       }

@@ -18,7 +18,6 @@
 #' @param DefDispVal numeric, scalar. The value to be used when the fucntion defined by AggScoreFun produce NA (e.g., sd applied to genes that appear only in one geneset)
 #' @param QTop numeric, scalar. The quantile threshold associted with the top saturation color. If NULL, the max will be used.
 #' @param QBottom numeric, scalar. The quantile threshold associted with the lower saturation color.  If NULL, the min will be used.
-#' @param Steps numeric, scalar. The number of steps of the heatmap?? 
 #' @param MapURL string, scalar. The url of the map to use. The available maps can be seen on acsn.curie.fr and navicell.curie.fr. Possible values include
 #' \itemize{
 #' \item 'https://navicell.curie.fr/navicell/maps/cellcycle/master/index.php'
@@ -37,7 +36,7 @@
 #'
 #' @examples
 PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
-                       QTop = NULL, QBottom = NULL, Steps = 2,
+                       QTop = NULL, QBottom = NULL,
                        MapURL = "", Selected = NULL, FilterByWei = NULL,
                        AggGeneFun = "mean", DispMode = "Module",
                        DataName = "Sample", DefDispVal = 0, PlotInfo = TRUE,
@@ -48,26 +47,26 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   }
   
   if(is.null(Selected)){
-    Selected <- 1:nrow(RomaData$ProjMatrix)
+    Selected <- 1:nrow(RomaData$SampleMatrix)
   }
   
-  if(sum(SampleName %in% colnames(RomaData$ProjMatrix))<0){
+  if(sum(SampleName %in% colnames(RomaData$SampleMatrix))<0){
     print("Sample(s) not found")
     return()
   } else {
-    SelSampleNames <- intersect(SampleName, colnames(RomaData$ProjMatrix))
+    SelSampleNames <- intersect(SampleName, colnames(RomaData$SampleMatrix))
     print(paste(length(SelSampleNames), "sample(s) selected"))
   }
   
-  if(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix)))<1){
+  if(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix)))<1){
     print("No Genset selected")
     return(NULL)
   } else {
-    print(paste(length(intersect(Selected, 1:nrow(RomaData$ProjMatrix))), "geneset(s) selected"))
+    print(paste(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix))), "geneset(s) selected"))
   }
   
   
-  AllGenesWei <- lapply(RomaData$ModuleSummary[Selected], "[[", "PC1Weight.SignFixed")
+  AllGenesWei <- lapply(RomaData$ModuleSummary[Selected], "[[", "GeneWeight.SignFixed")
   AllGenesWei <- unlist(AllGenesWei, use.names = TRUE)
   AllGenesWei.Split <- split(AllGenesWei, f = names(AllGenesWei))
   
@@ -102,7 +101,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   
   if(any(DispMode == "Module")){
     
-    ModuleScore <- RomaData$ProjMatrix[Selected, SelSampleNames]
+    ModuleScore <- RomaData$SampleMatrix[Selected, SelSampleNames]
     
     if(length(SelSampleNames)>1){
       if(length(Selected)>1){
@@ -160,8 +159,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     Session.Navicell$importDatatable("Continuous copy number data", DataName, DataToPlot)
     
     Session.Navicell$continuousConfigSwitchSampleTab(DataName, "color")
-    Session.Navicell$continuousConfigSetStepCount("sample", 'color', DataName, Steps)
-    Session.Navicell$continuousConfigSetColorAt(DataName, "sample", 0, 'FFFFFF')
+    Session.Navicell$continuousConfigSetStepCount("sample", 'color', DataName, 2)
     
     if(LocalRange){
       
@@ -180,15 +178,15 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     } else {
       
       if(is.null(QTop)){
-        Top <- max(RomaData$ProjMatrix[Selected,])
+        Top <- max(RomaData$SampleMatrix[Selected,])
       } else {
-        Top <- quantile(RomaData$ProjMatrix[Selected,], QTop)
+        Top <- quantile(RomaData$SampleMatrix[Selected,], QTop)
       }
       
       if(is.null(QBottom)){
-        Bottom <- min(RomaData$ProjMatrix[Selected,])
+        Bottom <- min(RomaData$SampleMatrix[Selected,])
       } else {
-        Bottom <- quantile(RomaData$ProjMatrix[Selected,], QBottom)
+        Bottom <- quantile(RomaData$SampleMatrix[Selected,], QBottom)
       }
       
     }
@@ -202,8 +200,13 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     }
     
     
-    Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Bottom, -1)
-    Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Top, 1)
+    Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", 0, Bottom)
+    Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", 1, 0)
+    Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", 2, Top)
+    
+    Session.Navicell$continuousConfigSetColorAt(DataName, "sample", 1, 'FFFFFF')
+    Session.Navicell$continuousConfigSetColorAt(DataName, "sample", 0, '0000FF')
+    Session.Navicell$continuousConfigSetColorAt(DataName, "sample", 2, 'FF0000')
     Session.Navicell$continuousConfigApply(DataName, "color")
     
     Session.Navicell$mapStainingEditorSelectDatatable(DataName)
@@ -236,8 +239,7 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
     Session.Navicell$importDatatable("Continuous copy number data", DataName, DataToPlot)
     
     Session.Navicell$continuousConfigSwitchSampleTab(DataName, "color")
-    Session.Navicell$continuousConfigSetStepCount("sample", 'color', DataName, Steps)
-    Session.Navicell$continuousConfigSetColorAt(DataName, "sample", 0, 'FFFFFF')
+    Session.Navicell$continuousConfigSetStepCount("sample", 'color', DataName, 2)
     
     
     if(is.null(QTop)){
@@ -260,8 +262,13 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
       Top <- 1
     }
     
-    Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Bottom, -1)
-    Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", Top, 1)
+    Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", 0, Bottom)
+    Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", 1, 0)
+    Session.Navicell$continuousConfigSetValueAt(DataName, "color", "sample", 2, Top)
+    
+    Session.Navicell$continuousConfigSetColorAt(DataName, "sample", 1, 'FFFFFF')
+    Session.Navicell$continuousConfigSetColorAt(DataName, "sample", 0, '0000FF')
+    Session.Navicell$continuousConfigSetColorAt(DataName, "sample", 2, 'FF0000')
     Session.Navicell$continuousConfigApply(DataName, "color")
     
     Session.Navicell$mapStainingEditorSelectDatatable(DataName)
@@ -295,3 +302,4 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
 GetSingle <- function(x) {
   ifelse(length(x)==1, x, NA)
 }
+

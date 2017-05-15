@@ -1,21 +1,22 @@
 #' Correct the sign of the principal component 
 #'
-#' @param Wei vector, numeric optional vector of weigths
+#' @param Wei vector, numeric optional vector of gene weigths
 #' @param Mode scalar, character. Mode to correct the sign
 #' @param Thr scalar, numeric quantile threshold 
-#' @param PCWeigth 
-#' @param PCProj 
+#' @param GeneScore 
+#' @param SampleScore 
 #' @param DefWei 
 #' @param Grouping 
 #' @param ExpMat 
 #' @param CorMethod c("pearson", "kendall", "spearman")
+#' @param PCAType character string, the type of PCA to perform. It can be "DimensionsAreGenes" or "DimensionsAreSamples"
 #'
 #' @return
 #' @export
 #'
 #' @examples
 FixPCSign <-
-  function(PCWeigth, PCProj, Wei = NULL, Mode = 'none', DefWei = 1,
+  function(GeneScore, SampleScore, Wei = NULL, Mode = 'none', DefWei = 1,
            Thr = NULL, Grouping = NULL, ExpMat = NULL, CorMethod = "pearson") {
     
     if (Mode == 'none') {
@@ -29,12 +30,12 @@ FixPCSign <-
       
       print("Orienting PC by preferential activation")
       
-      ToUse <- rep(TRUE, length(PC1Weigth))
+      ToUse <- rep(TRUE, length(GeneScore))
       if (!is.null(Thr)) {
-        ToUse <- abs(PCWeigth) >= quantile(abs(PCWeigth), Thr)
+        ToUse <- abs(GeneScore) >= quantile(abs(GeneScore), Thr)
       }
       
-      if (sum(PC1Weigth[ToUse]) < 0) {
+      if (sum(GeneScore[ToUse]) < 0) {
         return(-1)
       } else {
         return(+1)
@@ -55,12 +56,17 @@ FixPCSign <-
       print("Orienting PC by combining PC weights and gene weights")
       print(paste("Missing gene weights will be replaced by", 0))
       
-      ToUse <- rep(TRUE, length(PCWeigth))
+      ToUse <- rep(TRUE, length(GeneScore))
       if (!is.null(Thr)) {
-        ToUse <- abs(PCWeigth) >= quantile(abs(PCWeigth), Thr)
+        ToUse <- abs(GeneScore) >= quantile(abs(GeneScore), Thr)
       }
       
-      if (sum(Wei[!is.na(Wei) & ToUse] * PCWeigth[!is.na(Wei) & ToUse]) < 0) {
+      if(sum(!is.na(Wei) & ToUse)<1){
+        print("Not enough weights, PC will be oriented randomly")
+        return(1)
+      }
+      
+      if (sum(Wei[!is.na(Wei) & ToUse] * GeneScore[!is.na(Wei) & ToUse]) < 0) {
         return(-1)
       } else {
         return(+1)
@@ -77,7 +83,7 @@ FixPCSign <-
     
     if (Mode == 'CorrelateKnownWeightsByGene') {
       
-      print(paste("Orienting PC by correlating gene expression and PC projections (", CorMethod, ")", sep = ''))
+      print(paste("Orienting PC by correlating gene expression and sample score (", CorMethod, ")", sep = ''))
       
       if(sum(!is.na(Wei))<1){
         print("Not enough weights, PC will be oriented randomly")
@@ -100,7 +106,7 @@ FixPCSign <-
           aggregate(x = x, by=list(AssocitedGroups), FUN = median)
         })
         
-        MedianProj <- aggregate(PCProj, by=list(AssocitedGroups), FUN = median)
+        MedianProj <- aggregate(SampleScore, by=list(AssocitedGroups), FUN = median)
         
         print("Computing correlations")
         Cor.Test.Vect <- sapply(GroupMedians, function(x){
@@ -133,16 +139,16 @@ FixPCSign <-
       } else {
         print("Not using groups")
         
-        names(PCProj) <- colnames(ExpMat)
+        names(SampleScore) <- colnames(ExpMat)
         
         print("Computing correlations")
         Cor.Test.Vect <- apply(ExpMat, 1, function(x){
-          if(length(unique(x)) > 2 & length(unique(PCProj)) > 2){
+          if(length(unique(x)) > 2 & length(unique(SampleScore)) > 2){
             if(!is.null(Thr)){
-              CT <- cor.test(x, PCProj, method = CorMethod)
+              CT <- cor.test(x, SampleScore, method = CorMethod)
               return(c(CT$p.value, CT$estimate))
             } else {
-              return(c(NA, cor(x, PCProj, method = CorMethod)))
+              return(c(NA, cor(x, SampleScore, method = CorMethod)))
             }
           } else {
             c(NA, NA)
@@ -207,12 +213,12 @@ FixPCSign <-
         
         print("Computing correlations")
         Cor.Test.Vect <- apply(MediansByGroups, 1, function(x){
-          if(length(unique(x)) > 2 & length(unique(PCWeigth*Wei)) > 2){
+          if(length(unique(x)) > 2 & length(unique(GeneScore*Wei)) > 2){
             if(!is.null(Thr)){
-              CT <- cor.test(x, PCWeigth*Wei, method = CorMethod)
+              CT <- cor.test(x, GeneScore*Wei, method = CorMethod)
               return(c(CT$p.value, CT$estimate))
             } else {
-              return(c(NA, cor(x, PCWeigth*Wei, method = CorMethod)))
+              return(c(NA, cor(x, GeneScore*Wei, method = CorMethod)))
             }
           } else {
             c(NA, NA)
@@ -233,17 +239,17 @@ FixPCSign <-
       } else {
         print("Not using groups")
         
-        names(PCWeigth) <- rownames(ExpMat)
-        PCWeigth <- PCWeigth*Wei
+        names(GeneScore) <- rownames(ExpMat)
+        GeneScore <- GeneScore*Wei
         
         print("Computing correlations")
         Cor.Test.Vect <- apply(ExpMat, 2, function(x){
-          if(length(unique(x)) > 2 & length(unique(PCWeigth)) > 2){
+          if(length(unique(x)) > 2 & length(unique(GeneScore)) > 2){
             if(!is.null(Thr)){
-              CT <- cor.test(x, PCWeigth, method = CorMethod)
+              CT <- cor.test(x, GeneScore, method = CorMethod)
               return(c(CT$p.value, CT$estimate))
             } else {
-              return(c(NA, cor(x, PCWeigth, method = CorMethod)))
+              return(c(NA, cor(x, GeneScore, method = CorMethod)))
             }
           } else {
             c(NA, NA)

@@ -2,10 +2,10 @@
 % Please edit documentation in R/Plotting.R
 \name{PlotSampleProjections}
 \alias{PlotSampleProjections}
-\title{Plot gene weigth across selected samples}
+\title{Plot sample score across selected samples}
 \usage{
 PlotSampleProjections(RomaData, PlotSamples = 40, ExpressionMatrix = NULL,
-  LogExpression = TRUE, Selected = NULL, PlotPCProj = "none")
+  LogExpression = TRUE, Selected = NULL)
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
@@ -17,10 +17,7 @@ PlotSampleProjections(RomaData, PlotSamples = 40, ExpressionMatrix = NULL,
 \item{LogExpression}{boolean, should gene expression be logtransformed?}
 
 \item{Selected}{vector, integer. The position of the genesets to plot}
-
-\item{PlotPCProj}{vector, string. The plotting modality of projections. It can containing any combination of the following strings: 'Points', 'Density', or 'Bins'.
-Any other value will result in projections not being plotted}
 }
 \description{
-Plot gene weigth across selected samples
+Plot sample score across selected samples
 }

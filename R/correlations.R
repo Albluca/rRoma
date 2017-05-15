@@ -21,16 +21,16 @@ GetCorrelations <- function(RomaData, Selected = NULL, MatData, Methods = "pears
 
   AllCor <- NULL
 
-  SampleIds <- intersect(colnames(MatData), colnames(RomaData$ProjMatrix))
+  SampleIds <- intersect(colnames(MatData), colnames(RomaData$SampleMatrix))
 
   for(i in Selected){
 
     CorVal <- apply(MatData[RomaData$ModuleSummary[[i]]$UsedGenes, SampleIds], 1, function(x){
-      CT <- cor.test(x = x, y = RomaData$ProjMatrix[i, SampleIds], conf.level = ConfLevel, method = Methods)
+      CT <- cor.test(x = x, y = RomaData$SampleMatrix[i, SampleIds], conf.level = ConfLevel, method = Methods)
       c(CT$estimate, CT$conf.int, CT$p.value)
     })
 
-    CorVal <- rbind(colnames(CorVal), CorVal, rep(rownames(RomaData$ProjMatrix)[i], ncol(CorVal)))
+    CorVal <- rbind(colnames(CorVal), CorVal, rep(rownames(RomaData$SampleMatrix)[i], ncol(CorVal)))
 
     if(Methods == "pearson"){
       rownames(CorVal) <- c("gene", "cor", "ci.low", "ci.high", "p.val", "GS")
@@ -54,7 +54,7 @@ GetCorrelations <- function(RomaData, Selected = NULL, MatData, Methods = "pears
       c(CT$estimate, CT$conf.int, CT$p.value)
     })
 
-    CorVal <- rbind(colnames(CorVal), CorVal, rep(rownames(RomaData$ProjMatrix)[i], ncol(CorVal)))
+    CorVal <- rbind(colnames(CorVal), CorVal, rep(rownames(RomaData$SampleMatrix)[i], ncol(CorVal)))
 
     if(Methods == "pearson"){
       rownames(CorVal) <- c("sample", "cor", "ci.low", "ci.high", "p.val", "GS")
