@@ -212,11 +212,11 @@ SelectFromInternalDB <- function(SearchString, BDName = "MsigDB", Version = NULL
   if(BDName == "ACSN_CellCycle"){
     if(is.null(Version)){
       print("Searching in ACSN Cell Cycle map v1.1")
-      InternalDB <- rRoma::ACSN_Apoptosis.v1.1
+      InternalDB <- rRoma::ACSN_CellCycle.v1.1
     } else {
       if(Version == "1.1"){
-        print("Searching in ACSN Apoptosis map v1.1")
-        InternalDB <- rRoma::ACSN_Apoptosis.v1.1
+        print("Searching in ACSN Cell Cycle map v1.1")
+        InternalDB <- rRoma::ACSN_CellCycle.v1.1
       }
     }
   }
