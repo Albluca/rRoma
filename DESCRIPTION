@@ -28,4 +28,5 @@ Imports:
 Suggests:
       mice,
       RNaviCell,
+      biomaRt,
       SigCheck

@@ -5,10 +5,10 @@
 \title{Project ROMA results onto ACSN maps}
 \usage{
 PlotOnACSN(RomaData, SampleName, AggScoreFun = "mean", QTop = NULL,
-  QBottom = NULL, Steps = 2, MapURL = "", Selected = NULL,
-  FilterByWei = NULL, AggGeneFun = "mean", DispMode = "Module",
-  DataName = "Sample", DefDispVal = 0, PlotInfo = TRUE,
-  ReturnInfo = FALSE, LocalRange = FALSE)
+  QBottom = NULL, MapURL = "", Selected = NULL, FilterByWei = NULL,
+  AggGeneFun = "mean", DispMode = "Module", DataName = "Sample",
+  DefDispVal = 0, PlotInfo = TRUE, ReturnInfo = FALSE,
+  LocalRange = FALSE)
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
@@ -21,8 +21,6 @@ Note that this function will be applied even to genes appearin in one geneset. T
 \item{QTop}{numeric, scalar. The quantile threshold associted with the top saturation color. If NULL, the max will be used.}
 
 \item{QBottom}{numeric, scalar. The quantile threshold associted with the lower saturation color.  If NULL, the min will be used.}
-
-\item{Steps}{numeric, scalar. The number of steps of the heatmap??}
 
 \item{MapURL}{string, scalar. The url of the map to use. The available maps can be seen on acsn.curie.fr and navicell.curie.fr. Possible values include
 \itemize{
