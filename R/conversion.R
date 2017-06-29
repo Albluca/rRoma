@@ -168,7 +168,7 @@ ConvertModuleNames <- function(
                            TargetOrganism = TargetOrganism,
                            Genes = lapply(ModuleList, "[[", "Genes"),
                            SourceTypes = SourceTypes,
-                           TargetTypes = SourceTypes,
+                           TargetTypes = TargetTypes,
                            HomologyLevel = HomologyLevel) 
   
   if(SourceOrganism != TargetOrganism){
