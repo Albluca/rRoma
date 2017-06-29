@@ -6,21 +6,14 @@
 #' @param SourceTypes Type of gene names used as input (currently either "Names" or "Ensembl"). Default is "Names".
 #' @param TargetTypes Type of gene names to be returned (currently either "Names" or "Ensembl"). Default is "Names".
 #' @param HomologyLevel minimal level of homology (0 by default)
+#' @param HOST alterntive host is the default one doe snot work
+#' @param PATH path of the alterntive host
 #'
 #' @return
 #' @export
 #'
 #' @examples
 #'
-#' Genes <- c("CCND3", "CD151", "CD2BP2", "CD81", "CDC34", "CDC37", "CDC42BPB", "CDC42EP1","CDC42EP4")
-#'
-#' ConvertNames("human", "mouse", SourceTypes = "Names", TargetTypes = "Names", GenNames)
-#'
-#' MoN <- ConvertNames("human", "mouse", SourceTypes = "Names", TargetTypes = "Names", GenNames)
-#' MoEn <- ConvertNames("human", "mouse", SourceTypes = "Names", TargetTypes = "Ensembl", GenNames)
-#'
-#' ConvertNames("mouse", "human", SourceTypes = "Names", TargetTypes = "Names", MoN)
-#' ConvertNames("mouse", "human", SourceTypes = "Ensembl", TargetTypes = "Ensembl", MoEn)
 #'
 #'
 ConvertNames <- function(SourceOrganism = "hsapiens",
@@ -28,9 +21,24 @@ ConvertNames <- function(SourceOrganism = "hsapiens",
                          Genes,
                          SourceTypes = "Names",
                          TargetTypes = "Names",
-                         HomologyLevel = 0) {
+                         HomologyLevel = 0,
+                         HOST = NULL,
+                         PATH = NULL) {
 
-  Mart <- biomaRt::useMart("ensembl", dataset = paste(SourceOrganism, "_gene_ensembl", sep = ''))
+  if(is.null(PATH) & !is.null(HOST)){
+    stop("PATH need to be specified if HOST is not NULL")
+  } else {
+    if(is.null(HOST)){
+      Mart <- biomaRt::useMart("ensembl", dataset = paste(SourceOrganism, "_gene_ensembl", sep = ''))
+    } else {
+      Mart <- biomaRt::useMart("ensembl", dataset = paste(SourceOrganism, "_gene_ensembl", sep = ''),
+                               host = HOST, path = PATH)
+    }
+  }
+  
+  
+  
+  
 
   ToList <- FALSE
 
@@ -46,32 +54,67 @@ ConvertNames <- function(SourceOrganism = "hsapiens",
   if(SourceTypes == "Ensembl"){
     FilterName = "ensembl_gene_id"
   }
-
-  CovGene <- lapply(Genes, function(x){
-    x <- x[!is.na(x)]
-    biomaRt::getBM(attributes = c(paste(TargetOrganism, "_homolog_orthology_confidence", sep=''),
-                                  paste(TargetOrganism, "_homolog_ensembl_gene", sep=''),
-                                  paste(TargetOrganism, "_homolog_associated_gene_name", sep='')),
-                   filters = FilterName,
-                   values = x,
-                   mart = Mart)
-  })
-
-  if(TargetTypes == "Names"){
-    ColName = paste(TargetOrganism, "_homolog_associated_gene_name", sep='')
-  }
-
-  if(TargetTypes == "Ensembl"){
-    ColName = paste(TargetOrganism, "_homolog_ensembl_gene", sep='')
-  }
-
-  RetGene <- lapply(CovGene, function(x){
-    if(length(x) <= 3){
-      return(NULL)
+  
+  if(SourceOrganism != TargetOrganism){
+    
+    CovGene <- lapply(Genes, function(x){
+      x <- x[!is.na(x)]
+      biomaRt::getBM(attributes = c(paste(TargetOrganism, "_homolog_orthology_confidence", sep=''),
+                                    paste(TargetOrganism, "_homolog_ensembl_gene", sep=''),
+                                    paste(TargetOrganism, "_homolog_associated_gene_name", sep='')),
+                     filters = FilterName,
+                     values = x,
+                     mart = Mart)
+    })
+    
+    if(TargetTypes == "Names"){
+      ColName = paste(TargetOrganism, "_homolog_associated_gene_name", sep='')
     }
-    DetectedHomology = x[,paste(TargetOrganism, "_homolog_orthology_confidence", sep='')]
-    return(x[ColName, (DetectedHomology  >= HomologyLevel) & !is.na(DetectedHomology)])
-  })
+    
+    if(TargetTypes == "Ensembl"){
+      ColName = paste(TargetOrganism, "_homolog_ensembl_gene", sep='')
+    }
+    
+    RetGene <- lapply(CovGene, function(x){
+      if(nrow(x) == 0){
+        return(NULL)
+      }
+      DetectedHomology = x[,paste(TargetOrganism, "_homolog_orthology_confidence", sep='')]
+      return(unique(x[(DetectedHomology  >= HomologyLevel) & !is.na(DetectedHomology), ColName]))
+    })
+    
+  } else {
+    
+    CovGene <- lapply(Genes, function(x){
+      x <- x[!is.na(x)]
+      biomaRt::getBM(attributes = c("ensembl_gene_id", "external_gene_name"),
+                     filters = FilterName,
+                     values = x,
+                     mart = Mart)
+    })
+    
+    if(TargetTypes == "Names"){
+      ColName = "external_gene_name"
+    }
+    
+    if(TargetTypes == "Ensembl"){
+      ColName = "ensembl_gene_id"
+    }
+    
+    RetGene <- lapply(CovGene, function(x){
+      if(nrow(x) == 0){
+        return(NULL)
+      }
+      
+      NewNames <- x[, ColName]
+      names(NewNames) <- x[, FilterName]
+
+      return(NewNames)
+    })
+    
+  }
+  
+  
 
   if(ToList){
     RetGene <- unlist(RetGene)
@@ -84,7 +127,77 @@ ConvertNames <- function(SourceOrganism = "hsapiens",
 
 
 
-MList <- SelectFromInternalDB("hall")
-ConvNames <- ConvertNames(SourceOrganism = 'hsapiens', TargetOrganism = 'mmusculus',
-                          Genes = lapply(MList, "[[", "Genes"))
+
+
+
+
+
+
+
+
+#' Conversion between gene naming convenctions and organisms of Modulelist
+#'
+#' @param SourceOrganism Source organism (e.g., "hsapens" or "mmusculus"). Default is "hsapens".
+#' @param TargetOrganism Target organism (e.g., "hsapens" or "mmusculus"). Default is "mmusculus".
+#' @param SourceTypes Type of gene names used as input (currently either "Names" or "Ensembl"). Default is "Names".
+#' @param TargetTypes Type of gene names to be returned (currently either "Names" or "Ensembl"). Default is "Names".
+#' @param HomologyLevel minimal level of homology (0 by default)
+#' @param ModuleList The module list to be convert.
+#' @param HOST alterntive host is the default one doe snot work
+#' @param PATH path of the alterntive host
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+#'
+#'
+ConvertModuleNames <- function(
+  ModuleList,
+  SourceOrganism = "hsapiens",
+  TargetOrganism = "mmusculus",
+  SourceTypes = "Names",
+  TargetTypes = "Names",
+  HomologyLevel = 0,
+  HOST = NULL,
+  PATH = NULL) {
+  
+  
+  NewGenes <- ConvertNames(SourceOrganism = SourceOrganism,
+                           TargetOrganism = TargetOrganism,
+                           Genes = lapply(ModuleList, "[[", "Genes"),
+                           SourceTypes = SourceTypes,
+                           TargetTypes = SourceTypes,
+                           HomologyLevel = HomologyLevel) 
+  
+  if(SourceOrganism != TargetOrganism){
+    print("Homology-supported gene conversion. Gene weigths will be deleted")
+    RetGene <- lapply(as.list(1:length(ModuleList)), function(i){
+      ModuleList[[i]]$Genes <- NewGenes[[i]]
+      ModuleList[[i]]$Weigths <- rep(NA, length(NewGenes[[i]]))
+      return(ModuleList[[i]])
+    })
+  } else {
+    RetGene <- lapply(as.list(1:length(ModuleList)), function(i){
+      
+      OldWei <- ModuleList[[i]]$Weigths
+      names(OldWei) <- ModuleList[[i]]$Genes
+      
+      OldWei <- OldWei[names(NewGenes[[i]])]
+      names(OldWei) <- NULL
+      ModuleList[[i]]$Weigths <- OldWei
+      
+      names(NewGenes[[i]]) <- NULL
+      ModuleList[[i]]$Genes <- NewGenes[[i]]
+      
+      return(ModuleList[[i]])
+    })
+  }
+  
+  return(RetGene)
+  
+}
+
+
 

@@ -19,13 +19,19 @@ A Java implementation developed by Andrei Zynovyev and is also [available](https
 
 # Intalling rROMA
 
-The rRoma package relies on the `scater` package, which is available only on BioConductor. This package can be installed with the following command
+The rRoma package relies on the `scater` and `biomaRt` packages, which are available only on BioConductor. These packagee can be installed with the following command
 
 ```{r, eval=TRUE}
+source("https://bioconductor.org/biocLite.R")
+
 if(!requireNamespace("scater")){
-  source("https://bioconductor.org/biocLite.R")
   biocLite("scater")
 }
+
+if(!requireNamespace("biomaRt")){
+  biocLite("biomaRt")
+}
+
 ```
 
 rRoma can then be installed using `devtools`
@@ -34,13 +40,18 @@ rRoma can then be installed using `devtools`
 if(!requireNamespace("devtools")){
   install.packages("devtools")
 }
-devtools::install_github("Albluca/rROMA")
+
+if(!requireNamespace("rRoma")){
+  devtools::install_github("Albluca/rROMA")
+}
 ```
 
 To fill missing values rRoma uses the mice package. This package needs to be installed manually if datasets with missing values need to be analysed:
 
 ```{r, eval=FALSE}
-install.packages("tictoc")
+if(!requireNamespace("tictoc")){
+  install.packages("tictoc")
+}
 ```
 
 Finally, rRoma allow projecting the results of the analysis on [ACSN maps](https://acsn.curie.fr). To use this functionality it is necessary to install the `RNaviCell` package:
@@ -49,7 +60,10 @@ Finally, rRoma allow projecting the results of the analysis on [ACSN maps](https
 if(!requireNamespace("devtools")){
   install.packages("devtools")
 }
-devtools::install_github("sysbio-curie/RNaviCell")
+
+if(!requireNamespace("RNaviCell")){
+  devtools::install_github("sysbio-curie/RNaviCell")
+}
 ```
 
 The packages `GEOquery`, `tictoc`, and `readr` are not required to run rRoma, but are used in the following example and need to be installed to reproduce the analysis 
@@ -190,8 +204,8 @@ To perform ROMA fixed center in parallel, by using 8 cores, it is sufficient wri
 ```{r, eval=TRUE}
 tictoc::tic()
 Data.FC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = AllHall, FixedCenter = TRUE,
-                   UseParallel = TRUE, nCores = 8, ClusType = "FORK",
-                   PCSignMode="CorrelateAllWeightsByGene")
+                   UseParallel = TRUE, nCores = 8, ClusType = "FORK", MaxGenes = 100,
+                   PCSignMode="CorrelateAllWeightsByGene", PCAType = "DimensionsAreSamples")
 tictoc::toc()
 
 ```
@@ -202,14 +216,14 @@ We can now explore the overdispersed genesets in ROMA with fixed center. Since w
 
 ```{r, fig.height=6, fig.width=12, eval=TRUE}
 AggData.FC <- Plot.Genesets(RomaData = Data.FC,
-              Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-3,
+              Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-2,
                                         VarMode = "Wil", VarType = "Over"),
               GenesetMargin = 20, SampleMargin = 14, cluster_cols = FALSE,
               GroupInfo = Type, AggByGroupsFL = c("mean", "sd"),
               HMTite = "Overdispersed genesets (Fixed center)")
 ```
 
-The fucntion returns a list of matrices with the aggregated data, which we save in the `AggData.FC` variable.
+The fucntion returns a list of matrices with the aggregated data, which we saved in the `AggData.FC` variable.
 
 ```{r}
 AggData.FC
@@ -272,10 +286,8 @@ Moreover, we can look at the projections of the samples with the fixed center
 PlotSampleProjections(RomaData = Data.FC, PlotSamples = 30,
                       ExpressionMatrix = MatData, LogExpression = FALSE,
                       Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-3,
-                                                VarMode = "Wil", VarType = "Over"),
-                      PlotPCProj = "none")
+                                                VarMode = "Wil", VarType = "Over"))
 ```
-
 
 ## Recurrent genes
 
@@ -285,7 +297,7 @@ Finally, we can look at genes which appear across different genesests and explor
 PlotRecurringGenes(RomaData = Data.FC,
                    Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-3,
                                              VarMode = "Wil", VarType = "Over"),
-                   GenesByGroup = 25, MinMult = 3)
+                   GenesByGroup = 25, MinMult = 2)
 ```
 
 
@@ -305,22 +317,45 @@ RedData.NFC <- rRoma.R(ExpressionMatrix = MatData, ModuleList = RedGMT, FixedCen
                     UseParallel = TRUE, nCores = 8, ClusType = "FORK",
                     PCSignMode="CorrelateAllWeightsByGene", 
                     PlotData = TRUE, MoreInfo = TRUE, FullSampleInfo = TRUE,
-                    Grouping = Type, GroupPCSign = FALSE)
+                    Grouping = Type, GroupPCSign = FALSE, PCAType = "DimensionsAreGenes")
 tictoc::toc()
 ```
 
 
 
 ```{r, eval=TRUE}
-PlotSampleProjections(RomaData = RedData.NFC, PlotSamples = 30,
-                      ExpressionMatrix = MatData, LogExpression = FALSE,
-                      Selected = NULL,
-                      PlotPCProj = c('Points', 'Density',  'Bins'))
+PlotPCProjections(RomaData = RedData.NFC, Selected = NULL,
+                  PlotPCProj = c('Points', 'Density',  'Bins'))
+
 ```
 
 ## Using the interactive dashboard
 
 An interactive dasboard that can be used to perform ROMA and visualize the results is available as a separate r package on [GitHub](https://github.com/Albluca/rRomaDash)
+
+## Converting gene names 
+
+Sometimes it may be necessary to convert gene names between different conventions and possibly organisms. The rRoma package provides the fucntion `ConvertNames` that can be used to conver the genes specified by the Module list. The fucntion relies on the `biomaRt` package and therefore a working internet connection is required.
+
+For example, to convert the MyoGS module list into the Ensembl format it is sufficient to write:
+
+```{r}
+MyoGS <- SelectFromInternalDB("myogenesis")
+MyoGS.ENS <- ConvertModuleNames(ModuleList = MyoGS,
+                                SourceOrganism = "hsapiens", TargetOrganism = "hsapiens",
+                   SourceTypes = "Names", TargetTypes = "Ensembl",
+                   HOST = "grch37.ensembl.org", PATH = "/biomart/martservice")
+```
+
+
+It is also possible to convert gene names across organisms. To minimize potential problematic results this is done only on genes with an homology score:
+
+```{r}
+MyoGS.ENS <- ConvertModuleNames(ModuleList = MyoGS, SourceOrganism = "hsapiens", TargetOrganism = "mmusculus",
+                   SourceTypes = "Names", TargetTypes = "Names",
+                   HOST = "grch37.ensembl.org", PATH = "/biomart/martservice")
+```
+
 
 ## Visualising on ACSN 
 
