@@ -383,7 +383,7 @@ tictoc::toc()
 
 ```
 
-We can now project the information obtained by using the following commands, which will open a windows in the default browser to visualize the map.
+We can now project the information obtained by using the following commands, which will open a windows in the default browser to visualize the map. We will start by displaying information relative to normal samples
 
 ```{r}
 PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "normal"]),
@@ -395,7 +395,13 @@ PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "normal"]),
            AggGeneFun = "median")
 ```
 
+This command will result in the following maps to be drawn:
 
+![Roma Scores](README_files/Map1.png)
+
+![Gene weights](README_files/Map2.png)
+
+We can then compare the information with metastatic samples.
 
 ```{r}
 PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "metastasized"]),
@@ -406,6 +412,8 @@ PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "metastasized
            MapURL = 'https://acsn.curie.fr/navicell/maps/survival/master/index.php',
            AggGeneFun = "median")
 ```
+
+![Roma Scores](README_files/Map3.png)
 
 ## Session information
 
