@@ -335,9 +335,9 @@ An interactive dasboard that can be used to perform ROMA and visualize the resul
 
 ## Converting gene names 
 
-Sometimes it may be necessary to convert gene names between different conventions and possibly organisms. The rRoma package provides the fucntion `ConvertNames` that can be used to conver the genes specified by the Module list. The fucntion relies on the `biomaRt` package and therefore a working internet connection is required.
+Sometimes it may be necessary to convert gene names between different conventions and possibly organisms. The rRoma package provides the fucntion `ConvertNames` that can be used to conver the genes specified by the Module list. The fucntion relies on the `biomaRt` package and therefore a working internet connection is required. The `HOST` and `PATH` argument are optional and can be used to specify an alternative host when ensembl.org is having problems.
 
-For example, to convert the MyoGS module list into the Ensembl format it is sufficient to write:
+To derive and convert the MyoGS module list into the Ensembl format it is sufficient to write:
 
 ```{r}
 MyoGS <- SelectFromInternalDB("myogenesis")
@@ -347,15 +347,24 @@ MyoGS.ENS <- ConvertModuleNames(ModuleList = MyoGS,
                    HOST = "grch37.ensembl.org", PATH = "/biomart/martservice")
 ```
 
+```{r}
+MyoGS.ENS[[1]]$Genes
+```
+
 
 It is also possible to convert gene names across organisms. To minimize potential problematic results this is done only on genes with an homology score:
 
 ```{r}
-MyoGS.ENS <- ConvertModuleNames(ModuleList = MyoGS, SourceOrganism = "hsapiens", TargetOrganism = "mmusculus",
-                   SourceTypes = "Names", TargetTypes = "Names",
+MyoGS.Mouse <- ConvertModuleNames(ModuleList = MyoGS, SourceOrganism = "hsapiens", TargetOrganism = "mmusculus",
+                   SourceTypes = "Names", TargetTypes = "Names", HomologyLevel = 1,
                    HOST = "grch37.ensembl.org", PATH = "/biomart/martservice")
 ```
 
+```{r}
+MyoGS.Mouse[[1]]$Genes
+```
+
+Converting across species, will suppress the weigth information.
 
 ## Visualising on ACSN 
 
@@ -374,29 +383,37 @@ tictoc::toc()
 
 ```
 
-We can now project the information obtained by using the following commands, which will open a windows in the default browser to visualize the map.
+We can now project the information obtained by using the following commands, which will open a windows in the default browser to visualize the map. We will start by displaying information relative to normal samples
 
 ```{r}
 PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "normal"]),
            AggScoreFun = "median", FilterByWei = 30, 
            DispMode = c("Module", "Gene"), DataName = "Normal", 
-           QTop = .99, QBottom = .1, Steps = 5, 
+           QTop = .99, QBottom = .1,
            Selected = NULL,
            MapURL = 'https://acsn.curie.fr/navicell/maps/survival/master/index.php',
            AggGeneFun = "median")
 ```
 
+This command will result in the following maps to be drawn:
 
+![Roma Scores](README_files/Map1.png)
+
+![Gene weights](README_files/Map2.png)
+
+We can then compare the information with metastatic samples.
 
 ```{r}
 PlotOnACSN(RomaData = Data.NFC.CS, SampleName = names(Type[Type == "metastasized"]),
            AggScoreFun = "median", FilterByWei = 30, 
            DispMode = "Module", DataName = "Metastasized", 
-           QTop = .99, QBottom = .1, Steps = 5, 
+           QTop = .99, QBottom = .1,
            Selected = NULL,
            MapURL = 'https://acsn.curie.fr/navicell/maps/survival/master/index.php',
            AggGeneFun = "median")
 ```
+
+![Roma Scores](README_files/Map3.png)
 
 ## Session information
 
