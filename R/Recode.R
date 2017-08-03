@@ -68,14 +68,39 @@
 #' @export
 #'
 #' @examples
-rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, ModuleList, UseWeigths = FALSE,
-                    DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000, ApproxSamples = 5,
-                    nSamples = 100, OutGeneNumber = 5, Ncomp = 10, OutGeneSpace = NULL, FixedCenter = TRUE,
-                    GeneOutDetection = "L1OutExpOut", GeneOutThr = 5, GeneSelMode = "All", SampleFilter = TRUE,
-                    MoreInfo = FALSE, PlotData = FALSE, PCADims = 2, PCSignMode ='none', PCSignThr = NULL,
-                    UseParallel = FALSE, nCores = NULL, ClusType = "PSOCK", SamplingGeneWeights = NULL,
-                    FillNAMethod = list(), Grouping = NULL, FullSampleInfo = FALSE, GroupPCSign = FALSE,
-                    CorMethod = "pearson", PCAType = "DimensionsAreGenes") {
+rRoma.R <- function(ExpressionMatrix,
+                    ModuleList,
+                    centerData = TRUE,
+                    ExpFilter=FALSE,
+                    UseWeigths = FALSE,
+                    DefaultWeight = 1,
+                    MinGenes = 10,
+                    MaxGenes = 1000,
+                    ApproxSamples = 5,
+                    nSamples = 100,
+                    OutGeneNumber = 5,
+                    Ncomp = 10,
+                    OutGeneSpace = NULL,
+                    FixedCenter = TRUE,
+                    GeneOutDetection = "L1OutExpOut",
+                    GeneOutThr = 5,
+                    GeneSelMode = "All",
+                    SampleFilter = TRUE,
+                    MoreInfo = FALSE,
+                    PlotData = FALSE,
+                    PCADims = 2,
+                    PCSignMode ='none',
+                    PCSignThr = NULL,
+                    UseParallel = FALSE,
+                    nCores = NULL,
+                    ClusType = "PSOCK",
+                    SamplingGeneWeights = NULL,
+                    FillNAMethod = list(),
+                    Grouping = NULL,
+                    FullSampleInfo = FALSE,
+                    GroupPCSign = FALSE,
+                    CorMethod = "pearson",
+                    PCAType = "DimensionsAreGenes") {
 
   if(PCADims < 1){
     stop("PCADims should be >= 1")
@@ -296,6 +321,7 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
 
     if(nCores >= no_cores){
       nCores = no_cores - 1
+      print(paste("Too many cores selected!", nCores, "will be used"))
     }
 
     # Initiate cluster
@@ -781,13 +807,14 @@ rRoma.R <- function(ExpressionMatrix, centerData = TRUE, ExpFilter=FALSE, Module
         MeltData$Wei <- factor(MeltData$Wei)
 
 
-
-
-
         SplitGroups <- cut(seq(from=1, by=1, to = length(unique(MeltData$Gene))),
             breaks = seq(from=0, to=length(unique(MeltData$Gene))+16, by=16))
 
-        names(SplitGroups) <- unique(MeltData$Gene)
+        
+        # check here!
+        # Order gene plot by weigt
+        
+        names(SplitGroups) <- sort(unique(MeltData$Gene))
 
         print("Plotting expression VS sample score")
 
