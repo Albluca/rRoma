@@ -5,7 +5,7 @@
 \title{Title}
 \usage{
 ExploreGeneProperties(RomaData, GeneName, ExpressionMatrix, Selected = NULL,
-  GroupInfo = NULL)
+  GroupInfo = NULL, DO_tSNE = FALSE, initial_dims = 50, perplexity = 30)
 }
 \arguments{
 \item{RomaData}{}
@@ -17,6 +17,12 @@ ExploreGeneProperties(RomaData, GeneName, ExpressionMatrix, Selected = NULL,
 \item{Selected}{}
 
 \item{GroupInfo}{}
+
+\item{DO_tSNE}{}
+
+\item{initial_dims}{}
+
+\item{perplexity}{}
 }
 \description{
 Title

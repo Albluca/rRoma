@@ -659,6 +659,9 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = 4,
 #' @param ExpressionMatrix 
 #' @param Selected 
 #' @param GroupInfo 
+#' @param DO_tSNE 
+#' @param initial_dims 
+#' @param perplexity 
 #'
 #' @return
 #' @export
@@ -670,8 +673,201 @@ ExploreGeneProperties <- function(
   GeneName,
   ExpressionMatrix,
   Selected = NULL,
-  GroupInfo = NULL
+  GroupInfo = NULL,
+  DO_tSNE = FALSE,
+  initial_dims = 50,
+  perplexity = 30
 ){
+  
+  
+  VarVect <- apply(ExpressionMatrix, 1, var)
+  
+  if(!is.null(GroupInfo)){
+    ExpMatByGroup <- split(data.frame(t(ExpressionMatrix)),
+                           f=GroupInfo[colnames(ExpressionMatrix)])
+    
+    VarByGroup <- sapply(ExpMatByGroup, function(x) {
+      apply(x, 2, var)
+    })
+    
+    rownames(VarByGroup) <- names(VarVect)
+    
+    VarByGroup <- cbind(VarByGroup, Total = VarVect)
+    
+  } else {
+    
+    VarByGroup <- data.frame(X1 = names(VarVect), Total = VarVect)
+    
+  }
+  
+ 
+  VarByGroup.Melt <- reshape::melt(VarByGroup)
+  colnames(VarByGroup.Melt) <- c("Gene", "Condition", "value")
+  
+  VarByGroup.Melt.Selected <- VarByGroup.Melt[VarByGroup.Melt$Gene == GeneName,]
+  
+  p <- ggplot2::ggplot(data = VarByGroup.Melt, mapping = ggplot2::aes(x=value, fill = Condition)) +
+    ggplot2::geom_density() +
+    ggplot2::geom_vline(data = VarByGroup.Melt.Selected,
+                        mapping = ggplot2::aes(xintercept = value), color="black") +
+    ggplot2::scale_x_log10() +
+    ggplot2::facet_wrap(~Condition) +
+    ggplot2::labs(x = "Variance of expression", title = GeneName) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+  
+  print(p)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  MeanVect <- apply(ExpressionMatrix, 1, mean)
+  
+  if(!is.null(GroupInfo)){
+    
+    MeanByGroup <- sapply(ExpMatByGroup, function(x) {
+      apply(x, 2, mean)
+    })
+    
+    rownames(MeanByGroup) <- names(MeanVect)
+    
+    MeanByGroup <- cbind(MeanByGroup, Total = MeanVect)
+    
+  } else {
+    
+    MeanByGroup <- data.frame(X1 = names(MeanVect), Total = MeanVect)
+    
+  }
+  
+  
+  MeanByGroup.Melt <- reshape::melt(MeanByGroup)
+  colnames(MeanByGroup.Melt) <- c("Gene", "Condition", "value")
+  
+  MeanByGroup.Melt.Selected <- MeanByGroup.Melt[MeanByGroup.Melt$Gene == GeneName,]
+  
+  p <- ggplot2::ggplot(data = MeanByGroup.Melt, mapping = ggplot2::aes(x=value, fill = Condition)) +
+    ggplot2::geom_density() +
+    ggplot2::geom_vline(data = MeanByGroup.Melt.Selected,
+                        mapping = ggplot2::aes(xintercept = value), color="black") +
+    ggplot2::facet_wrap(~Condition) +
+    ggplot2::labs(x = "Mean expression", title = GeneName) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+  
+  print(p)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  ExpData <- data.frame(
+    Sample = colnames(ExpressionMatrix),
+    Exp = ExpressionMatrix[GeneName,],
+    Condition = "Total",
+    stringsAsFactors = FALSE
+    )
+  
+  ToDisplay <- list()
+  
+  if(!is.null(GroupInfo)){
+    ExpData <- rbind(
+      ExpData,
+      data.frame(
+        Sample = colnames(ExpressionMatrix),
+        Exp = ExpressionMatrix[GeneName,],
+        Condition = GroupInfo[colnames(ExpressionMatrix)],
+        stringsAsFactors = FALSE
+      )
+    )
+    
+    PWComp <- pairwise.wilcox.test(ExpData$Exp, ExpData$Condition)$p.value
+    ExtPWComp <- matrix(rep(NA, length(unique(ExpData$Condition))^2), nrow = length(unique(ExpData$Condition)))
+    colnames(ExtPWComp) <- sort(unique(ExpData$Condition))
+    rownames(ExtPWComp) <- colnames(ExtPWComp)
+    
+    ExtPWComp[rownames(PWComp), colnames(PWComp)] <- PWComp
+    
+    ToDisplay <- apply(which(ExtPWComp <= .05, arr.ind = TRUE), 1, list)
+    ToDisplay <- lapply(ToDisplay, function(x){as.integer(unlist(x))})
+  }
+  
+
+  
+  
+  
+  
+  
+  p <- ggplot2::ggplot(data = ExpData, mapping = ggplot2::aes(y = Exp, x = Condition, fill=Condition)) + 
+    ggplot2::geom_boxplot() +
+    ggplot2::labs(y = "Expression", title = GeneName) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+    ggsignif::geom_signif(comparisons = ToDisplay,
+                          map_signif_level=TRUE, test = "wilcox.test", step_increase = .1)
+  
+  print(p)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  PCA_TotData <- irlba::prcomp_irlba(x = t(ExpressionMatrix), n = 2, center = TRUE, retx = TRUE)
+  
+  p <- ggplot2::ggplot(data = data.frame(PCA_TotData$x,
+                                    Exp = ExpressionMatrix[GeneName,]),
+                  mapping = ggplot2::aes(x=PC1, y=PC2, color=Exp)) +
+    ggplot2::geom_point() +
+    ggplot2::labs(title = GeneName) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+  
+  print(p)
+  
+  
+  
+  
+  
+  
+  if(DO_tSNE){
+    Data <- Rtsne::Rtsne(X = t(ExpressionMatrix), initial_dims = initial_dims, perplexity = perplexity)
+    
+    p <- ggplot2::ggplot(data = data.frame(Dim1 = Data$Y[,1], Dim2 = Data$Y[,2],
+                                           Exp = ExpressionMatrix[GeneName,]),
+                         mapping = ggplot2::aes(x=Dim1, y=Dim2, color=Exp)) +
+      ggplot2::geom_point() +
+      ggplot2::labs(title = GeneName, y = "tSNE dimension 2", x = "tSNE dimension 1") +
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    
+    print(p)
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$SampleMatrix)
