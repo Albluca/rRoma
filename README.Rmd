@@ -309,7 +309,7 @@ If we are interested in the dynamics of a specific gene, it is possible to look 
 ExploreGeneProperties(RomaData = Data.FC, 
                       Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 5e-3,
                                              VarMode = "Wil", VarType = "Over"),
-                      GeneName = "TGFB1", ExpressionMatrix = MatData, GroupInfo = Type,
+                      GeneName = "JAG1", ExpressionMatrix = MatData, GroupInfo = Type,
                       DO_tSNE = TRUE, initial_dims = 50, perplexity = 15)
 ```
 
