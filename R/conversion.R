@@ -61,7 +61,8 @@ ConvertNames <- function(SourceOrganism = "hsapiens",
       x <- x[!is.na(x)]
       biomaRt::getBM(attributes = c(paste(TargetOrganism, "_homolog_orthology_confidence", sep=''),
                                     paste(TargetOrganism, "_homolog_ensembl_gene", sep=''),
-                                    paste(TargetOrganism, "_homolog_associated_gene_name", sep='')),
+                                    paste(TargetOrganism, "_homolog_associated_gene_name", sep=''),
+                                    FilterName),
                      filters = FilterName,
                      values = x,
                      mart = Mart)
@@ -80,14 +81,16 @@ ConvertNames <- function(SourceOrganism = "hsapiens",
         return(NULL)
       }
       DetectedHomology = x[,paste(TargetOrganism, "_homolog_orthology_confidence", sep='')]
-      return(unique(x[(DetectedHomology  >= HomologyLevel) & !is.na(DetectedHomology), ColName]))
+      NewNames <- x[(DetectedHomology  >= HomologyLevel) & !is.na(DetectedHomology), ColName]
+      names(NewNames) <- x[(DetectedHomology  >= HomologyLevel) & !is.na(DetectedHomology), FilterName]
+      return(NewNames)
     })
     
   } else {
     
     CovGene <- lapply(Genes, function(x){
       x <- x[!is.na(x)]
-      biomaRt::getBM(attributes = c("ensembl_gene_id", "external_gene_name"),
+      biomaRt::getBM(attributes = c("ensembl_gene_id", "external_gene_name", FilterName),
                      filters = FilterName,
                      values = x,
                      mart = Mart)
@@ -117,7 +120,7 @@ ConvertNames <- function(SourceOrganism = "hsapiens",
   
 
   if(ToList){
-    RetGene <- unlist(RetGene)
+    RetGene <- RetGene[[1]]
   }
 
   return(RetGene)
