@@ -648,3 +648,144 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = 4,
   
   return(PlotMat)
 }
+
+
+
+
+#' Title
+#'
+#' @param RomaData 
+#' @param GeneName 
+#' @param ExpressionMatrix 
+#' @param Selected 
+#' @param GroupInfo 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' 
+ExploreGeneProperties <- function(
+  RomaData,
+  GeneName,
+  ExpressionMatrix,
+  Selected = NULL,
+  GroupInfo = NULL
+){
+  
+  if(is.null(Selected)){
+    Selected <- 1:nrow(RomaData$SampleMatrix)
+  }
+  
+  ModulesGenes <- lapply(RomaData$ModuleSummary[Selected], "[[", "UsedGenes")
+  names(ModulesGenes) <- sapply(RomaData$ModuleSummary[Selected], "[[", "ModuleName")
+  
+  WhichModules <- sapply(ModulesGenes, function(x){
+    GeneName %in% x
+  })
+  
+  Found <- sapply(RomaData$ModuleSummary, "[[", "ModuleName") %in%
+    names(which(WhichModules))
+  
+  print(paste("Gene found in", sum(Found), "modules"))
+  
+  WeiList <- lapply(RomaData$ModuleSummary[Found], "[[", "GeneWeight.SignFixed")
+  names(WeiList) <- sapply(RomaData$ModuleSummary[Found], "[[", "ModuleName")
+  
+  WeiList <- lapply(1:length(WeiList), function(i) {
+    x <- WeiList[[i]]
+    return(
+      data.frame(Wei = c(x, abs(x)),
+                 Name = rep(names(x), 2),
+                 Order = c(rank(x, ties.method = "average"),
+                           rank(abs(x), ties.method = "average"))/length(x),
+                 Type = rep(c("Signed", "Absolute"), each = length(x)),
+                 Module = rep(names(WeiList)[i], 2*length(x)),
+                 stringsAsFactors = FALSE)
+    )
+  })
+  
+  
+  Wei.DF <- do.call(rbind, WeiList)
+  Wei.DF.Selected <- Wei.DF[Wei.DF$Name == GeneName,]
+  
+  
+  p <- ggplot2::ggplot(data = Wei.DF,
+                       mapping = ggplot2::aes(y=Wei, x="")) +
+    ggplot2::geom_boxplot() +
+    ggplot2::facet_grid(Module ~ Type, scales = "free") + 
+    ggplot2::geom_point(data = Wei.DF.Selected,
+                        mapping = ggplot2::aes(y=Wei, x=""),
+                        inherit.aes = FALSE,
+                        color = "red",
+                        size = 3) +
+    ggplot2::labs(y = "Weight", x = "", title = GeneName) + 
+    ggplot2::geom_text(data = Wei.DF.Selected,
+                       mapping = ggplot2::aes(x = "", y = Wei,
+                                              label = paste(signif(100*Order, 2), "th")
+                       ),
+                       hjust = 0, nudge_x = 0.05, size = 7,
+                       inherit.aes = FALSE) + 
+    ggplot2::geom_text(data = Wei.DF.Selected,
+                       mapping = ggplot2::aes(x = "", y = Wei,
+                                              label = signif(Wei, 4)
+                       ),
+                       hjust = 1, nudge_x = -0.05, size = 7,
+                       inherit.aes = FALSE) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+  
+  print(p)
+  
+  
+  
+  GeneExp <- ExpressionMatrix[GeneName,]
+  
+  ModScoreList <- lapply(RomaData$ModuleSummary[Found], "[[", "SampleScore.SignFixed")
+  names(ModScoreList) <- sapply(RomaData$ModuleSummary[Found], "[[", "ModuleName")
+  
+  ModMat <- do.call(cbind, ModScoreList)
+  Mod.DF <- data.frame(ModMat,
+                       Sample = rownames(ModMat),
+                       stringsAsFactors = FALSE)
+  
+  Mod.DF <- reshape::melt(Mod.DF, id.vars = "Sample")
+  
+  if(!is.null(GroupInfo)){
+    
+    Mod.DF <- data.frame(Mod.DF, Exp = GeneExp[Mod.DF$Sample], Groups = GroupInfo[Mod.DF$Sample])
+    
+    p <- ggplot2::ggplot(data = Mod.DF, mapping = ggplot2::aes(x = value, y = Exp)) +
+      ggplot2::geom_smooth(color = "black") +
+      ggplot2::geom_point(mapping = ggplot2::aes(color = Groups)) + 
+      ggplot2::facet_wrap(~variable) +
+      ggplot2::labs(x = "Sample Score", y = "Gene expression", title = GeneName) +
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    
+   
+    
+  } else {
+    
+    Mod.DF <- data.frame(Mod.DF, Exp = GeneExp[Mod.DF$Sample])
+    
+    p <- ggplot2::ggplot(data = Mod.DF, mapping = ggplot2::aes(x = value, y = Exp)) +
+      ggplot2::geom_smooth() + 
+      ggplot2::geom_point() + 
+      ggplot2::facet_wrap(~variable) +
+      ggplot2::labs(x = "Sample Score", y = "Gene expression", title = GeneName) +
+      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    
+  }
+  
+  print(p)
+  
+}
+                      
+
+
+
+
+
+
+
+
+

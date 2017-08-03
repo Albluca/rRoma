@@ -4,7 +4,7 @@
 \alias{rRoma.R}
 \title{Perform ROMA on a datasets}
 \usage{
-rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
+rRoma.R(ExpressionMatrix, ModuleList, centerData = TRUE, ExpFilter = FALSE,
   UseWeigths = FALSE, DefaultWeight = 1, MinGenes = 10, MaxGenes = 1000,
   ApproxSamples = 5, nSamples = 100, OutGeneNumber = 5, Ncomp = 10,
   OutGeneSpace = NULL, FixedCenter = TRUE,
@@ -19,11 +19,11 @@ rRoma.R(ExpressionMatrix, centerData = TRUE, ExpFilter = FALSE, ModuleList,
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
 
+\item{ModuleList}{list, gene module list}
+
 \item{centerData}{logical, should the gene expression values be centered over the samples?}
 
 \item{ExpFilter}{logical, should the samples be filtered?}
-
-\item{ModuleList}{list, gene module list}
 
 \item{UseWeigths}{logical, should the weigths be used for PCA calculation?}
 
@@ -49,14 +49,14 @@ an outlier in the gene expression space. If set to NULL, the gene space filterin
 
 \item{GeneOutDetection}{character scalar, the algorithm used to filter genes in a module. Possible values are
 \itemize{
-\item 'L1OutVarPerc': percentage variation relative to the median variance explained supporgted by a leave one out approach 
+\item 'L1OutVarPerc': percentage variation relative to the median variance explained supported by a leave one out approach
 \item 'L1OutVarDC': dendrogram clustering statistics on variance explained supported by a leave one out approach
 \item 'L1OutExpOut': number of median-absolute-deviations away from median explined variance
 \item 'L1OutSdMean': Number of standard deviations away from the mean
 }
 The option "L1OutExpOut" requires the scater package to be installed.}
 
-\item{GeneOutThr}{scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC"), 
+\item{GeneOutThr}{scalar, threshold used by gene filtering algorithm in the modules. It can represent maximum size of filtered cluster ("L1OutVarDC"),
 minimal percentage variation (L1OutVarPerc) or the number of median-absolute-deviations away from median ("L1OutExpOut")}
 
 \item{GeneSelMode}{character scalar, mode used to sample genes: all available genes ("All") or genes not present in the module ("Others")}
