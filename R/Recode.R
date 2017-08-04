@@ -957,8 +957,6 @@ rRoma.R <- function(ExpressionMatrix,
 
      }
 
-    # Work here!
-
     # Correct the sign of the first PC projections
     names(GeneScore1) <- SelGenes
     names(SampleScore1) <- colnames(ExpressionMatrix)
@@ -967,14 +965,26 @@ rRoma.R <- function(ExpressionMatrix,
 
     WeigthList[[length(WeigthList)+1]] <- GeneScore1 * CorrectSign1
 
-    ModuleSummary[[length(ModuleSummary)+1]] <- list(ModuleName = ModuleList[[i]]$Name, ModuleDesc = ModuleList[[i]]$Desc,
-                               OriginalGenes = CompatibleGenes, UsedGenes = SelGenes, SampledGenes = SampledsGeneList,
-                               PCABase = PCBase, PCBaseUnf = PCBaseUnf,
-                               CorrectSign1 = CorrectSign1, CorrectSign2 = CorrectSign2, ExpVarBase = ExpVar,
-                               ExpVarBaseUnf = ExpVarUnf, SampledExp = SampledExp,
-                               SampleScore.SignFixed = SampleScore1, SampleScoreUnf.SignFixed = SampleScore1Unf,
-                               GeneWeight.SignFixed = GeneScore1, GeneWeightUnf.SignFixed = GeneScore1Unf,
-                               GMTWei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes])
+    ModuleSummary[[length(ModuleSummary)+1]] <-
+      list(ModuleName = ModuleList[[i]]$Name,
+           ModuleDesc = ModuleList[[i]]$Desc,
+           OriginalGenes = CompatibleGenes,
+           UsedGenes = SelGenes,
+           SampledGenes = SampledsGeneList,
+           PCABase = PCBase,
+           PCBaseUnf = PCBaseUnf,
+           CorrectSignUnf = CorrectSignUnf,
+           CorrectSign1 = CorrectSign1,
+           CorrectSign2 = CorrectSign2,
+           ExpVarBase = ExpVar,
+           ExpVarBaseUnf = ExpVarUnf,
+           SampledExp = SampledExp,
+           SampleScore = SampleScore1,
+           SampleScoreUnf = SampleScore1Unf,
+           GeneWeight = GeneScore1,
+           GeneWeightUnf = GeneScore1Unf,
+           GMTWei = ModuleList[[i]]$Weigths[ModuleList[[i]]$Genes %in% SelGenes])
+                               
 
   }
 

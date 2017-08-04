@@ -177,7 +177,7 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
   
   for(i in Selected){
     
-    FiltGenes <- RomaData$ModuleSummary[[i]]$GeneWeight.SignFixed
+    FiltGenes <- RomaData$ModuleSummary[[i]]$GeneWeight * RomaData$ModuleSummary[[i]]$CorrectSign1
     names(FiltGenes) <- RomaData$ModuleSummary[[i]]$UsedGenes
     
     GeneNames <- RomaData$ModuleSummary[[i]]$UsedGenes
@@ -311,7 +311,7 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
   
   for(i in Selected){
     
-    FiltSamp <- RomaData$ModuleSummary[[i]]$SampleScore.SignFixed
+    FiltSamp <- RomaData$ModuleSummary[[i]]$SampleScore * RomaData$ModuleSummary[[i]]$CorrectSign1
     # names(FiltSamp) <- colnames(RomaData$SampleMatrix)
     
     GeneNames <- RomaData$ModuleSummary[[i]]$UsedGenes
@@ -512,7 +512,9 @@ PlotRecurringGenes  <- function(RomaData, Selected = NULL,
     return(NULL)
   }
   
-  AllGenesWei <- lapply(RomaData$ModuleSummary, "[[", "GeneWeight.SignFixed")
+  AllGenesWei <- lapply(RomaData$ModuleSummary, function(x){
+    x$GeneWeight * x$CorrectSign1
+  })
   
   GenesModuleMat <- sapply(AllGenesWei, function(x){x[names(GeneMult)]})
 
@@ -885,7 +887,10 @@ ExploreGeneProperties <- function(
   
   print(paste("Gene found in", sum(Found), "modules"))
   
-  WeiList <- lapply(RomaData$ModuleSummary[Found], "[[", "GeneWeight.SignFixed")
+  WeiList <- lapply(RomaData$ModuleSummary[Found], function(x){
+    x$GeneWeight * x$CorrectSign1
+  })
+  
   names(WeiList) <- sapply(RomaData$ModuleSummary[Found], "[[", "ModuleName")
   
   WeiList <- lapply(1:length(WeiList), function(i) {
@@ -936,7 +941,9 @@ ExploreGeneProperties <- function(
   
   GeneExp <- ExpressionMatrix[GeneName,]
   
-  ModScoreList <- lapply(RomaData$ModuleSummary[Found], "[[", "SampleScore.SignFixed")
+  ModScoreList <- lapply(RomaData$ModuleSummary[Found], function(x){
+    x$SampleScore * x$CorrectSign1
+  })
   names(ModScoreList) <- sapply(RomaData$ModuleSummary[Found], "[[", "ModuleName")
   
   ModMat <- do.call(cbind, ModScoreList)
