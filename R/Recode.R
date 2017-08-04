@@ -142,7 +142,10 @@ rRoma.R <- function(ExpressionMatrix,
   }
 
   if(any(is.na(AllGenesMatrix) | is.null(AllGenesMatrix))){
-    stop("Missing gene names in the matrix. Impossible to proceed")
+    print("Missing gene name in following line(s):")
+    print(which(is.na(AllGenesMatrix) | is.null(AllGenesMatrix)))
+    print("Please fix this before proceding.")
+    stop("Impossible to proceed")
   }
 
   if(ncol(ExpressionMatrix) <= SAMPLE_WARNING & interactive()){
