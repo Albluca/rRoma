@@ -14,7 +14,17 @@ GetTopContrib(RomaData, Selected = NULL, nGenes = 0.1, Mode = "Wei",
 
 \item{Selected}{vector, integer. The indices of the genesets to plot}
 
-\item{nGenes}{integer scalar. The number of genes to extract per geneset}
+\item{nGenes}{either a value between 0 and 1 or a positive integer larger than 1. If the parameter
+is an integer larger than 1, it will be interpreted as the number of genes to return per geneset.
+If the parameter is a value between 1 and 0 it will be interpreted as the ratio or genes to return per
+geneset (e.g., .1 indicates 10% of the genes of the geneset)).}
+
+\item{Mode}{string, the mode used to determine the top contributing genes. It can be "Wei"
+(gene weigths will be used) or "Cor" (pearson correlation between gene expression and module score will be used)}
+
+\item{Plot}{boolean, shoul the summary heatmap be plotted?}
+
+\item{ExpressionMatrix}{numerical matrix, the expression matrix in the same format used by the rRoma.R function}
 
 \item{ColorGradient}{vector, string. The colors used for the heatmap.}
 
