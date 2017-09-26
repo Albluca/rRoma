@@ -6,7 +6,7 @@
 #' @param nGenes either a value between 0 and 1 or a positive integer larger than 1. If the parameter
 #' is an integer larger than 1, it will be interpreted as the number of genes to return per geneset.
 #' If the parameter is a value between 1 and 0 it will be interpreted as the ratio or genes to return per
-#' geneset (e.g., .1 indicates 10% of the genes of the geneset)).
+#' geneset (e.g., .1 indicates 10\% of the genes of the geneset)).
 #' @param Mode string, the mode used to determine the top contributing genes. It can be "Wei"
 #' (gene weigths will be used) or "Cor" (pearson correlation between gene expression and module score will be used)
 #' @param Plot boolean, shoul the summary heatmap be plotted?
@@ -18,6 +18,9 @@
 #' @param cluster_cols boolean, should the genesets be reordered according to the dendrogram?
 #' @param HMTite scalar, string. The title of the heatmap.
 #' @param Transpose boolean, should the genes by plotted on the rows instead of the columns?
+#' @param CorMethod string, the method to use to compute the correlation ("pearson", "kendall",
+#' or "spearman"). Methods other than "pearson" will produce potenital problems in the derivation
+#' of statistics accociated with the correlation
 #'
 #' @return
 #' @export
@@ -27,7 +30,7 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = .1,
                           Mode = "Wei", Plot = FALSE, ExpressionMatrix = NULL,
                           ColorGradient = colorRamps::blue2red(50),
                           cluster_cols = FALSE, HMTite = "Top contributing genes",
-                          OrderType = "Abs", Transpose = FALSE) {
+                          OrderType = "Abs", Transpose = FALSE, CorMethod = "pearson") {
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$SampleMatrix)
@@ -43,7 +46,7 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = .1,
     AllData <- lapply(Selected, function(i){
       Scores <- RomaData$SampleMatrix[i,]
       Genes <- RomaData$ModuleSummary[[i]]$UsedGenes
-      AllTests <- apply(ExpressionMatrix[Genes, names(Scores)], 1, cor.test, y = Scores)
+      AllTests <- apply(ExpressionMatrix[Genes, names(Scores)], 1, cor.test, y = Scores, method = CorMethod)
       PVs <- sapply(AllTests, "[[", "p.value")
       Est <- sapply(AllTests, "[[", "estimate")
       CI <- sapply(AllTests, "[[", "conf.int")

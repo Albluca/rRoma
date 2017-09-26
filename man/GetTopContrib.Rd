@@ -7,7 +7,8 @@
 GetTopContrib(RomaData, Selected = NULL, nGenes = 0.1, Mode = "Wei",
   Plot = FALSE, ExpressionMatrix = NULL,
   ColorGradient = colorRamps::blue2red(50), cluster_cols = FALSE,
-  HMTite = "Top contributing genes", OrderType = "Abs", Transpose = FALSE)
+  HMTite = "Top contributing genes", OrderType = "Abs", Transpose = FALSE,
+  CorMethod = "pearson")
 }
 \arguments{
 \item{RomaData}{list, the analysis returned by rRoma}
@@ -17,7 +18,7 @@ GetTopContrib(RomaData, Selected = NULL, nGenes = 0.1, Mode = "Wei",
 \item{nGenes}{either a value between 0 and 1 or a positive integer larger than 1. If the parameter
 is an integer larger than 1, it will be interpreted as the number of genes to return per geneset.
 If the parameter is a value between 1 and 0 it will be interpreted as the ratio or genes to return per
-geneset (e.g., .1 indicates 10% of the genes of the geneset)).}
+geneset (e.g., .1 indicates 10\% of the genes of the geneset)).}
 
 \item{Mode}{string, the mode used to determine the top contributing genes. It can be "Wei"
 (gene weigths will be used) or "Cor" (pearson correlation between gene expression and module score will be used)}
@@ -37,6 +38,10 @@ The current implementation allow "Abs" (genes with the largest weight in absolut
 "Pos" (genes with the largest weight), and "Neg" (genes with the largest negative weight)}
 
 \item{Transpose}{boolean, should the genes by plotted on the rows instead of the columns?}
+
+\item{CorMethod}{string, the method to use to compute the correlation ("pearson", "kendall",
+or "spearman"). Methods other than "pearson" will produce potenital problems in the derivation
+of statistics accociated with the correlation}
 }
 \description{
 Get the top contributing genes per geneset
