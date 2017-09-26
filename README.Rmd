@@ -1,7 +1,7 @@
 ---
 title: "rROMA"
 author: '[Luca Albergante](mailto:luca.albergante@gmail.com)'
-date: "April 2017"
+date: "September 2017"
 output:
   md_document:
     toc: yes
@@ -256,18 +256,32 @@ CompareAcrossSamples(RomaData = Data.FC,
 
 ## Top contributing genes
 
-We can also explore the top contributing genes, i.e., the genes with the largers weights in the selected modules:
+We can also explore the top contributing genes, i.e., the genes with the largers weights in the selected modules. The number of selected genes can be specified via the ratio of genes of the module (`nGenes` larger than 0 and smaller than 1) of via the absolute number of genes to return (`nGenes` integer and larger than 1). Additionally, top contributing genes can be obtained via their correlation with the module score (`Mode` = "Cor") of via their weight (`Mode` = "Wei").If `Plot = TRUE` a summary heatmap will be plotted as well. To use correlation the expression matrix needs to be specified (via the `ExpressionMatrix` parameter).
+
+The function will return a table (`Table`) with the computed information and the matrix used to produce the heatmap (`VizMat`).
 
 ```{r, fig.height=12, fig.width=6}
-GeneMat <- GetTopContrib(Data.FC, Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-5,
-                                        VarMode = "Wil", VarType = "Over"), nGenes = 6, OrderType = "Abs")
+GeneMat <- GetTopContrib(Data.FC,
+                         Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-5,
+                                                   VarMode = "Wil", VarType = "Over"),
+                         nGenes = .1, OrderType = "Abs", Mode = "Wei", Plot = TRUE)
 ```
 
-This allow us to quicky determine if a set of genes play a strong (potentially opposite) role across different genesets. The function also returns the matrix used to plot the heatmap.
+
+```{r, fig.height=12, fig.width=6}
+GeneMat <- GetTopContrib(Data.FC,
+                         Selected = SelectGeneSets(RomaData = Data.FC, VarThr = 1e-5,
+                                                   VarMode = "Wil", VarType = "Over"),
+                         ExpressionMatrix = MatData,
+                         nGenes = .1, OrderType = "Abs", Mode = "Cor", Plot = TRUE)
+```
+
+
+The heatmap cha be used to quicky determine if a set of genes play a strong (potentially opposite) role across different genesets.
 
 ## Gene weights
 
-We can also explore the gene weigths with the fixed center
+We can also explore the gene weigths
 
 ```{r, eval=TRUE}
 PlotGeneWeight(RomaData = Data.FC, PlotGenes = 30,
