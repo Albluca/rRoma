@@ -92,13 +92,26 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
     
   }
   
+  if(is.null(dim(PlotMat))){
+    dim(PlotMat) <- c(1, length(PlotMat))
+    colnames(PlotMat) <- names(RomaData$SampleMatrix[Selected,])
+    rownames(PlotMat) <- rownames(RomaData$SampleMatrix)[Selected]
+    tClusCol <- FALSE
+    tClusRow <- FALSE
+  } else {
+    tClusCol <- cluster_cols
+    tClusRow <- TRUE
+  }
+  
   if(Transpose){
     pheatmap::pheatmap(t(PlotMat), color = ColorGradient,
-                       main = HMTite, cluster_rows = cluster_cols,
+                       main = HMTite, cluster_rows = tClusCol,
+                       cluster_cols = tClusRow,
                        annotation_row = AddInfo)
   } else {
     pheatmap::pheatmap(PlotMat, color = ColorGradient,
-                       main = HMTite, cluster_cols = cluster_cols,
+                       main = HMTite, cluster_cols = tClusCol,
+                       cluster_rows = tClusRow,
                        annotation_col = AddInfo)
   }
   
@@ -106,7 +119,13 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
   
   if(length(AggByGroupsFL)>0 & !is.null(AddInfo)){
 
-    SplitData <- split(data.frame(t(PlotMat[,FoundSamp])), f=AddInfo$Groups)
+    if(length(Selected) == 1){
+      tDF <- data.frame(PlotMat[,FoundSamp])
+      colnames(tDF) <- rownames(RomaData$SampleMatrix)[Selected]
+      SplitData <- split(tDF, f=AddInfo$Groups)
+    } else {
+      SplitData <- split(data.frame(t(PlotMat[,FoundSamp])), f=AddInfo$Groups)
+    }
     
     RetData <- list()
     
@@ -116,14 +135,25 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
         apply(x, 2, get(AggByGroupsFL[[i]]))
         })
       
+      if(is.null(dim(Aggmat))){
+        dim(Aggmat) <- c(1, length(Aggmat))
+        colnames(Aggmat) <- names(SplitData)
+        rownames(Aggmat) <- rownames(RomaData$SampleMatrix)[Selected]
+        tClusCol <- FALSE
+        tClusRow <- FALSE
+      } else {
+        tClusCol <- cluster_cols
+        tClusRow <- TRUE
+      }
+      
       if(Transpose){
         pheatmap::pheatmap(t(Aggmat), color = ColorGradient,
                            main = paste(HMTite, "/", AggByGroupsFL[[i]]),
-                           cluster_rows = cluster_cols)
+                           cluster_rows = tClusCol, cluster_cols = tClusRow)
       } else {
         pheatmap::pheatmap(Aggmat, color = ColorGradient,
                            main = paste(HMTite, "/", AggByGroupsFL[[i]]),
-                           cluster_cols = cluster_cols)
+                           cluster_cols = tClusCol, cluster_rows = tClusRow)
       }
       
       RetData[[length(RetData)+1]] <- Aggmat
