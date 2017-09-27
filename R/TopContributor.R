@@ -175,7 +175,7 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = .1,
           }
           
           Ret <- x[1:nGenes]
-          Ret[Ret>0]
+          Ret[Ret<0]
           
         })
     }
