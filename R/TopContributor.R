@@ -77,9 +77,22 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = .1,
         Sel <- Sel[Sel %in% which(Est < 0)]
       }
       
+      if(is.list(CI)){
+        if(any(is.null(unlist(CI)))){
+          CI.low = NA
+          CI.high = NA
+        } else {
+          error("You should not be here ... please contact the author of the package!")
+        }
+      } else {
+        CI.low = CI[1,Sel]
+        CI.high = CI[2,Sel]
+      }
+      
+      
       DF <- data.frame(
         Gene = names(PVs)[Sel], Module= RomaData$ModuleSummary[[i]]$ModuleName,
-        p.value = PVs[Sel], estimate = Est[Sel], CI.low = CI[1,Sel], CI.high = CI[2,Sel]
+        p.value = PVs[Sel], estimate = Est[Sel], CI.low = CI.low, CI.high = CI.high
       )
       rownames(DF) <- NULL
       
