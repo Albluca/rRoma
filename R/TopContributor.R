@@ -59,6 +59,10 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = .1,
         nGenes = length(Genes)
       }
       
+      if(nGenes < 1 ){
+        nGenes <- 1
+      }
+      
       if(OrderType == "Abs"){
         Sel <- sort(abs(Est), decreasing = TRUE, index.return=TRUE)$ix[1:nGenes]
       }
@@ -121,6 +125,10 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = .1,
               nGenes <- length(x)
             }
             
+            if(nGenes < 1 ){
+              nGenes <- 1
+            }
+            
             x[1:nGenes]
           })
 
@@ -138,8 +146,13 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = .1,
           if(nGenes > length(x)){
             nGenes <- length(x)
           }
+  
+          if(nGenes < 1 ){
+            nGenes <- 1
+          }
           
           Ret <- x[1:nGenes]
+          
           Ret[ (RomaData$WeigthList[Selected])[names(Ret)]>0 ]
           
         })
@@ -156,6 +169,10 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = .1,
           
           if(nGenes > length(x)){
             nGenes <- length(x)
+          }
+          
+          if(nGenes < 1 ){
+            nGenes <- 1
           }
           
           Ret <- x[1:nGenes]
