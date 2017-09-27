@@ -152,8 +152,7 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = .1,
           }
           
           Ret <- x[1:nGenes]
-          
-          Ret[ (RomaData$WeigthList[Selected])[names(Ret)]>0 ]
+          Ret[Ret>0]
           
         })
     }
@@ -176,18 +175,21 @@ GetTopContrib <- function(RomaData, Selected = NULL, nGenes = .1,
           }
           
           Ret <- x[1:nGenes]
-          Ret[ (RomaData$WeigthList[Selected])[names(Ret)]<0 ]
+          Ret[Ret>0]
           
         })
     }
     
     ModuleNameList <- lapply(RomaData$ModuleSummary, "[[", "ModuleName")
+    ModuleNameList <- unlist(ModuleNameList)
+    ModuleNameList <- ModuleNameList[Selected]
+    
     GeneWeiList <- lapply(GenesWei, length)
     
     RetTable <- data.frame(
       Gene = unlist(lapply(GenesWei, names)),
       Module = unlist(
-        lapply(1:length(ModuleNameList), function(i){rep(ModuleNameList[[i]], GeneWeiList[[i]])})
+        sapply(1:length(ModuleNameList), function(i){rep(ModuleNameList[i], GeneWeiList[[i]])})
       ),
       Weigth = unlist(GenesWei)
     )
