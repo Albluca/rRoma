@@ -281,7 +281,7 @@ rRoma.R <- function(ExpressionMatrix,
   OutLiersList <- list()
   UsedModules <- NULL
 
-  GeneFounds <- NULL
+  GeneFounds <- rep(FALSE, length(ModuleList))
   
   # Filter genes for compatibility with the expression matrix
   
@@ -292,8 +292,6 @@ rRoma.R <- function(ExpressionMatrix,
       ModuleList[[i]]$Genes <- ModuleList[[i]]$Genes[Preserve]
       ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
       GeneFounds <- c(GeneFounds, TRUE)
-    } else {
-      GeneFounds <- c(GeneFounds, FALSE)
     }
     
   }
