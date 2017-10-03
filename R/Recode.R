@@ -282,11 +282,18 @@ rRoma.R <- function(ExpressionMatrix,
   UsedModules <- NULL
 
   # Filter genes for compatibility with the expression matrix
-
+  
   for(i in 1:length(ModuleList)){
     Preserve <- ModuleList[[i]]$Genes %in% rownames(ExpressionMatrix)
-    ModuleList[[i]]$Genes <- ModuleList[[i]]$Genes[Preserve]
-    ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
+    
+    if(any(Preserve)){
+      ModuleList[[i]]$Genes <- ModuleList[[i]]$Genes[Preserve]
+      ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
+    } else {
+      ModuleList[[i]]$Genes <- NA
+      ModuleList[[i]]$Weigths <- NA
+    }
+    
   }
 
   # Filter genesets depending on the number of genes
@@ -351,7 +358,7 @@ rRoma.R <- function(ExpressionMatrix,
     CompatibleGenes <- ModuleList[[i]]$Genes
 
     print(paste(length(CompatibleGenes), "genes available for analysis"))
-
+    
     if(MoreInfo){
       print("The following genes will be used:")
       print(CompatibleGenes)
