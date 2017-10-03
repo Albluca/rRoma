@@ -135,7 +135,7 @@ CompareAcrossSamples <- function(RomaData, Groups, Selected = NULL,
         ggsignif::geom_signif(comparisons = GetComb(unique(MeltData$Group)),
                               map_signif_level=TRUE, test = "wilcox.test", step_increase = .1) +
         ggplot2::labs(y="Sample score", x="Groups", title = paste("Geneset VS Groups - Part", i-1)) +
-        ggplot2::facet_wrap( ~ GeneSet, ncol = 2) + ggplot2::theme(strip.text.x = ggplot2::element_text(size=6, face = "bold")) +
+        ggplot2::facet_wrap( ~ GeneSet, scales = "free_y", ncol = 2) + ggplot2::theme(strip.text.x = ggplot2::element_text(size=6, face = "bold")) +
         ggplot2::guides(fill = "none")
       
       print(p)
