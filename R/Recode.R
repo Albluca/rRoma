@@ -298,9 +298,8 @@ rRoma.R <- function(ExpressionMatrix,
   ToFilter <- (nGenes > MaxGenes | nGenes < MinGenes)
   ToUse <- !ToFilter
 
-
-  if(sum(ToFilter)>1){
-    print("The following geneset(s) will be ignored due to the number of genes being outside the specified range")
+  if(sum(ToFilter)>0){
+    print("The following geneset(s) will be ignored due to the number of usable genes being outside the specified range")
     print(unlist(lapply(ModuleList[ToFilter], "[[", "Name")))
 
     if(sum(ToUse) == 0){
@@ -325,9 +324,13 @@ rRoma.R <- function(ExpressionMatrix,
       nCores = no_cores - 1
     }
 
-    if(nCores >= no_cores){
+    if(nCores > no_cores){
       nCores = no_cores - 1
       print(paste("Too many cores selected!", nCores, "will be used"))
+    }
+    
+    if(nCores = no_cores){
+      print("Using all the available cores. This will likely render the computer unresponsive during the analysis.")
     }
 
     # Initiate cluster
