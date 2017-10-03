@@ -285,8 +285,15 @@ rRoma.R <- function(ExpressionMatrix,
 
   for(i in 1:length(ModuleList)){
     Preserve <- ModuleList[[i]]$Genes %in% rownames(ExpressionMatrix)
-    ModuleList[[i]]$Genes <- ModuleList[[i]]$Genes[Preserve]
-    ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
+    
+    if(any(Preserve)){
+      ModuleList[[i]]$Genes <- ModuleList[[i]]$Genes[Preserve]
+      ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
+    } else {
+      ModuleList[[i]]$Genes <- NULL
+      ModuleList[[i]]$Weigths <- NULL
+    }
+    
   }
 
   # Filter genesets depending on the number of genes
