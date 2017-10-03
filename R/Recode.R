@@ -281,25 +281,21 @@ rRoma.R <- function(ExpressionMatrix,
   OutLiersList <- list()
   UsedModules <- NULL
 
-  GeneFounds <- rep(FALSE, length(ModuleList))
+  nGenes <- rep(NA, length(ModuleList))
   
   # Filter genes for compatibility with the expression matrix
   
   for(i in 1:length(ModuleList)){
     Preserve <- ModuleList[[i]]$Genes %in% rownames(ExpressionMatrix)
+    nGenes[i] <- sum(Preserve)
     
-    if(any(Preserve)){
-      ModuleList[[i]]$Genes <- ModuleList[[i]]$Genes[Preserve]
-      ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
-      GeneFounds <- c(GeneFounds, TRUE)
-    }
+    ModuleList[[i]]$Genes <- ModuleList[[i]]$Genes[Preserve]
+    ModuleList[[i]]$Weigths <- ModuleList[[i]]$Weigths[Preserve]
     
   }
 
   # Filter genesets depending on the number of genes
-
-  nGenes <- unlist(lapply(lapply(ModuleList, "[[", "Genes"), length))
-  ToFilter <- (nGenes > MaxGenes | nGenes < MinGenes | !GeneFounds)
+  ToFilter <- (nGenes > MaxGenes | nGenes < MinGenes)
   ToUse <- !ToFilter
 
 
