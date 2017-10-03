@@ -329,7 +329,7 @@ rRoma.R <- function(ExpressionMatrix,
       print(paste("Too many cores selected!", nCores, "will be used"))
     }
     
-    if(nCores = no_cores){
+    if(nCores == no_cores){
       print("Using all the available cores. This will likely render the computer unresponsive during the analysis.")
     }
 
