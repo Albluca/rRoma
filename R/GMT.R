@@ -21,7 +21,9 @@ ReadGMTFile <- function(FileLocation, SearchString = NULL, Mode = "ANY") {
     Idx <- Idx + 1
     
      tLine <- unlist(readr::read_delim(FileLocation, "\t", escape_double = FALSE,
-                                         col_names = FALSE, trim_ws = TRUE, n_max = 1, skip = Idx - 1),
+                                       col_names = FALSE, trim_ws = TRUE, n_max = 1, skip = Idx - 1,
+                                       col_types = cols(.default = col_character())
+                                       ),
                               use.names = FALSE)
     
     if(length(tLine) < 3){
