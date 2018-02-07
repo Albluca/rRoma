@@ -63,6 +63,7 @@
 #' @param CorMethod character string indicating which correlation coefficient is to be used
 #' for orienting the principal components. Can be "pearson", "kendall", or "spearman".
 #' @param PCAType character string, the type of PCA to perform. It can be "DimensionsAreGenes" or "DimensionsAreSamples"
+#' @param SuppressWarning boolean, should warnings be displayed? This option well be ignored in non-interactive sessions.
 #'
 #' @return
 #' @export
@@ -100,7 +101,8 @@ rRoma.R <- function(ExpressionMatrix,
                     FullSampleInfo = FALSE,
                     GroupPCSign = FALSE,
                     CorMethod = "pearson",
-                    PCAType = "DimensionsAreGenes") {
+                    PCAType = "DimensionsAreGenes",
+                    SuppressWarning = FALSE) {
 
   if(PCADims < 1){
     stop("PCADims should be >= 1")
@@ -108,7 +110,9 @@ rRoma.R <- function(ExpressionMatrix,
 
   if(PCADims == 1){
     print("PCADims = 1. Be aware that this is not advisable under normal circumstances")
-    readline("Press any key")
+    if(!SuppressWarning){
+      readline("Press any key")
+    }
   }
 
   if(is.null(SamplingGeneWeights)){
@@ -151,9 +155,11 @@ rRoma.R <- function(ExpressionMatrix,
   if(ncol(ExpressionMatrix) <= SAMPLE_WARNING & interactive()){
     print(paste("Only", ncol(ExpressionMatrix), "sample found"))
     print("The number of samples may be too small to guarantee a reliable analysis")
-    Ans <- readline("Do you want to continue anyway? (y/n)")
-    if(Ans != "y" & Ans != "Y"){
-      return(NULL)
+    if(!SuppressWarning){
+      Ans <- readline("Do you want to continue anyway? (y/n)")
+      if(Ans != "y" & Ans != "Y"){
+        return(NULL)
+      }
     }
   }
 
@@ -163,17 +169,21 @@ rRoma.R <- function(ExpressionMatrix,
 
   if(any(duplicated(AllGenesMatrix)) & interactive()){
     print("Duplicated gene names detected. This may create inconsistencies in the analysis. Consider fixing this problem.")
-    readline("Press any key")
+    if(!SuppressWarning){
+      readline("Press any key")
+    }
   }
 
   if(FullSampleInfo & interactive()){
     print("PC projections and weigths will be computed and reoriented for sampled genesets. This is potentially very time consuming.")
-    Ans <- readline("Are you sure you want to do that? (y/n)")
-    if(Ans != "y" & Ans != "Y"){
-      FullSampleInfo <- FALSE
-      print("PC projections and weigths will NOT be computed and reoriented for sampled genesets.")
-    } else {
-      print("PC projections and weigths will be computed and reoriented for sampled genesets.")
+    if(!SuppressWarning){
+      Ans <- readline("Are you sure you want to do that? (y/n)")
+      if(Ans != "y" & Ans != "Y"){
+        FullSampleInfo <- FALSE
+        print("PC projections and weigths will NOT be computed and reoriented for sampled genesets.")
+      } else {
+        print("PC projections and weigths will be computed and reoriented for sampled genesets.")
+      }
     }
   }
 
@@ -182,12 +192,14 @@ rRoma.R <- function(ExpressionMatrix,
   if(PlotData & interactive()){
     print("Diagnostic plots will be produced. This is time consuming and can produce errors expecially if done interactivelly.")
     print("It is advisable to only use this option if a relatively small number of genesets is analyzed and/or to redirect the graphic out (e.g. with pdf())")
-    Ans <- readline("Are you sure you want to do that? (y/n)")
-    if(Ans != "y" & Ans != "Y"){
-      FullSampleInfo <- FALSE
-      print("Diagnostic plots will NOT be produced.")
-    } else {
-      print("Diagnostic plots will be produced.")
+    if(!SuppressWarning){
+      Ans <- readline("Are you sure you want to do that? (y/n)")
+      if(Ans != "y" & Ans != "Y"){
+        PlotData <- FALSE
+        print("Diagnostic plots will NOT be produced.")
+      } else {
+        print("Diagnostic plots will be produced.")
+      }
     }
   }
 
@@ -300,7 +312,9 @@ rRoma.R <- function(ExpressionMatrix,
 
   if(sum(ToFilter)>0){
     print("The following geneset(s) will be ignored due to the number of usable genes being outside the specified range")
-    print(unlist(lapply(ModuleList[ToFilter], "[[", "Name")))
+    print(
+      paste(unlist(lapply(ModuleList[ToFilter], "[[", "Name")), "/", nGenes[ToFilter], "gene(s)")
+    )
 
     if(sum(ToUse) == 0){
       print("No geneset available for the analisis. The analysis cannot proceed.")
