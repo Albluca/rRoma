@@ -14,7 +14,7 @@ rRoma.R(ExpressionMatrix, ModuleList, centerData = TRUE, ExpFilter = FALSE,
   nCores = NULL, ClusType = "PSOCK", SamplingGeneWeights = NULL,
   FillNAMethod = list(), Grouping = NULL, FullSampleInfo = FALSE,
   GroupPCSign = FALSE, CorMethod = "pearson",
-  PCAType = "DimensionsAreGenes")
+  PCAType = "DimensionsAreGenes", SuppressWarning = FALSE)
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -112,6 +112,8 @@ which should be faster.}
 for orienting the principal components. Can be "pearson", "kendall", or "spearman".}
 
 \item{PCAType}{character string, the type of PCA to perform. It can be "DimensionsAreGenes" or "DimensionsAreSamples"}
+
+\item{SuppressWarning}{boolean, should warnings be displayed? This option well be ignored in non-interactive sessions.}
 }
 \description{
 Perform ROMA on a datasets

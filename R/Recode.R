@@ -596,7 +596,7 @@ rRoma.R <- function(ExpressionMatrix,
 
 
         if(SampleFilter & !UseParallel){
-          pb <- txtProgressBar(min = 0, max = nSamples, initial = 0, style = 3)
+          # pb <- txtProgressBar(min = 0, max = nSamples, initial = 0, style = 3)
           GeneToSample <- length(SelGenes)
         } else {
           GeneToSample <- length(CompatibleGenes)
