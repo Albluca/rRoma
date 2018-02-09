@@ -23,7 +23,8 @@
 #' @examples
 DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter,
                            CompatibleGenes, ExpressionData, PCAType = PCAType,
-                           PlotData = FALSE, ModuleName = '', PrintInfo = TRUE) {
+                           PlotData = FALSE, ModuleName = '', PrintInfo = TRUE,
+                           Mode = 1) {
   
   if(!(PCAType %in% c("DimensionsAreGenes", "DimensionsAreSamples"))){
     print("Incompatible PCAType, no outlier filtering will be performed")
@@ -51,7 +52,16 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter,
   }
   
   # Computing all the PC1
-  AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), GetAllPC1Var)
+  if(Mode == 1){
+    AllPCA1 <- sapply(as.list(1:length(CompatibleGenes)), GetAllPC1Var)
+  } else {
+    AllPCA1 <- rep(0, length(CompatibleGenes))
+    for(i in 1:length(CompatibleGenes)){
+      AllPCA1[i] <- GetAllPC1Var(i)
+    }
+  }
+  
+  
   
   if(GeneOutDetection == "L1OutVarPerc"){
     

@@ -347,14 +347,22 @@ rRoma.R <- function(ExpressionMatrix,
       print("Using all the available cores. This will likely render the computer unresponsive during the analysis.")
     }
 
-    # Initiate cluster
-    cl <- parallel::makeCluster(nCores, type = ClusType)
-
-    parallel::clusterExport(cl=cl, varlist=c("SampleFilter", "GeneOutDetection", "GeneOutThr",
-                                   "ModulePCACenter", "ExpressionMatrix", "DetectOutliers",
-                                   "PCADims", "OrgExpMatrix", "FullSampleInfo", "FoundSampNames",
-                                   "PCAType", "GroupPCSign"),
-                          envir = environment())
+    if(ClusType == "PSOCK"){
+      # Initiate sock cluster
+      cl <- parallel::makePSOCKcluster(nCores)
+      
+      parallel::clusterExport(cl=cl, varlist=c("SampleFilter", "GeneOutDetection", "GeneOutThr",
+                                               "ModulePCACenter", "ExpressionMatrix", "DetectOutliers",
+                                               "PCADims", "OrgExpMatrix", "FullSampleInfo", "FoundSampNames",
+                                               "PCAType", "GroupPCSign"),
+                              envir = environment())
+    }
+    
+    if(ClusType == "FORK"){
+      # Initiate sock cluster
+      cl <- parallel::makeForkCluster(nnodes = nCores)
+    }
+    
   }
 
   ModuleOrder <- order(unlist(lapply(lapply(ModuleList, "[[", "Genes"), length)))
