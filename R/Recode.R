@@ -322,11 +322,16 @@ rRoma.R <- function(ExpressionMatrix,
     }
 
     ModuleList <- ModuleList[ToUse]
+    nGenes <- nGenes[ToFilter]
   } else {
     print("All the genesets will be used")
   }
 
 
+  if(MoreInfo){
+    print("The following genesets will be used:")
+    paste(unlist(lapply(ModuleList, "[[", "Name")), "/", nGenes, "gene(s)")
+  }
 
 
   if(UseParallel){
@@ -373,6 +378,7 @@ rRoma.R <- function(ExpressionMatrix,
   for(i in 1:length(ModuleList)){
 
     print(Sys.time())
+    gc()
 
     print(paste("[", i, "/", length(ModuleList), "] Working on ", ModuleList[[i]]$Name, " - ", ModuleList[[i]]$Desc, sep = ""))
 
@@ -485,7 +491,7 @@ rRoma.R <- function(ExpressionMatrix,
 
         # Define base analysis function
 
-        TestGenes <- function(Gl){
+        TestGenes <- function(Gl, UpdatePB = FALSE){
           # library(irlba)
 
           if(SampleFilter){
@@ -535,6 +541,11 @@ rRoma.R <- function(ExpressionMatrix,
             VarVect <- c(VarVect, rep(0, PCADims - length(VarVect)))
           }
 
+          if(UpdatePB){
+            pb$up(pb$getVal() + 1)
+          }
+          
+          
           if(FullSampleInfo){
 
             if(GroupPCSign){
@@ -624,13 +635,18 @@ rRoma.R <- function(ExpressionMatrix,
 
 
         if(!UseParallel){
-          Time <- system.time(SampledExp <- lapply(SampledsGeneList, TestGenes), gcFirst = FALSE)
+          pb <- txtProgressBar(min = 0, max = nSamples, initial = 0, style = 3)
+          tictoc::tic()
+          SampledExp <- lapply(SampledsGeneList, TestGenes, UpdatePB = TRUE)
+          cat("\n")
+          tictoc::toc()
         } else {
-          Time <- system.time(SampledExp <- parallel::parLapply(cl, SampledsGeneList, TestGenes), gcFirst = FALSE)
+          tictoc::tic()
+          SampledExp <- parallel::parLapply(cl, SampledsGeneList, TestGenes, UpdatePB = FALSE)
+          cat("\n")
+          tictoc::toc()
         }
-
-        print(Time)
-
+        
         SampleExpVar <- sapply(SampledExp, "[[", "ExpVar")
         SampleMedianExp <- sapply(SampledExp, "[[", "MedianExp")
 

@@ -25,7 +25,8 @@ Imports:
       readr,
       colorRamps,
       Rtsne,
-      ggsignif
+      ggsignif,
+      tictoc
 Suggests:
       mice,
       RNaviCell,
