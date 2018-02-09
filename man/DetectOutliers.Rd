@@ -6,7 +6,7 @@
 \usage{
 DetectOutliers(GeneOutDetection, GeneOutThr, ModulePCACenter, CompatibleGenes,
   ExpressionData, PCAType = PCAType, PlotData = FALSE, ModuleName = "",
-  PrintInfo = TRUE)
+  PrintInfo = TRUE, Mode = 1, cl = NULL)
 }
 \arguments{
 \item{GeneOutDetection}{character scalar, the algorithm used to filter genes in a module. Possible values are
@@ -23,13 +23,19 @@ minimal percentage variation (L1OutVarPerc) or the number of median-absolute-dev
 
 \item{ModulePCACenter}{}
 
+\item{CompatibleGenes}{}
+
 \item{ExpressionData}{}
 
 \item{PCAType}{character string, the type of PCA to perform. It can be "DimensionsAreGenes" or "DimensionsAreSamples"}
 
 \item{PlotData}{}
 
-\item{Genes}{}
+\item{PrintInfo}{}
+
+\item{Mode}{}
+
+\item{cl}{}
 }
 \description{
 Detect outliers

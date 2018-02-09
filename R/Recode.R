@@ -64,6 +64,8 @@
 #' for orienting the principal components. Can be "pearson", "kendall", or "spearman".
 #' @param PCAType character string, the type of PCA to perform. It can be "DimensionsAreGenes" or "DimensionsAreSamples"
 #' @param SuppressWarning boolean, should warnings be displayed? This option well be ignored in non-interactive sessions.
+#' @param ShowParallelPB boolean, should the progress bas be displayed when using parallel processing. Note that the
+#' progress bar is diaplayed via the pbapply package. This may slow donwn the computation, expecially with FORK clusters.
 #'
 #' @return
 #' @export
@@ -102,7 +104,8 @@ rRoma.R <- function(ExpressionMatrix,
                     GroupPCSign = FALSE,
                     CorMethod = "pearson",
                     PCAType = "DimensionsAreGenes",
-                    SuppressWarning = FALSE) {
+                    SuppressWarning = FALSE,
+                    ShowParallelPB = TRUE) {
 
   if(PCADims < 1){
     stop("PCADims should be >= 1")
@@ -392,9 +395,16 @@ rRoma.R <- function(ExpressionMatrix,
     }
 
     # Filtering genes
-    SelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
-                               CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ],
-                               PlotData = PlotData, ModuleName = ModuleList[[i]]$Name, PCAType = PCAType)
+    if(UseParallel){
+      SelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
+                                 CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ],
+                                 PlotData = PlotData, ModuleName = ModuleList[[i]]$Name, PCAType = PCAType, Mode = 3, cl = cl)
+    } else {
+      SelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
+                                 CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ],
+                                 PlotData = PlotData, ModuleName = ModuleList[[i]]$Name, PCAType = PCAType, Mode = 1)
+    }
+    
 
     if(length(SelGenes) > MaxGenes | length(SelGenes) < MinGenes){
       print("Number of selected genes outside the specified range")
@@ -633,7 +643,7 @@ rRoma.R <- function(ExpressionMatrix,
 
 
         if(!UseParallel){
-          print("Computing samples.")
+          print("Computing samples")
           pb <- txtProgressBar(min = 0, max = nSamples, initial = 0, style = 3)
           tictoc::tic()
           SampledExp <- lapply(SampledsGeneList, TestGenes, UpdatePB = TRUE)
@@ -641,10 +651,19 @@ rRoma.R <- function(ExpressionMatrix,
           tictoc::toc()
           pb$kill()
         } else {
-          print("Computing samples via parallel execution (no progress bar will be shown)")
-          tictoc::tic()
-          SampledExp <- parallel::parLapply(cl, SampledsGeneList, TestGenes, UpdatePB = FALSE)
-          tictoc::toc()
+          if(ShowParallelPB){
+            print("Computing samples via parallel execution with pbapply progress bar (If this is too slow try setting ShowParallelPB = FALSE)")
+            pbo <- pbapply::pboptions(nout = 20)
+            tictoc::tic()
+            SampledExp <- pbapply::pblapply(SampledsGeneList, TestGenes, UpdatePB = FALSE, cl = cl)
+            tictoc::toc()
+            pbo <- pbapply::pboptions(pbo)
+          } else {
+            print("Computing samples (no progress bar will be shown)")
+            tictoc::tic()
+            SampledExp <- parallel::parLapply(cl, SampledsGeneList, TestGenes, UpdatePB = FALSE)
+            tictoc::toc()
+          }
         }
         
         SampleExpVar <- sapply(SampledExp, "[[", "ExpVar")

@@ -14,7 +14,8 @@ rRoma.R(ExpressionMatrix, ModuleList, centerData = TRUE, ExpFilter = FALSE,
   nCores = NULL, ClusType = "PSOCK", SamplingGeneWeights = NULL,
   FillNAMethod = list(), Grouping = NULL, FullSampleInfo = FALSE,
   GroupPCSign = FALSE, CorMethod = "pearson",
-  PCAType = "DimensionsAreGenes", SuppressWarning = FALSE)
+  PCAType = "DimensionsAreGenes", SuppressWarning = FALSE,
+  ShowParallelPB = TRUE)
 }
 \arguments{
 \item{ExpressionMatrix}{matrix, a numeric matrix containing the gene expression information. Columns indicate samples and rows indicated genes.}
@@ -114,6 +115,9 @@ for orienting the principal components. Can be "pearson", "kendall", or "spearma
 \item{PCAType}{character string, the type of PCA to perform. It can be "DimensionsAreGenes" or "DimensionsAreSamples"}
 
 \item{SuppressWarning}{boolean, should warnings be displayed? This option well be ignored in non-interactive sessions.}
+
+\item{ShowParallelPB}{boolean, should the progress bas be displayed when using parallel processing. Note that the
+progress bar is diaplayed via the pbapply package. This may slow donwn the computation, expecially with FORK clusters.}
 }
 \description{
 Perform ROMA on a datasets

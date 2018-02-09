@@ -26,7 +26,8 @@ Imports:
       colorRamps,
       Rtsne,
       ggsignif,
-      tictoc
+      tictoc,
+      pbapply
 Suggests:
       mice,
       RNaviCell,
