@@ -487,8 +487,6 @@ rRoma.R <- function(ExpressionMatrix,
 
       } else {
 
-        print("Computing samples")
-
         # Define base analysis function
 
         TestGenes <- function(Gl, UpdatePB = FALSE){
@@ -635,15 +633,17 @@ rRoma.R <- function(ExpressionMatrix,
 
 
         if(!UseParallel){
+          print("Computing samples.")
           pb <- txtProgressBar(min = 0, max = nSamples, initial = 0, style = 3)
           tictoc::tic()
           SampledExp <- lapply(SampledsGeneList, TestGenes, UpdatePB = TRUE)
           cat("\n")
           tictoc::toc()
+          pb$kill()
         } else {
+          print("Computing samples via parallel execution (no progress bar will be shown)")
           tictoc::tic()
           SampledExp <- parallel::parLapply(cl, SampledsGeneList, TestGenes, UpdatePB = FALSE)
-          cat("\n")
           tictoc::toc()
         }
         
