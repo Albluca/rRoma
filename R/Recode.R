@@ -105,7 +105,7 @@ rRoma.R <- function(ExpressionMatrix,
                     CorMethod = "pearson",
                     PCAType = "DimensionsAreGenes",
                     SuppressWarning = FALSE,
-                    ShowParallelPB = TRUE) {
+                    ShowParallelPB = FALSE) {
 
   if(PCADims < 1){
     stop("PCADims should be >= 1")
