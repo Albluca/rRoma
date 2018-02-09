@@ -28,6 +28,10 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
     Selected <- 1:nrow(RomaData$SampleMatrix)
   }
   
+  if((length(ColorGradient) %% 2) != 0){
+    stop("the length of ColorGradient MUST be a multiple of 2")
+  }
+  
   if(length(intersect(Selected, 1:nrow(RomaData$SampleMatrix)))<1){
     print("No Genset selected")
     return(NULL)
@@ -103,15 +107,48 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
     tClusRow <- TRUE
   }
   
+  # Compute breaks
+  
+  MatRange <- range(PlotMat)
+  BrkPoints <- rep(NA, length(ColorGradient) + 1)
+  
+  tColorGradient <- ColorGradient
+  
+  if(prod(MatRange) > 0){
+    # Only positive or negative values are observed
+    
+    # Only positive or negative values are observed
+    if(MatRange[1]>0){
+      # Only positive values are available
+      tColorGradient <- ColorGradient[(length(ColorGradient)/2 +1):length(ColorGradient)]
+      BrkPoints <- seq(to = MatRange[2], from = 0, length.out = length(ColorGradient)/2 + 1 )
+    } else {
+      # Only negative values are available
+      tColorGradient <- ColorGradient[1:(length(ColorGradient)/2)]
+      BrkPoints <- seq(from = MatRange[1], to = 0, length.out = length(ColorGradient)/2 + 1 )
+    }
+    
+  } else {
+    # Both positive and negative values are observed
+    
+    LowBrks <- seq(from = MatRange[1], to = 0, length.out = length(ColorGradient)/2 + 1 )
+    UpBrks <- seq(to = MatRange[2], from = 0, length.out = length(ColorGradient)/2 + 1 )
+    
+    BrkPoints <- c(LowBrks, UpBrks[-1])
+  }
+  
+  
   if(Transpose){
-    pheatmap::pheatmap(t(PlotMat), color = ColorGradient,
-                       main = HMTite, cluster_rows = tClusCol,
-                       cluster_cols = tClusRow,
+    pheatmap::pheatmap(t(PlotMat),
+                       color = tColorGradient, breaks = BrkPoints,
+                       main = HMTite,
+                       cluster_rows = tClusCol, cluster_cols = tClusRow,
                        annotation_row = AddInfo)
   } else {
-    pheatmap::pheatmap(PlotMat, color = ColorGradient,
-                       main = HMTite, cluster_cols = tClusCol,
-                       cluster_rows = tClusRow,
+    pheatmap::pheatmap(PlotMat,
+                       color = tColorGradient, breaks = BrkPoints,
+                       main = HMTite,
+                       cluster_cols = tClusCol, cluster_rows = tClusRow,
                        annotation_col = AddInfo)
   }
   
@@ -146,12 +183,44 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
         tClusRow <- TRUE
       }
       
+      
+      # Compute breaks
+      
+      MatRange <- range(Aggmat)
+      BrkPoints <- rep(NA, length(ColorGradient) + 1)
+      
+      tColorGradient <- ColorGradient
+      
+      if(prod(MatRange) > 0){
+        # Only positive or negative values are observed
+        if(MatRange[1]>0){
+          # Only positive values are available
+          tColorGradient <- ColorGradient[(length(ColorGradient)/2 +1):length(ColorGradient)]
+          BrkPoints <- seq(to = MatRange[2], from = 0, length.out = length(ColorGradient)/2 + 1 )
+        } else {
+          # Only negative values are available
+          tColorGradient <- ColorGradient[1:(length(ColorGradient)/2)]
+          BrkPoints <- seq(from = MatRange[1], to = 0, length.out = length(ColorGradient)/2 + 1 )
+        }
+        
+      } else {
+        # Both positive and negative values are observed
+        
+        LowBrks <- seq(from = MatRange[1], to = 0, length.out = length(ColorGradient)/2 + 1 )
+        UpBrks <- seq(to = MatRange[2], from = 0, length.out = length(ColorGradient)/2 + 1 )
+        
+        BrkPoints <- c(LowBrks, UpBrks[-1])
+      }
+      
+      
       if(Transpose){
-        pheatmap::pheatmap(t(Aggmat), color = ColorGradient,
+        pheatmap::pheatmap(t(Aggmat),
+                           color = tColorGradient, breaks = BrkPoints,
                            main = paste(HMTite, "/", AggByGroupsFL[[i]]),
                            cluster_rows = tClusCol, cluster_cols = tClusRow)
       } else {
-        pheatmap::pheatmap(Aggmat, color = ColorGradient,
+        pheatmap::pheatmap(Aggmat,
+                           color = tColorGradient, breaks = BrkPoints,
                            main = paste(HMTite, "/", AggByGroupsFL[[i]]),
                            cluster_cols = tClusCol, cluster_rows = tClusRow)
       }
