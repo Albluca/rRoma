@@ -147,7 +147,7 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
     # Both positive and negative values are observed
     if(is.null(ZeroColor)){
       nBrkPoints <- length(ColorGradient)/2 + 1
-      LowBrks <- seq(from = MatRange[1], to = MatRange[1], length.out = nBrkPoints)
+      LowBrks <- seq(from = MatRange[1], to = 0, length.out = nBrkPoints)
       UpBrks <- seq(to = MatRange[2], from = 0, length.out = nBrkPoints)
       BrkPoints <- c(LowBrks, UpBrks[-1])
     } else {
@@ -250,7 +250,7 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
         # Both positive and negative values are observed
         if(is.null(ZeroColor)){
           nBrkPoints <- length(ColorGradient)/2 + 1
-          LowBrks <- seq(from = MatRange[1], to = MatRange[1], length.out = nBrkPoints)
+          LowBrks <- seq(from = MatRange[1], to = 0, length.out = nBrkPoints)
           UpBrks <- seq(to = MatRange[2], from = 0, length.out = nBrkPoints)
           BrkPoints <- c(LowBrks, UpBrks[-1])
         } else {
