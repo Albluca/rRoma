@@ -12,6 +12,7 @@
 #' geneset weigths and produce additional heatmaps.
 #' @param Normalize boolean, shuold weights be normalized to c(-1, 1) for each geneset
 #' @param Transpose boolean, should the samples by plotted on the rows instead of the columns?
+#' @param ZeroColor string, the color to use to mark the points closed to 0 (e.g., "#FFFFFF")
 #'
 #' @return
 #' @export
@@ -22,7 +23,7 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
                           ColorGradient = colorRamps::blue2red(50),
                           cluster_cols = FALSE, GroupInfo = NULL,
                           HMTite = "Selected Genesets", AggByGroupsFL = list(),
-                          Normalize = FALSE, Transpose = FALSE){
+                          Normalize = FALSE, Transpose = FALSE, ZeroColor = NULL){
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$SampleMatrix)
@@ -120,21 +121,47 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
     # Only positive or negative values are observed
     if(MatRange[1]>0){
       # Only positive values are available
-      tColorGradient <- ColorGradient[(length(ColorGradient)/2 +1):length(ColorGradient)]
-      BrkPoints <- seq(to = MatRange[2], from = 0, length.out = length(ColorGradient)/2 + 1 )
+      if(is.null(ZeroColor)){
+        nBrkPoints <- length(ColorGradient)/2 + 1
+        tColorGradient <- ColorGradient[(length(ColorGradient)/2 +1):length(ColorGradient)]
+        BrkPoints <- seq(to = MatRange[2], from = 0, length.out =  nBrkPoints)
+      } else {
+        nBrkPoints <- length(ColorGradient)/2 + 2
+        tColorGradient <- c(ZeroColor, ColorGradient[(length(ColorGradient)/2 +1):length(ColorGradient)])
+        BrkPoints <- seq(to = MatRange[2], from = 0, length.out = nBrkPoints)
+      }
     } else {
       # Only negative values are available
-      tColorGradient <- ColorGradient[1:(length(ColorGradient)/2)]
-      BrkPoints <- seq(from = MatRange[1], to = 0, length.out = length(ColorGradient)/2 + 1 )
+      if(is.null(ZeroColor)){
+        nBrkPoints <- length(ColorGradient)/2 + 1
+        tColorGradient <- ColorGradient[1:(length(ColorGradient)/2)]
+        BrkPoints <- seq(from = MatRange[1], to = 0, length.out = nBrkPoints)
+      } else {
+        nBrkPoints <- length(ColorGradient)/2 + 2
+        tColorGradient <- c(ColorGradient[1:(length(ColorGradient)/2)], ZeroColor)
+        BrkPoints <- seq(from = MatRange[1], to = 0, length.out = nBrkPoints)
+      }
     }
     
   } else {
     # Both positive and negative values are observed
+    if(is.null(ZeroColor)){
+      nBrkPoints <- length(ColorGradient)/2 + 1
+      LowBrks <- seq(from = MatRange[1], to = MatRange[1], length.out = nBrkPoints)
+      UpBrks <- seq(to = MatRange[2], from = 0, length.out = nBrkPoints)
+      BrkPoints <- c(LowBrks, UpBrks[-1])
+    } else {
+      nBrkPoints <- length(ColorGradient)/2 + 1
+      LowBrks <- seq(from = MatRange[1], to = .5*MatRange[1]/nBrkPoints, length.out = nBrkPoints)
+      UpBrks <- seq(to = MatRange[2], from = .5*MatRange[2]/nBrkPoints, length.out = nBrkPoints)
+      BrkPoints <- c(LowBrks, UpBrks)
+      tColorGradient <- c(
+        ColorGradient[1:(length(ColorGradient)/2)],
+        ZeroColor,
+        ColorGradient[(length(ColorGradient)/2+1):length(ColorGradient)])
+    }
     
-    LowBrks <- seq(from = MatRange[1], to = 0, length.out = length(ColorGradient)/2 + 1 )
-    UpBrks <- seq(to = MatRange[2], from = 0, length.out = length(ColorGradient)/2 + 1 )
     
-    BrkPoints <- c(LowBrks, UpBrks[-1])
   }
   
   
@@ -193,23 +220,51 @@ Plot.Genesets <- function(RomaData, Selected = NULL,
       
       if(prod(MatRange) > 0){
         # Only positive or negative values are observed
+        
+        # Only positive or negative values are observed
         if(MatRange[1]>0){
           # Only positive values are available
-          tColorGradient <- ColorGradient[(length(ColorGradient)/2 +1):length(ColorGradient)]
-          BrkPoints <- seq(to = MatRange[2], from = 0, length.out = length(ColorGradient)/2 + 1 )
+          if(is.null(ZeroColor)){
+            nBrkPoints <- length(ColorGradient)/2 + 1
+            tColorGradient <- ColorGradient[(length(ColorGradient)/2 +1):length(ColorGradient)]
+            BrkPoints <- seq(to = MatRange[2], from = 0, length.out =  nBrkPoints)
+          } else {
+            nBrkPoints <- length(ColorGradient)/2 + 2
+            tColorGradient <- c(ZeroColor, ColorGradient[(length(ColorGradient)/2 +1):length(ColorGradient)])
+            BrkPoints <- seq(to = MatRange[2], from = 0, length.out = nBrkPoints)
+          }
         } else {
           # Only negative values are available
-          tColorGradient <- ColorGradient[1:(length(ColorGradient)/2)]
-          BrkPoints <- seq(from = MatRange[1], to = 0, length.out = length(ColorGradient)/2 + 1 )
+          if(is.null(ZeroColor)){
+            nBrkPoints <- length(ColorGradient)/2 + 1
+            tColorGradient <- ColorGradient[1:(length(ColorGradient)/2)]
+            BrkPoints <- seq(from = MatRange[1], to = 0, length.out = nBrkPoints)
+          } else {
+            nBrkPoints <- length(ColorGradient)/2 + 2
+            tColorGradient <- c(ColorGradient[1:(length(ColorGradient)/2)], ZeroColor)
+            BrkPoints <- seq(from = MatRange[1], to = 0, length.out = nBrkPoints)
+          }
         }
         
       } else {
         # Both positive and negative values are observed
+        if(is.null(ZeroColor)){
+          nBrkPoints <- length(ColorGradient)/2 + 1
+          LowBrks <- seq(from = MatRange[1], to = MatRange[1], length.out = nBrkPoints)
+          UpBrks <- seq(to = MatRange[2], from = 0, length.out = nBrkPoints)
+          BrkPoints <- c(LowBrks, UpBrks[-1])
+        } else {
+          nBrkPoints <- length(ColorGradient)/2 + 1
+          LowBrks <- seq(from = MatRange[1], to = .5*MatRange[1]/nBrkPoints, length.out = nBrkPoints)
+          UpBrks <- seq(to = MatRange[2], from = .5*MatRange[2]/nBrkPoints, length.out = nBrkPoints)
+          BrkPoints <- c(LowBrks, UpBrks)
+          tColorGradient <- c(
+            ColorGradient[1:(length(ColorGradient)/2)],
+            ZeroColor,
+            ColorGradient[(length(ColorGradient)/2+1):length(ColorGradient)])
+        }
         
-        LowBrks <- seq(from = MatRange[1], to = 0, length.out = length(ColorGradient)/2 + 1 )
-        UpBrks <- seq(to = MatRange[2], from = 0, length.out = length(ColorGradient)/2 + 1 )
         
-        BrkPoints <- c(LowBrks, UpBrks[-1])
       }
       
       
