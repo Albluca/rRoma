@@ -78,6 +78,8 @@ PlotOnACSN <- function(RomaData, SampleName, AggScoreFun = "mean",
   
   ToPlot <- unique(names(AllGenesWei))
   
+  Outliers <- NULL
+  
   if(any(!is.na(AllGenesWei.Var))){
     
     if(PlotInfo){
