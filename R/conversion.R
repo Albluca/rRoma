@@ -59,13 +59,17 @@ ConvertNames <- function(SourceOrganism = "hsapiens",
     
     CovGene <- lapply(Genes, function(x){
       x <- x[!is.na(x)]
-      biomaRt::getBM(attributes = c(paste(TargetOrganism, "_homolog_orthology_confidence", sep=''),
-                                    paste(TargetOrganism, "_homolog_ensembl_gene", sep=''),
-                                    paste(TargetOrganism, "_homolog_associated_gene_name", sep=''),
-                                    FilterName),
-                     filters = FilterName,
-                     values = x,
-                     mart = Mart)
+      if(length(x)>0){
+        biomaRt::getBM(attributes = c(paste(TargetOrganism, "_homolog_orthology_confidence", sep=''),
+                                      paste(TargetOrganism, "_homolog_ensembl_gene", sep=''),
+                                      paste(TargetOrganism, "_homolog_associated_gene_name", sep=''),
+                                      FilterName),
+                       filters = FilterName,
+                       values = x,
+                       mart = Mart)
+      } else {
+        matrix(NA, nrow = 0, ncol = 2)
+      }
     })
     
     if(TargetTypes == "Names"){
@@ -90,10 +94,15 @@ ConvertNames <- function(SourceOrganism = "hsapiens",
     
     CovGene <- lapply(Genes, function(x){
       x <- x[!is.na(x)]
-      biomaRt::getBM(attributes = c("ensembl_gene_id", "external_gene_name", FilterName),
-                     filters = FilterName,
-                     values = x,
-                     mart = Mart)
+      if(length(x)>0){
+        biomaRt::getBM(attributes = c("ensembl_gene_id", "external_gene_name", FilterName),
+                       filters = FilterName,
+                       values = x,
+                       mart = Mart)
+      } else {
+        matrix(NA, nrow = 0, ncol = 2)
+      }
+      
     })
     
     if(TargetTypes == "Names"){
