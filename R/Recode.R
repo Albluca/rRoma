@@ -441,7 +441,9 @@ rRoma.R <- function(ExpressionMatrix,
     if(PCADims > min(dim(ExpressionMatrix[CompatibleGenes, ])/3)){
       PCBase <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
     } else {
-      PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000, retx = TRUE)
+      PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims,
+                                    work = min(PCADims+7, min(dim(ExpressionMatrix[CompatibleGenes, ]))),
+                                    center = ModulePCACenter, scale. = FALSE, maxit = 10000, retx = TRUE)
     }
 
     ExpVar <- apply(PCBase$x[,1:2], 2, var)/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var))
@@ -469,7 +471,9 @@ rRoma.R <- function(ExpressionMatrix,
     if(PCADims > min(dim(ExpressionMatrix[SelGenes, ])/3)){
       PCBase <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
     } else {
-      PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, maxit = 10000, retx = TRUE)
+      PCBase <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims,
+                                    work = min(PCADims+7, min(dim(ExpressionMatrix[SelGenes, ]))),
+                                    center = ModulePCACenter, scale. = FALSE, maxit = 10000, retx = TRUE)
     }
 
     ExpVar <- apply(PCBase$x[,1:2], 2, var)/sum(apply(scale(BaseMatrix, center = ModulePCACenter, scale = FALSE), 2, var))
@@ -530,7 +534,8 @@ rRoma.R <- function(ExpressionMatrix,
           SampMedian <- median(OrgExpMatrix[SampleSelGenes, ])
 
           if(length(SampleSelGenes) >= 3*PCADims){
-            PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
+            PCSamp <- irlba::prcomp_irlba(x = BaseMatrix, n = PCADims,
+                                          center = ModulePCACenter, scale. = FALSE, retx = TRUE)
           } else {
             PCSamp <- prcomp(x = BaseMatrix, center = ModulePCACenter, scale. = FALSE, retx = TRUE)
           }

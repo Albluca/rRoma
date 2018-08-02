@@ -47,7 +47,8 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter,
     }
     
     PC1Var <- var(
-      irlba::prcomp_irlba(x = tData, n = 1, center = ModulePCACenter,
+      irlba::prcomp_irlba(x = tData, n = 1, work = min(8, min(dim(tData)) - 1),
+                          center = ModulePCACenter,
                           scale. = FALSE, retx = TRUE)$x
     )
     return(PC1Var/sum(apply(scale(tData, center = ModulePCACenter, scale = FALSE), 2, var)))

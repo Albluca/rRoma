@@ -114,7 +114,7 @@ ReadGMTFile <- function(FileLocation, SearchString = NULL, Mode = "ANY") {
 #' @export
 #'
 #' @examples
-SelectFromMSIGdb <- function(SearchString, Version = "6.0", Mode = "ANY") {
+SelectFromMSIGdb <- function(SearchString, Version = "6.2", Mode = "ANY") {
   
   return(SelectFromInternalDB(SearchString, BDName = "MsigDB", Version = Version, Mode = Mode))
   
@@ -159,6 +159,7 @@ SelectFromMSIGdb <- function(SearchString, Version = "6.0", Mode = "ANY") {
 #' @return
 #' @export
 #'
+#'
 #' @examples
 SelectFromInternalDB <- function(SearchString, BDName = "MsigDB", Version = NULL, Mode = "ANY") {
   
@@ -168,8 +169,8 @@ SelectFromInternalDB <- function(SearchString, BDName = "MsigDB", Version = NULL
     
     if(is.null(Version)){
       
-      print("Searching in MsigDB v6.0")
-      InternalDB <- rRoma::Msigdb.v6.0.symbols.all
+      print("Searching in MsigDB v6.2")
+      InternalDB <- rRoma::Msigdb.v6.2.symbols.all
       
     } else {
       
@@ -179,8 +180,18 @@ SelectFromInternalDB <- function(SearchString, BDName = "MsigDB", Version = NULL
       }
       
       if(Version == "6.0"){
-        print("Searching in MsigDB v5.2")
+        print("Searching in MsigDB v6.0")
         InternalDB <- rRoma::Msigdb.v6.0.symbols.all
+      }
+      
+      if(Version == "6.2"){
+        print("Searching in MsigDB v6.2")
+        InternalDB <- rRoma::Msigdb.v6.2.symbols.all
+      }
+      
+      if(Version == "6.2E"){
+        print("Searching in MsigDB v6.2 (Entrez)")
+        InternalDB <- rRoma::Msigdb.v6.2.entrez.all
       }
       
     }
@@ -273,6 +284,10 @@ SelectFromInternalDB <- function(SearchString, BDName = "MsigDB", Version = NULL
     }
   }
   
+  if(length(InternalDB) == 0){
+    print("No database selected")
+    return(NULL)
+  }
   
   SelGeneSets <- NULL
   for(i in 1:length(SearchString)){
