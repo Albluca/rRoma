@@ -27,12 +27,13 @@
 DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter,
                            CompatibleGenes, ExpressionData, PCAType = PCAType,
                            PlotData = FALSE, ModuleName = '', PrintInfo = TRUE,
-                           Mode = 1, cl = NULL) {
+                           Mode = 1, ClusType, cl = NULL) {
   
   if(!(PCAType %in% c("DimensionsAreGenes", "DimensionsAreSamples"))){
     print("Incompatible PCAType, no outlier filtering will be performed")
     return(CompatibleGenes)
   }
+  
   
   SelGenes <- CompatibleGenes
   
@@ -69,6 +70,9 @@ DetectOutliers <- function(GeneOutDetection, GeneOutThr, ModulePCACenter,
   }
   
   if(Mode == 3){
+    if(ClusType == "PSOCK"){
+      parallel::clusterExport(cl = cl, varlist = c("ExpressionData"), envir = environment())
+    }
     AllPCA1 <- parallel::parSapply(cl = cl, X = as.list(1:length(CompatibleGenes)), FUN = GetAllPC1Var)
   }
   

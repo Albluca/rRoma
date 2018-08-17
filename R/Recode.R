@@ -325,7 +325,7 @@ rRoma.R <- function(ExpressionMatrix,
     }
 
     ModuleList <- ModuleList[ToUse]
-    nGenes <- nGenes[ToFilter]
+    nGenes <- nGenes[ToUse]
   } else {
     print("All the genesets will be used")
   }
@@ -398,7 +398,8 @@ rRoma.R <- function(ExpressionMatrix,
     if(UseParallel){
       SelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
                                  CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ],
-                                 PlotData = PlotData, ModuleName = ModuleList[[i]]$Name, PCAType = PCAType, Mode = 3, cl = cl)
+                                 PlotData = PlotData, ModuleName = ModuleList[[i]]$Name, PCAType = PCAType, Mode = 3,
+                                 ClusType = ClusType, cl = cl)
     } else {
       SelGenes <- DetectOutliers(GeneOutDetection = GeneOutDetection, GeneOutThr = GeneOutThr, ModulePCACenter = ModulePCACenter,
                                  CompatibleGenes = CompatibleGenes, ExpressionData = ExpressionMatrix[CompatibleGenes, ],
@@ -735,9 +736,14 @@ rRoma.R <- function(ExpressionMatrix,
     PVVectMat <- rbind(PVVectMat, PVVect)
 
     ModuleMatrix <- rbind(ModuleMatrix,
-                          c(ExpVar[1], sum(sign(SampleExpVar[1,] - ExpVar[1])==1)/nSamples,
-                            ExpVar[1]/ExpVar[2], sum(sign(SampleExpVar[2,] - ExpVar[1]/ExpVar[2])==1)/nSamples,
-                            MedianExp, sum(sign(MedianVect - MedianExp)==1)/nSamples))
+                          c(ExpVar[1],
+                            median(SampleExpVar[1,]),
+                            sum(sign(SampleExpVar[1,] - ExpVar[1])==1)/nSamples,
+                            ExpVar[1]/ExpVar[2],
+                            median(SampleExpVar[2,]),
+                            sum(sign(SampleExpVar[2,] - ExpVar[1]/ExpVar[2])==1)/nSamples,
+                            MedianExp,
+                            sum(sign(MedianVect - MedianExp)==1)/nSamples))
 
     # Compute the sign correction
 
@@ -1064,11 +1070,11 @@ rRoma.R <- function(ExpressionMatrix,
   }
 
   # Makes sure ModuleMatrix is treated as a matrix
-  if(length(ModuleMatrix) == 6){
-    dim(ModuleMatrix) <- c(1, 6)
+  if(length(ModuleMatrix) == 8){
+    dim(ModuleMatrix) <- c(1, 8)
   }
 
-  colnames(ModuleMatrix) <- c("L1", "ppv L1", "L1/L2", "ppv L1/L2", "Median Exp", "ppv Median Exp")
+  colnames(ModuleMatrix) <- c("L1", "Median L1", "ppv L1", "L1/L2", "Median L1/L2", "ppv L1/L2", "Median Exp", "ppv Median Exp")
   rownames(ModuleMatrix) <- unlist(lapply(ModuleList, "[[", "Name"))[UsedModules]
 
   # Makes sure PVVectMat is treated as a matrix
