@@ -443,6 +443,8 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
 #' @param ExpressionMatrix matrix, numeric. The expression matrix used to produce gene expression boxplot. If NULL (default), no gene expression information is reported
 #' @param LogExpression boolean, should gene expression be logtransformed?
 #' @param Selected vector, integer. The position of the genesets to plot
+#' @param FullExpDist boolean, should the all the genes be used when showing gene expression
+#' distribution (TRUE) or only the genes of the geneset under consideration (FALSE) ?
 #'
 #' @return
 #' @export
@@ -450,7 +452,7 @@ PlotGeneWeight <- function(RomaData, PlotGenes = 40,
 #' @examples
 PlotSampleProjections <- function(RomaData, PlotSamples = 40,
                                 ExpressionMatrix = NULL, LogExpression = TRUE,
-                                Selected = NULL){
+                                Selected = NULL, FullExpDist = FALSE){
   
   if(is.null(Selected)){
     Selected <- 1:nrow(RomaData$SampleMatrix)
@@ -497,7 +499,12 @@ PlotSampleProjections <- function(RomaData, PlotSamples = 40,
       
     } else {
       
-      ReshapedData <- reshape::melt(ExpressionMatrix[GeneNames, as.character(DF$Samples)])
+      if(FullExpDist){
+        ReshapedData <- reshape::melt(ExpressionMatrix[, as.character(DF$Samples)])
+      } else {
+        ReshapedData <- reshape::melt(ExpressionMatrix[GeneNames, as.character(DF$Samples)])
+      }
+      
       
       ReshapedData$X2 <- factor(as.character(ReshapedData$X2), levels = levels(DF$Samples))
       
@@ -768,7 +775,6 @@ ExploreGeneProperties <- function(
   perplexity = 30
 ){
   
-  
   VarVect <- apply(ExpressionMatrix, 1, var)
   
   if(!is.null(GroupInfo)){
@@ -793,6 +799,12 @@ ExploreGeneProperties <- function(
   VarByGroup.Melt <- reshape::melt(VarByGroup)
   colnames(VarByGroup.Melt) <- c("Gene", "Condition", "value")
   
+  if(is.factor(VarByGroup.Melt$Condition)){
+    VarByGroup.Melt$Condition <- relevel(VarByGroup.Melt$Condition, "Total")
+  } else {
+    VarByGroup.Melt$Condition <- relevel(factor(VarByGroup.Melt$Condition), "Total")
+  }
+  
   VarByGroup.Melt.Selected <- VarByGroup.Melt[VarByGroup.Melt$Gene == GeneName,]
   
   p <- ggplot2::ggplot(data = VarByGroup.Melt, mapping = ggplot2::aes(x=value, fill = Condition)) +
@@ -801,8 +813,9 @@ ExploreGeneProperties <- function(
                         mapping = ggplot2::aes(xintercept = value), color="black") +
     ggplot2::scale_x_log10() +
     ggplot2::facet_wrap(~Condition) +
-    ggplot2::labs(x = "Variance of expression", title = GeneName) +
-    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    ggplot2::labs(x = "Expression variance (line indicates the target gene)", title = GeneName) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+    ggplot2::guides(fill = "none")
   
   print(p)
   
@@ -839,6 +852,13 @@ ExploreGeneProperties <- function(
   MeanByGroup.Melt <- reshape::melt(MeanByGroup)
   colnames(MeanByGroup.Melt) <- c("Gene", "Condition", "value")
   
+  if(is.factor(MeanByGroup.Melt$Condition)){
+    MeanByGroup.Melt$Condition <- relevel(MeanByGroup.Melt$Condition, "Total")
+  } else {
+    MeanByGroup.Melt$Condition <- relevel(factor(MeanByGroup.Melt$Condition), "Total")
+  }
+  
+  
   MeanByGroup.Melt.Selected <- MeanByGroup.Melt[MeanByGroup.Melt$Gene == GeneName,]
   
   p <- ggplot2::ggplot(data = MeanByGroup.Melt, mapping = ggplot2::aes(x=value, fill = Condition)) +
@@ -846,8 +866,9 @@ ExploreGeneProperties <- function(
     ggplot2::geom_vline(data = MeanByGroup.Melt.Selected,
                         mapping = ggplot2::aes(xintercept = value), color="black") +
     ggplot2::facet_wrap(~Condition) +
-    ggplot2::labs(x = "Mean expression", title = GeneName) +
-    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    ggplot2::labs(x = "Mean expression (line indicates the target gene)", title = GeneName) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+    ggplot2::guides(fill = "none")
   
   print(p)
   
@@ -889,18 +910,23 @@ ExploreGeneProperties <- function(
     
     ToDisplay <- apply(which(ExtPWComp <= .05, arr.ind = TRUE), 1, list)
     ToDisplay <- lapply(ToDisplay, function(x){as.integer(unlist(x))})
+    ToDisplay <- ToDisplay[sapply(ToDisplay, function(x){all(x != 1)})]
   }
   
 
-  
-  
-  
+  if(is.factor(ExpData$Condition)){
+    ExpData$Condition <- relevel(ExpData$Condition, "Total")
+  } else {
+    ExpData$Condition <- relevel(factor(ExpData$Condition), "Total")
+  }
   
   
   p <- ggplot2::ggplot(data = ExpData, mapping = ggplot2::aes(y = Exp, x = Condition, fill=Condition)) + 
     ggplot2::geom_boxplot() +
     ggplot2::labs(y = "Expression", title = GeneName) +
-    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(hjust = 0.5),
+      axis.text.x = ggplot2::element_blank()) +
     ggsignif::geom_signif(comparisons = ToDisplay,
                           map_signif_level=TRUE, test = "wilcox.test", step_increase = .1)
   
@@ -974,6 +1000,10 @@ ExploreGeneProperties <- function(
   
   print(paste("Gene found in", sum(Found), "modules"))
   
+  if(sum(Found) < 1){
+    return()
+  }
+  
   WeiList <- lapply(RomaData$ModuleSummary[Found], function(x){
     x$GeneWeight * x$CorrectSign1
   })
@@ -1044,23 +1074,38 @@ ExploreGeneProperties <- function(
     
     Mod.DF <- data.frame(Mod.DF, Exp = GeneExp[Mod.DF$Sample], Groups = GroupInfo[Mod.DF$Sample])
     
+    SplDS <- split(Mod.DF, Mod.DF$variable)
+    
+    SpeCor <- sapply(SplDS, function(x){
+      cor(x$value, x$Exp, method = "spe")
+    })
+    
+    Mod.DF$Lab <- paste(as.character(Mod.DF$variable), signif(SpeCor[as.character(Mod.DF$variable)], 3), sep = " / Cor=")
+    
     p <- ggplot2::ggplot(data = Mod.DF, mapping = ggplot2::aes(x = value, y = Exp)) +
       ggplot2::geom_smooth(color = "black") +
       ggplot2::geom_point(mapping = ggplot2::aes(color = Groups)) + 
-      ggplot2::facet_wrap(~variable) +
+      ggplot2::facet_wrap(~Lab) +
       ggplot2::labs(x = "Sample Score", y = "Gene expression", title = GeneName) +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
     
-   
     
   } else {
     
     Mod.DF <- data.frame(Mod.DF, Exp = GeneExp[Mod.DF$Sample])
     
+    SplDS <- split(Mod.DF, Mod.DF$variable)
+    
+    SpeCor <- sapply(SplDS, function(x){
+      cor(x$value, x$Exp, method = "spe")
+    })
+    
+    Mod.DF$Lab <- paste(as.character(Mod.DF$variable), signif(SpeCor[as.character(Mod.DF$variable)], 3), sep = " / Cor=")
+    
     p <- ggplot2::ggplot(data = Mod.DF, mapping = ggplot2::aes(x = value, y = Exp)) +
       ggplot2::geom_smooth() + 
       ggplot2::geom_point() + 
-      ggplot2::facet_wrap(~variable) +
+      ggplot2::facet_wrap(~Lab) +
       ggplot2::labs(x = "Sample Score", y = "Gene expression", title = GeneName) +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
     
