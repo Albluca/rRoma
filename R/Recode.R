@@ -103,7 +103,7 @@ rRoma.R <- function(ExpressionMatrix,
                     FullSampleInfo = FALSE,
                     GroupPCSign = FALSE,
                     CorMethod = "pearson",
-                    PCAType = "DimensionsAreGenes",
+                    PCAType = "DimensionsAreSamples",
                     SuppressWarning = FALSE,
                     ShowParallelPB = FALSE) {
 
@@ -279,6 +279,10 @@ rRoma.R <- function(ExpressionMatrix,
     SampleCenters <- attr(ExpressionMatrix, "scaled:center")
     attr(ExpressionMatrix, "scaled:center") <- NULL
     ModulePCACenter = FALSE
+    if(PCAType == "DimensionsAreGenes"){
+      print("Fixed center is not currently implemented with PCAType = 'DimensionsAreGenes'. It will be changed to 'DimensionsAreGenes'")
+    }
+    PCAType <- "DimensionsAreSamples"
   } else {
     print("Using local center (NOT centering over genes)")
     ModulePCACenter = TRUE
